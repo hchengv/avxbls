@@ -5,10 +5,11 @@
  */
 
 #include "fields.h"
+#include "vect.h"
 
 void reciprocal_fp(vec384 out, const vec384 inp)
 {
-#if 0
+#if 1
     static const vec384 Px8 = {    /* left-aligned value of the modulus */
         TO_LIMB_T(0xcff7fffffffd5558), TO_LIMB_T(0xf55ffff58a9ffffd),
         TO_LIMB_T(0x39869507b587b120), TO_LIMB_T(0x23ba5c279c2895fb),

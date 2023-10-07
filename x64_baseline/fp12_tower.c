@@ -49,7 +49,7 @@ void redc_fp2x2(vec384x ret, const vec768x a)
 
 void mul_fp2x2(vec768x ret, const vec384x a, const vec384x b)
 {
-#if 0
+#if 1
     mul_382x(ret, a, b, BLS12_381_P);   /* +~6% in Miller loop */
 #else
     union { vec384 x[2]; vec768 x2; } t;
@@ -70,7 +70,7 @@ void mul_fp2x2(vec768x ret, const vec384x a, const vec384x b)
 
 void sqr_fp2x2(vec768x ret, const vec384x a)
 {
-#if 0
+#if 1
     sqr_382x(ret, a, BLS12_381_P);      /* +~5% in final exponentiation */
 #else
     vec384 t0, t1;

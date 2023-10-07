@@ -34,42 +34,43 @@ typedef limb_t bool_t;
  */
 # define mul_mont_384 mulx_mont_384
 # define sqr_mont_384 sqrx_mont_384
+# define mul_384 mulx_384
 # define redc_mont_384 redcx_mont_384
-// # define ct_inverse_mod_383 ctx_inverse_mod_383
+# define ct_inverse_mod_383 ctx_inverse_mod_383
 
 void mul_mont_384(vec384 ret, const vec384 a, const vec384 b,
                   const vec384 p, limb_t n0);
 void sqr_mont_384(vec384 ret, const vec384 a, const vec384 p, limb_t n0);
 void redc_mont_384(vec384 ret, const vec768 a, const vec384 p, limb_t n0);
 
-extern void add_mod_384(vec384 ret, const vec384 a, const vec384 b, const vec384 p);
+void add_mod_384(vec384 ret, const vec384 a, const vec384 b, const vec384 p);
 void sub_mod_384(vec384 ret, const vec384 a, const vec384 b, const vec384 p);
-void mul_by_8_mod_384(vec384 ret, const vec384 a, const vec384 p);
 void mul_by_3_mod_384(vec384 ret, const vec384 a, const vec384 p);
+void mul_by_8_mod_384(vec384 ret, const vec384 a, const vec384 p);
 void cneg_mod_384(vec384 ret, const vec384 a, bool_t flag, const vec384 p);
 void lshift_mod_384(vec384 ret, const vec384 a, size_t count, const vec384 p);
-// void ct_inverse_mod_383(vec768 ret, const vec384 inp, const vec384 mod,
-//                                                       const vec384 modx);
-// currently use Fermat's Little Theorem instead 
-// flt_inverse_mont_384
-void flt_inverse_mont_384(vec384 ret, const vec384 inp, const vec384 p, 
-                          limb_t n0);
+void ct_inverse_mod_383(vec768 ret, const vec384 inp, const vec384 mod,
+                                                      const vec384 modx);
 
 void mul_384(vec768 ret, const vec384 a, const vec384 b);
 
 # define mul_mont_384x mulx_mont_384x
 # define sqr_mont_384x sqrx_mont_384x
+# define mul_382x mulx_382x
+# define sqr_382x sqrx_382x
 
 void mul_mont_384x(vec384x ret, const vec384x a, const vec384x b,
                    const vec384 p, limb_t n0);
 void sqr_mont_384x(vec384x ret, const vec384x a, const vec384 p, limb_t n0);
+void mul_382x(vec768 ret[2], const vec384x a, const vec384x b, const vec384 p);
+void sqr_382x(vec768 ret[2], const vec384x a, const vec384 p);
 
 void add_mod_384x(vec384x ret, const vec384x a, const vec384x b,
-                  const vec384 p);
+                         const vec384 p);
 void sub_mod_384x(vec384x ret, const vec384x a, const vec384x b,
                   const vec384 p);
-void mul_by_8_mod_384x(vec384x ret, const vec384x a, const vec384 p);
 void mul_by_3_mod_384x(vec384x ret, const vec384x a, const vec384 p);
+void mul_by_8_mod_384x(vec384x ret, const vec384x a, const vec384 p);
 void mul_by_1_plus_i_mod_384x(vec384x ret, const vec384x a, const vec384 p);
 void add_mod_384x384(vec768 ret, const vec768 a, const vec768 b,
                      const vec384 p);
@@ -101,22 +102,37 @@ static inline void vec_cswap(void *restrict a, void *restrict b, size_t num,
 }
 
 /* ret = bit ? a : b */
+void vec_select_32(void *ret, const void *a, const void *b, bool_t sel_a);
+void vec_select_48(void *ret, const void *a, const void *b, bool_t sel_a);
+void vec_select_96(void *ret, const void *a, const void *b, bool_t sel_a);
+void vec_select_144(void *ret, const void *a, const void *b, bool_t sel_a);
+void vec_select_192(void *ret, const void *a, const void *b, bool_t sel_a);
+void vec_select_288(void *ret, const void *a, const void *b, bool_t sel_a);
 static inline void vec_select(void *ret, const void *a, const void *b,
                               size_t num, bool_t sel_a)
 {
     launder(sel_a);
-    limb_t bi;
-    volatile limb_t *rp = (limb_t *)ret;
-    const limb_t *ap = (const limb_t *)a;
-    const limb_t *bp = (const limb_t *)b;
-    limb_t xorm, mask = (limb_t)0 - sel_a;
-    size_t i;
 
-    num /= sizeof(limb_t);
+    if (num == 32)          vec_select_32(ret, a, b, sel_a);
+    else if (num == 48)     vec_select_48(ret, a, b, sel_a);
+    else if (num == 96)     vec_select_96(ret, a, b, sel_a);
+    else if (num == 144)    vec_select_144(ret, a, b, sel_a);
+    else if (num == 192)    vec_select_192(ret, a, b, sel_a);
+    else if (num == 288)    vec_select_288(ret, a, b, sel_a);
+    else {
+        limb_t bi;
+        volatile limb_t *rp = (limb_t *)ret;
+        const limb_t *ap = (const limb_t *)a;
+        const limb_t *bp = (const limb_t *)b;
+        limb_t xorm, mask = (limb_t)0 - sel_a;
+        size_t i;
 
-    for (i = 0; i < num; i++) {
-        xorm = (ap[i] ^ (bi = bp[i])) & mask;
-        rp[i] = bi ^ xorm;
+        num /= sizeof(limb_t);
+
+        for (i = 0; i < num; i++) {
+            xorm = (ap[i] ^ (bi = bp[i])) & mask;
+            rp[i] = bi ^ xorm;
+        }
     }
 }
 
@@ -133,6 +149,12 @@ static inline bool_t vec_is_zero(const void *a, size_t num)
     limb_t acc;
     size_t i;
 
+#ifndef __BLST_NO_ASM__
+    bool_t vec_is_zero_16x(const void *a, size_t num);
+    if ((num & 15) == 0)
+        return vec_is_zero_16x(a, num);
+#endif
+
     num /= sizeof(limb_t);
 
     for (acc = 0, i = 0; i < num; i++)
@@ -147,6 +169,12 @@ static inline bool_t vec_is_equal(const void *a, const void *b, size_t num)
     const limb_t *bp = (const limb_t *)b;
     limb_t acc;
     size_t i;
+
+#ifndef __BLST_NO_ASM__
+    bool_t vec_is_equal_16x(const void *a, const void *b, size_t num);
+    if ((num & 15) == 0)
+        return vec_is_equal_16x(a, b, num);
+#endif
 
     num /= sizeof(limb_t);
 
