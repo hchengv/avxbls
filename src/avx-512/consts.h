@@ -4,8 +4,9 @@
 
 #include "vect.h"
 
+
 // prime p of the base field
-const uint64_t BLS12_381_P[VNWORDS] = {
+const uint64_t BLS12_381_P[NWORDS] = {
   0xFFFFFFFFAAABULL, 0xB153FFFFB9FEULL, 0xF6241EABFFFEULL, 0x6730D2A0F6B0ULL,
   0x4B84F38512BFULL, 0x434BACD76477ULL, 0xE69A4B1BA7B6ULL, 0x1A0111EA397FULL, };
 
@@ -15,7 +16,7 @@ const uint64_t BLS12_381_P[VNWORDS] = {
   0x585370525745ULL, 0xA256EC6D77CEULL, 0xE4935C071A97ULL, 0x15F65EC3FA80ULL
 
 // {R, 0}
-const uint64_t BLS12_381_Rx[2][VNWORDS] = { { ONE_MONT_P }, { 0 }, };
+const uint64_t BLS12_381_Rx[2][NWORDS] = { { ONE_MONT_P }, { 0 }, };
 
 // w = -1/p: constant in Montgomery reduction 
 #define MONT_W 0xFFFCFFFCFFFDULL

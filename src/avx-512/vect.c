@@ -5,10 +5,10 @@
 void add_mod_384_8x1w(__m512i *r, const __m512i *a, const __m512i *b, 
                       const uint64_t *sp)
 {
-  __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
-  __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
-  __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
-  __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
+  const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+  const __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
   const __m512i p0 = VSET1(sp[0]), p1 = VSET1(sp[1]), p2 = VSET1(sp[2]);
   const __m512i p3 = VSET1(sp[3]), p4 = VSET1(sp[4]), p5 = VSET1(sp[5]);
   const __m512i p6 = VSET1(sp[6]), p7 = VSET1(sp[7]), bmask = VSET1(BMASK);
@@ -57,10 +57,10 @@ void add_mod_384_8x1w(__m512i *r, const __m512i *a, const __m512i *b,
 void sub_mod_384_8x1w(__m512i *r, const __m512i *a, const __m512i *b, 
                       const uint64_t *sp)
 {
-  __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
-  __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
-  __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
-  __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
+  const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+  const __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
   const __m512i p0 = VSET1(sp[0]), p1 = VSET1(sp[1]), p2 = VSET1(sp[2]);
   const __m512i p3 = VSET1(sp[3]), p4 = VSET1(sp[4]), p5 = VSET1(sp[5]);
   const __m512i p6 = VSET1(sp[6]), p7 = VSET1(sp[7]), bmask = VSET1(BMASK);
@@ -104,10 +104,10 @@ void sub_mod_384_8x1w(__m512i *r, const __m512i *a, const __m512i *b,
 // integer multiplication (Karatsuba)
 void mul_384_8x1w_v1(__m512i *r, const __m512i *a, const __m512i *b)
 {
-  __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
-  __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
-  __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
-  __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
+  const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+  const __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
   __m512i ta0, ta1, ta2, ta3;
   __m512i tb0, tb1, tb2, tb3;
   __m512i z0  = VZERO, z1  = VZERO, z2  = VZERO, z3  = VZERO;
@@ -261,10 +261,10 @@ void mul_384_8x1w_v1(__m512i *r, const __m512i *a, const __m512i *b)
 // integer multiplication (product-scanning)
 void mul_384_8x1w_v2(__m512i *r, const __m512i *a, const __m512i *b)
 {
-  __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
-  __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
-  __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
-  __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
+  const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+  const __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
   __m512i z0  = VZERO, z1  = VZERO, z2  = VZERO, z3  = VZERO;
   __m512i z4  = VZERO, z5  = VZERO, z6  = VZERO, z7  = VZERO;
   __m512i z8  = VZERO, z9  = VZERO, z10 = VZERO, z11 = VZERO;
@@ -360,6 +360,103 @@ void mul_384_8x1w_v2(__m512i *r, const __m512i *a, const __m512i *b)
 
   z14 = VMACLO(y13, a7, b7);
   y14 = VMACHI(y14, a7, b7);
+  y14 = VSHL(y14, BALIGN);
+
+  z15 = y14;
+
+  r[0 ] = z0 ; r[1 ] = z1 ; r[2 ] = z2 ; r[3 ] = z3 ;
+  r[4 ] = z4 ; r[5 ] = z5 ; r[6 ] = z6 ; r[7 ] = z7 ;
+  r[8 ] = z8 ; r[9 ] = z9 ; r[10] = z10; r[11] = z11;
+  r[12] = z12; r[13] = z13; r[14] = z14; r[15] = z15; 
+}
+
+// integer squaring (product-scanning)
+void sqr_384_8x1w(__m512i *r, const __m512i *a)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
+  __m512i z0  = VZERO, z1  = VZERO, z2  = VZERO, z3  = VZERO;
+  __m512i z4  = VZERO, z5  = VZERO, z6  = VZERO, z7  = VZERO;
+  __m512i z8  = VZERO, z9  = VZERO, z10 = VZERO, z11 = VZERO;
+  __m512i z12 = VZERO, z13 = VZERO, z14 = VZERO, z15 = VZERO;
+  __m512i y0  = VZERO, y1  = VZERO, y2  = VZERO, y3  = VZERO;
+  __m512i y4  = VZERO, y5  = VZERO, y6  = VZERO, y7  = VZERO;
+  __m512i y8  = VZERO, y9  = VZERO, y10 = VZERO, y11 = VZERO;
+  __m512i y12 = VZERO, y13 = VZERO, y14 = VZERO, y15 = VZERO;
+
+  z0 = VMACLO(z0, a0, a0);
+  y0 = VMACHI(y0, a0, a0);
+  y0 = VSHL(y0, BALIGN);
+
+  z1 = VMACLO(y0, a0, a1); z1 = VADD(z1, z1);
+  y1 = VMACHI(y1, a0, a1); 
+  y1 = VSHL(y1, BALIGN+1);
+
+  z2 = VMACLO(y1, a0, a2); z2 = VADD(z2, z2);       z2 = VMACLO(z2, a1, a1); 
+  y2 = VMACHI(y2, a0, a2); y2 = VADD(y2, y2);       y2 = VMACHI(y2, a1, a1);
+  y2 = VSHL(y2, BALIGN);
+
+  z3 = VMACLO(y2, a0, a3); z3 = VMACLO(z3, a1, a2); z3 = VADD(z3, z3);
+  y3 = VMACHI(y3, a0, a3); y3 = VMACHI(y3, a1, a2); 
+  y3 = VSHL(y3, BALIGN+1);
+
+  z4 = VMACLO(y3, a0, a4); z4 = VMACLO(z4, a1, a3); z4 = VADD(z4, z4);
+  z4 = VMACLO(z4, a2, a2); 
+  y4 = VMACHI(y4, a0, a4); y4 = VMACHI(y4, a1, a3); y4 = VADD(y4, y4);
+  y4 = VMACHI(y4, a2, a2); 
+  y4 = VSHL(y4, BALIGN);
+
+  z5 = VMACLO(y4, a0, a5); z5 = VMACLO(z5, a1, a4); z5 = VMACLO(z5, a2, a3);
+  z5 = VADD(z5, z5);
+  y5 = VMACHI(y5, a0, a5); y5 = VMACHI(y5, a1, a4); y5 = VMACHI(y5, a2, a3);
+  y5 = VSHL(y5, BALIGN+1);
+
+  z6 = VMACLO(y5, a0, a6); z6 = VMACLO(z6, a1, a5); z6 = VMACLO(z6, a2, a4);
+  z6 = VADD(z6, z6);       z6 = VMACLO(z6, a3, a3); 
+  y6 = VMACHI(y6, a0, a6); y6 = VMACHI(y6, a1, a5); y6 = VMACHI(y6, a2, a4);
+  y6 = VADD(y6, y6);       y6 = VMACHI(y6, a3, a3); 
+  y6 = VSHL(y6, BALIGN);
+
+  z7 = VMACLO(y6, a0, a7); z7 = VMACLO(z7, a1, a6); z7 = VMACLO(z7, a2, a5);
+  z7 = VMACLO(z7, a3, a4); z7 = VADD(z7, z7);
+  y7 = VMACHI(y7, a0, a7); y7 = VMACHI(y7, a1, a6); y7 = VMACHI(y7, a2, a5);
+  y7 = VMACHI(y7, a3, a4); 
+  y7 = VSHL(y7, BALIGN+1);
+
+  z8 = VMACLO(y7, a1, a7); z8 = VMACLO(z8, a2, a6); z8 = VMACLO(z8, a3, a5);
+  z8 = VADD(z8, z8);       z8 = VMACLO(z8, a4, a4); 
+  y8 = VMACHI(y8, a1, a7); y8 = VMACHI(y8, a2, a6); y8 = VMACHI(y8, a3, a5);
+  y8 = VADD(y8, y8);       y8 = VMACHI(y8, a4, a4); 
+  y8 = VSHL(y8, BALIGN);
+
+  z9 = VMACLO(y8, a2, a7); z9 = VMACLO(z9, a3, a6); z9 = VMACLO(z9, a4, a5);
+  z9 = VADD(z9, z9);
+  y9 = VMACHI(y9, a2, a7); y9 = VMACHI(y9, a3, a6); y9 = VMACHI(y9, a4, a5);
+  y9 = VSHL(y9, BALIGN+1);
+
+  z10 = VMACLO(y9,  a3, a7); z10 = VMACLO(z10, a4, a6);
+  z10 = VADD(z10, z10);      z10 = VMACLO(z10, a5, a5); 
+  y10 = VMACHI(y10, a3, a7); y10 = VMACHI(y10, a4, a6);
+  y10 = VADD(y10, y10);      y10 = VMACHI(y10, a5, a5); 
+  y10 = VSHL(y10, BALIGN);
+
+  z11 = VMACLO(y10, a4, a7); z11 = VMACLO(z11, a5, a6);
+  z11 = VADD(z11, z11);
+  y11 = VMACHI(y11, a4, a7); y11 = VMACHI(y11, a5, a6);
+  y11 = VSHL(y11, BALIGN+1);
+
+  z12 = VMACLO(y11, a5, a7); z12 = VADD(z12, z12);  
+  z12 = VMACLO(z12, a6, a6);
+  y12 = VMACHI(y12, a5, a7); y12 = VADD(y12, y12);
+  y12 = VMACHI(y12, a6, a6);
+  y12 = VSHL(y12, BALIGN);
+
+  z13 = VMACLO(y12, a6, a7); z13 = VADD(z13, z13);
+  y13 = VMACHI(y13, a6, a7);
+  y13 = VSHL(y13, BALIGN+1);
+
+  z14 = VMACLO(y13, a7, a7);
+  y14 = VMACHI(y14, a7, a7);
   y14 = VSHL(y14, BALIGN);
 
   z15 = y14;
