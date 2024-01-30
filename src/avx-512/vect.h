@@ -22,5 +22,7 @@ void sub_mod_384_8x1w(__m512i *r, const __m512i *a, const __m512i *b,
 void mul_384_8x1w_v1(__m512i *r, const __m512i *a, const __m512i *b);
 void mul_384_8x1w_v2(__m512i *r, const __m512i *a, const __m512i *b);
 void sqr_384_8x1w(__m512i *r, const __m512i *a);
+void redc_mont_384_8x1w(__m512i r, const __m512i *a, const uint64_t *sp, 
+                        const uint64_t n0);
 
 #endif

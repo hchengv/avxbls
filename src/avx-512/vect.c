@@ -61,8 +61,8 @@ void sub_mod_384_8x1w(__m512i *r, const __m512i *a, const __m512i *b,
   const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
   const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
   const __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
-  const __m512i p0 = VSET1(sp[0]), p1 = VSET1(sp[1]), p2 = VSET1(sp[2]);
-  const __m512i p3 = VSET1(sp[3]), p4 = VSET1(sp[4]), p5 = VSET1(sp[5]);
+  const __m512i p0 = VSET1(sp[0]), p1 = VSET1(sp[1]), p2    = VSET1(sp[2]);
+  const __m512i p3 = VSET1(sp[3]), p4 = VSET1(sp[4]), p5    = VSET1(sp[5]);
   const __m512i p6 = VSET1(sp[6]), p7 = VSET1(sp[7]), bmask = VSET1(BMASK);
   __m512i r0, r1, r2, r3, r4, r5, r6, r7, smask;
 
@@ -465,4 +465,68 @@ void sqr_384_8x1w(__m512i *r, const __m512i *a)
   r[4 ] = z4 ; r[5 ] = z5 ; r[6 ] = z6 ; r[7 ] = z7 ;
   r[8 ] = z8 ; r[9 ] = z9 ; r[10] = z10; r[11] = z11;
   r[12] = z12; r[13] = z13; r[14] = z14; r[15] = z15; 
+}
+
+// Montgomery reduction (including final reduction)
+void redc_mont_384_8x1w(__m512i r, const __m512i *a, const uint64_t *sp, 
+                        const uint64_t n0)
+{
+  __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
+  __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
+  __m512i a8  = a[8 ], a9  = a[9 ], a10 = a[10], a11 = a[11];
+  __m512i a12 = a[12], a13 = a[13], a14 = a[14], a15 = a[15];
+  __m512i y0  = VZERO, y1  = VZERO, y2  = VZERO, y3  = VZERO;
+  __m512i y4  = VZERO, y5  = VZERO, y6  = VZERO, y7  = VZERO;
+  __m512i y8  = VZERO, y9  = VZERO, y10 = VZERO, y11 = VZERO;
+  __m512i y12 = VZERO, y13 = VZERO, y14 = VZERO, y15 = VZERO;
+  const __m512i p0 = VSET1(sp[0]), p1 = VSET1(sp[1]), p2 = VSET1(sp[2]);
+  const __m512i p3 = VSET1(sp[3]), p4 = VSET1(sp[4]), p5 = VSET1(sp[5]);
+  const __m512i p6 = VSET1(sp[6]), p7 = VSET1(sp[7]), bmask = VSET1(BMASK);
+  const __m512i VN0 = VSET1(n0), zero = VZERO;
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7, smask, u;
+
+  u  = VMACLO(zero, a0, VN0);
+  a0 = VMACLO(a0, u, p0); a1 = VMACLO(a1, u, p1); a2 = VMACLO(a2, u, p2);
+  a3 = VMACLO(a3, u, p3); a4 = VMACLO(a4, u, p4); a5 = VMACLO(a5, u, p5);
+  a6 = VMACLO(a6, u, p6); a7 = VMACLO(a7, u, p7); 
+  y0 = VMACHI(y0, u, p0); y1 = VMACHI(y1, u, p1); y2 = VMACHI(y2, u, p2);
+  y3 = VMACHI(y3, u, p3); y4 = VMACHI(y4, u, p4); y5 = VMACHI(y5, u, p5);
+  y6 = VMACHI(y6, u, p6); y7 = VMACHI(y7, u, p7); 
+  a1 = VADD(VADD(a1, VSRA(a0, BRADIX)), VSHL(y0, BALIGN));
+
+  u  = VMACLO(zero, a1, VN0);
+  a1 = VMACLO(a1, u, p0); a2 = VMACLO(a2, u, p1); a3 = VMACLO(a3, u, p2);
+  a4 = VMACLO(a4, u, p3); a5 = VMACLO(a5, u, p4); a6 = VMACLO(a6, u, p5);
+  a7 = VMACLO(a7, u, p6); a8 = VMACLO(a8, u, p7); 
+  y1 = VMACHI(y1, u, p0); y2 = VMACHI(y2, u, p1); y3 = VMACHI(y3, u, p2);
+  y4 = VMACHI(y4, u, p3); y5 = VMACHI(y5, u, p4); y6 = VMACHI(y6, u, p5);
+  y7 = VMACHI(y7, u, p6); y8 = VMACHI(y8, u, p7); 
+  a2 = VADD(VADD(a2, VSRA(a1, BRADIX)), VSHL(y1, BALIGN));
+
+  u  = VMACLO(zero, a2, VN0);
+  a2 = VMACLO(a2, u, p0); a3 = VMACLO(a3, u, p1); a4 = VMACLO(a4, u, p2);
+  a5 = VMACLO(a5, u, p3); a6 = VMACLO(a6, u, p4); a7 = VMACLO(a7, u, p5);
+  a8 = VMACLO(a8, u, p6); a9 = VMACLO(a9, u, p7); 
+  y2 = VMACHI(y2, u, p0); y3 = VMACHI(y3, u, p1); y4 = VMACHI(y4, u, p2);
+  y5 = VMACHI(y5, u, p3); y6 = VMACHI(y6, u, p4); y7 = VMACHI(y7, u, p5);
+  y8 = VMACHI(y8, u, p6); y9 = VMACHI(y9, u, p7); 
+  a3 = VADD(VADD(a3, VSRA(a2, BRADIX)), VSHL(y2, BALIGN));
+
+  u  = VMACLO(zero, a3, VN0);
+  a3 = VMACLO(a3, u, p0); a4  = VMACLO(a4,  u, p1); a5 = VMACLO(a5, u, p2);
+  a6 = VMACLO(a6, u, p3); a7  = VMACLO(a7,  u, p4); a8 = VMACLO(a8, u, p5);
+  a9 = VMACLO(a9, u, p6); a10 = VMACLO(a10, u, p7); 
+  y3 = VMACHI(y3, u, p0); y4  = VMACHI(y4 , u, p1); y5 = VMACHI(y5, u, p2);
+  y6 = VMACHI(y6, u, p3); y7  = VMACHI(y7 , u, p4); y8 = VMACHI(y8, u, p5);
+  y9 = VMACHI(y9, u, p6); y10 = VMACHI(y10, u, p7); 
+  a4 = VADD(VADD(a4, VSRA(a3, BRADIX)), VSHL(y3, BALIGN));
+
+  u   = VMACLO(zero, a4, VN0);
+  a4  = VMACLO(a4 , u, p0); a5  = VMACLO(a5 , u, p1); a6 = VMACLO(a6, u, p2);
+  a7  = VMACLO(a7 , u, p3); a8  = VMACLO(a8 , u, p4); a9 = VMACLO(a9, u, p5);
+  a10 = VMACLO(a10, u, p6); a11 = VMACLO(a11, u, p7); 
+  y4  = VMACHI(y4 , u, p0); y5  = VMACHI(y5 , u, p1); y6 = VMACHI(y6, u, p2);
+  y7  = VMACHI(y7 , u, p3); y8  = VMACHI(y8 , u, p4); y9 = VMACHI(y9, u, p5);
+  y10 = VMACHI(y10, u, p6); y11 = VMACHI(y11, u, p7); 
+  a5  = VADD(VADD(a5, VSRA(a4, BRADIX)), VSHL(y4, BALIGN));
 }
