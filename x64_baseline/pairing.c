@@ -1,3 +1,7 @@
+// the original pairing.c file of blst
+
+#if 1
+
 /*
  * Copyright Supranational LLC
  * Licensed under the Apache License, Version 2.0, see LICENSE for details.
@@ -6,6 +10,12 @@
 
 #include "pairing.h"
 
+#ifdef PROFILING
+  extern uint64_t read_tsc();
+  extern uint64_t line_add_cycles;
+  extern uint64_t line_dbl_cycles;
+#endif 
+
 /*
  * Line evaluations from  https://eprint.iacr.org/2010/354.pdf
  * with a twist moving common expression to line_by_Px2.
@@ -13,6 +23,10 @@
 static void line_add(vec384fp6 line, POINTonE2 *T, const POINTonE2 *R,
                                                    const POINTonE2_affine *Q)
 {
+  #ifdef PROFILING
+    uint64_t start_cycles = read_tsc();
+  #endif
+
     vec384x Z1Z1, U2, S2, H, HH, I, J, V;
 # define r line[1]
 
@@ -64,10 +78,19 @@ static void line_add(vec384fp6 line, POINTonE2 *T, const POINTonE2 *R,
     add_fp2(line[0], I, I);          /* 2*(r*X2 - Y2*Z3) */
 # undef r
     vec_copy(line[2], T->Z, sizeof(T->Z));
+
+  #ifdef PROFILING
+    uint64_t end_cycles = read_tsc();
+    line_add_cycles += end_cycles - start_cycles;
+  #endif    
 }
 
 static void line_dbl(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q)
 {
+  #ifdef PROFILING
+    uint64_t start_cycles = read_tsc();
+  #endif
+
     vec384x ZZ, A, B, C, D, E, F;
 
     /*
@@ -114,6 +137,11 @@ static void line_dbl(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q)
     mul_fp2(line[1], E, ZZ);            /* 3*X1^2 * Z1^2 */
 
     mul_fp2(line[2], T->Z, ZZ);         /* Z3 * Z1^2 */
+
+  #ifdef PROFILING
+    uint64_t end_cycles = read_tsc();
+    line_dbl_cycles += end_cycles - start_cycles;
+  #endif     
 }
 
 static void line_by_Px2(vec384fp6 line, const POINTonE1_affine *Px2)
@@ -270,3 +298,4 @@ void optimal_ate_pairing(vec384fp12 ret, POINTonE2_affine Q[],
   final_exp(ret, f);
 }
 
+#endif

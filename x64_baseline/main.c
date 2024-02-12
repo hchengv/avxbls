@@ -7,6 +7,37 @@
 #include "point.h"
 #include "ec_ops.h"
 
+#ifdef PROFILING
+uint64_t sqr_fp12_cycles;
+uint64_t cyclotomic_sqr_fp12_cycles;
+uint64_t mul_by_xy00z0_fp12_cycles;
+
+uint64_t line_add_cycles;
+uint64_t line_dbl_cycles;
+#endif
+
+#ifdef PROFILING
+static void profiling_reset() {
+  sqr_fp12_cycles            = 0;
+  cyclotomic_sqr_fp12_cycles = 0;
+  mul_by_xy00z0_fp12_cycles  = 0;
+
+  line_add_cycles            = 0;
+  line_dbl_cycles            = 0;
+}
+
+static void profiling_dump(uint64_t total_cycles, int iter){
+  puts("");
+  printf("sqr_fp12_cycles                = %llu (%.2f%%)\n", sqr_fp12_cycles              / iter, (double)(sqr_fp12_cycles            / iter) / total_cycles*100.0f);
+  printf("cyclotomic_sqr_fp12_cycles     = %llu (%.2f%%)\n", cyclotomic_sqr_fp12_cycles   / iter, (double)(cyclotomic_sqr_fp12_cycles / iter) / total_cycles*100.0f);
+  printf("mul_by_xy00z0_fp12_cycles      = %llu (%.2f%%)\n", mul_by_xy00z0_fp12_cycles    / iter, (double)(mul_by_xy00z0_fp12_cycles  / iter) / total_cycles*100.0f);
+
+  printf("line_add_cycles                = %llu (%.2f%%)\n", line_add_cycles              / iter, (double)(line_add_cycles            / iter) / total_cycles*100.0f);
+  printf("line_dbl_cycles                = %llu (%.2f%%)\n", line_dbl_cycles              / iter, (double)(line_dbl_cycles            / iter) / total_cycles*100.0f);
+  puts("");
+}
+#endif
+
 
 // for measuring CPU cycles
 
@@ -76,7 +107,8 @@ void test_pairing()
 	srand(seed);
 
   // scalar k can be modified to be any non-0 value
-  uint64_t k[4] = { rand(), rand(), rand(), rand(), };
+  // uint64_t k[4] = { rand(), rand(), rand(), rand(), };
+  uint64_t k[4] = { 3 };
 
   // currently use _P = BLS12_381_G1 and _Q = BLS12_381_G2 and k = 2 
   // to conduct a very simple test
@@ -101,6 +133,11 @@ void test_pairing()
     printf("\x1b[31m  e1 != e2 \x1b[0m \n");
   else 
     printf("\x1b[32m  e1 == e2 \x1b[0m \n");
+
+  // print out parts of the result
+  // printf("e1[0][0][0] = ");
+  // for (int i = 6; i > 0; i-- ) printf("%016llX", e1[0][0][0][i]);
+  // printf("\n");
 
   printf("- (e(P, [k]Q))^2 == e([2k]P, Q) \n");
   // compute [2k]P 
@@ -274,18 +311,30 @@ void timing()
   POINTonE2_to_affine(Q, _Q);
 
   printf("- miller_loop:        ");
-  LOAD_CACHE(miller_loop_n(f, Q, P, 1), 1);
-  MEASURE_CYCLES(miller_loop_n(f, Q, P, 1), 10);
+  LOAD_CACHE(miller_loop_n(f, Q, P, 1), 10);
+  #ifdef PROFILING
+  profiling_reset();
+  #endif
+  MEASURE_CYCLES(miller_loop_n(f, Q, P, 1), 100);
   printf("  #cycle = %lld\n", diff_cycles);
+  #ifdef PROFILING
+  profiling_dump(diff_cycles, 100);
+  #endif
 
   printf("- final_exp:          ");
-  LOAD_CACHE(final_exp(e1, f), 1);
-  MEASURE_CYCLES(final_exp(e1, f), 10);
+  LOAD_CACHE(final_exp(e1, f), 10);
+  #ifdef PROFILING
+  profiling_reset();
+  #endif
+  MEASURE_CYCLES(final_exp(e1, f), 100);
   printf("  #cycle = %lld\n", diff_cycles);
+  #ifdef PROFILING
+  profiling_dump(diff_cycles, 100);
+  #endif
 
   printf("- optimal_ate_pairing:");
-  LOAD_CACHE(optimal_ate_pairing(e1, Q, P, 1), 1);
-  MEASURE_CYCLES(optimal_ate_pairing(e1, Q, P, 1), 10);
+  LOAD_CACHE(optimal_ate_pairing(e1, Q, P, 1), 10);
+  MEASURE_CYCLES(optimal_ate_pairing(e1, Q, P, 1), 100);
   printf("  #cycle = %lld\n", diff_cycles);
 
   printf("=============================================================\n");

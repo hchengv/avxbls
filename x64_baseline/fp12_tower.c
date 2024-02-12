@@ -6,6 +6,13 @@
 
 #include "fields.h"
 
+#ifdef PROFILING
+  extern uint64_t read_tsc();
+  extern uint64_t sqr_fp12_cycles;
+  extern uint64_t cyclotomic_sqr_fp12_cycles;
+  extern uint64_t mul_by_xy00z0_fp12_cycles;
+#endif 
+
 /*
  * Fp2  = Fp[u]  / (u^2 + 1)
  * Fp6  = Fp2[v] / (v^3 - u - 1)
@@ -276,6 +283,10 @@ static void mul_by_xy0_fp6x2(vec768fp6 ret, const vec384fp6 a,
 void mul_by_xy00z0_fp12(vec384fp12 ret, const vec384fp12 a,
                                         const vec384fp6 xy00z0)
 {
+  #ifdef PROFILING
+    uint64_t start_cycles = read_tsc();
+  #endif
+
     vec768fp6 t0, t1, rr;
     vec384fp6 t2;
 
@@ -298,10 +309,19 @@ void mul_by_xy00z0_fp12(vec384fp12 ret, const vec384fp12 a,
     add_fp2x2(rr[1], t0[1], t1[0]);
     add_fp2x2(rr[2], t0[2], t1[1]);
     redc_fp6x2(ret[0], rr);
+
+  #ifdef PROFILING
+    uint64_t end_cycles = read_tsc();
+    mul_by_xy00z0_fp12_cycles += end_cycles - start_cycles;
+  #endif
 }
 
 void sqr_fp12(vec384fp12 ret, const vec384fp12 a)
 {
+  #ifdef PROFILING
+    uint64_t start_cycles = read_tsc();
+  #endif
+
     vec384fp6 t0, t1;
 
     add_fp6(t0, a[0], a[1]);
@@ -322,6 +342,11 @@ void sqr_fp12(vec384fp12 ret, const vec384fp12 a)
     sub_fp2(ret[0][0], ret[0][0], t1[2]);
     sub_fp2(ret[0][1], ret[0][1], t1[0]);
     sub_fp2(ret[0][2], ret[0][2], t1[1]);
+
+  #ifdef PROFILING
+    uint64_t end_cycles = read_tsc();
+    sqr_fp12_cycles += end_cycles - start_cycles;
+  #endif
 }
 
 void conjugate_fp12(vec384fp12 a)
@@ -403,6 +428,10 @@ static void sqr_fp4(vec384fp4 ret, const vec384x a0, const vec384x a1)
 
 void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
 {
+  #ifdef PROFILING
+    uint64_t start_cycles = read_tsc();
+  #endif
+
     vec384fp4 t0, t1, t2;
 
     sqr_fp4(t0, a[0][0], a[1][1]);
@@ -433,6 +462,11 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
     add_fp2(ret[1][2], t1[1],     a[1][2]);
     add_fp2(ret[1][2], ret[1][2], ret[1][2]);
     add_fp2(ret[1][2], ret[1][2], t1[1]);
+
+  #ifdef PROFILING
+    uint64_t end_cycles = read_tsc();
+    cyclotomic_sqr_fp12_cycles += end_cycles - start_cycles;
+  #endif
 }
 
 /*
