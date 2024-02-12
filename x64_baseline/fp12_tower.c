@@ -9,8 +9,11 @@
 #ifdef PROFILING
   extern uint64_t read_tsc();
   extern uint64_t sqr_fp12_cycles;
+  extern uint64_t mul_fp12_cycles;
   extern uint64_t cyclotomic_sqr_fp12_cycles;
   extern uint64_t mul_by_xy00z0_fp12_cycles;
+  extern uint64_t inverse_fp12_cycles;
+  extern uint64_t frobenius_map_fp12_cycles;
 #endif 
 
 /*
@@ -219,6 +222,10 @@ static void neg_fp6(vec384fp6 ret, const vec384fp6 a)
  */
 void mul_fp12(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b)
 {
+  #ifdef PROFILING
+    uint64_t start_cycles = read_tsc();
+  #endif
+  
     vec768fp6 t0, t1, rx;
     vec384fp6 t2;
 
@@ -240,6 +247,11 @@ void mul_fp12(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b)
     add_fp2x2(rx[1], t0[1], t1[0]);
     add_fp2x2(rx[2], t0[2], t1[1]);
     redc_fp6x2(ret[0], rx);
+
+  #ifdef PROFILING
+    uint64_t end_cycles = read_tsc();
+    mul_fp12_cycles += end_cycles - start_cycles;
+  #endif    
 }
 
 static inline void mul_by_0y0_fp6x2(vec768fp6 ret, const vec384fp6 a,
@@ -390,6 +402,10 @@ static void inverse_fp6(vec384fp6 ret, const vec384fp6 a)
 
 void inverse_fp12(vec384fp12 ret, const vec384fp12 a)
 {
+  #ifdef PROFILING
+    uint64_t start_cycles = read_tsc();
+  #endif
+
     vec384fp6 t0, t1;
 
     sqr_fp6(t0, a[0]);
@@ -404,6 +420,11 @@ void inverse_fp12(vec384fp12 ret, const vec384fp12 a)
     mul_fp6(ret[0], a[0], t1);
     mul_fp6(ret[1], a[1], t1);
     neg_fp6(ret[1], ret[1]);
+
+  #ifdef PROFILING
+    uint64_t end_cycles = read_tsc();
+    inverse_fp12_cycles += end_cycles - start_cycles;
+  #endif
 }
 
 typedef vec384x vec384fp4[2];
@@ -513,6 +534,10 @@ static void frobenius_map_fp6(vec384fp6 ret, const vec384fp6 a, size_t n)
 
 void frobenius_map_fp12(vec384fp12 ret, const vec384fp12 a, size_t n)
 {
+  #ifdef PROFILING
+    uint64_t start_cycles = read_tsc();
+  #endif
+
     static const vec384x coeffs[] = {  /* (u + 1)^((P^n - 1) / 6) */
       { { TO_LIMB_T(0x07089552b319d465), TO_LIMB_T(0xc6695f92b50a8313),
           TO_LIMB_T(0x97e83cccd117228f), TO_LIMB_T(0xa35baecab2dc29ee),
@@ -537,4 +562,9 @@ void frobenius_map_fp12(vec384fp12 ret, const vec384fp12 a, size_t n)
     mul_fp2(ret[1][0], ret[1][0], coeffs[n]);
     mul_fp2(ret[1][1], ret[1][1], coeffs[n]);
     mul_fp2(ret[1][2], ret[1][2], coeffs[n]);
+
+  #ifdef PROFILING
+    uint64_t end_cycles = read_tsc();
+    frobenius_map_fp12_cycles += end_cycles - start_cycles;
+  #endif
 }

@@ -14,6 +14,7 @@
   extern uint64_t read_tsc();
   extern uint64_t line_add_cycles;
   extern uint64_t line_dbl_cycles;
+  extern uint64_t line_by_Px2_cycles;
 #endif 
 
 /*
@@ -146,11 +147,20 @@ static void line_dbl(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q)
 
 static void line_by_Px2(vec384fp6 line, const POINTonE1_affine *Px2)
 {
+  #ifdef PROFILING
+    uint64_t start_cycles = read_tsc();
+  #endif
+
     mul_fp(line[1][0], line[1][0], Px2->X);   /* "b01" *= -2*P->X */
     mul_fp(line[1][1], line[1][1], Px2->X);
 
     mul_fp(line[2][0], line[2][0], Px2->Y);   /* "b11" *= 2*P->Y */
     mul_fp(line[2][1], line[2][1], Px2->Y);
+
+  #ifdef PROFILING
+    uint64_t end_cycles = read_tsc();
+    line_by_Px2_cycles += end_cycles - start_cycles;
+  #endif 
 }
 
 static void start_dbl_n(vec384fp12 ret, POINTonE2 T[],

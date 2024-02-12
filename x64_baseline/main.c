@@ -9,31 +9,44 @@
 
 #ifdef PROFILING
 uint64_t sqr_fp12_cycles;
+uint64_t mul_fp12_cycles;
 uint64_t cyclotomic_sqr_fp12_cycles;
 uint64_t mul_by_xy00z0_fp12_cycles;
+uint64_t inverse_fp12_cycles;
+uint64_t frobenius_map_fp12_cycles;
 
 uint64_t line_add_cycles;
 uint64_t line_dbl_cycles;
+uint64_t line_by_Px2_cycles;
 #endif
 
 #ifdef PROFILING
 static void profiling_reset() {
   sqr_fp12_cycles            = 0;
+  mul_fp12_cycles            = 0;
   cyclotomic_sqr_fp12_cycles = 0;
   mul_by_xy00z0_fp12_cycles  = 0;
+  inverse_fp12_cycles        = 0;
+  frobenius_map_fp12_cycles  = 0;
 
   line_add_cycles            = 0;
   line_dbl_cycles            = 0;
+  line_by_Px2_cycles         = 0;
 }
 
 static void profiling_dump(uint64_t total_cycles, int iter){
   puts("");
   printf("sqr_fp12_cycles                = %llu (%.2f%%)\n", sqr_fp12_cycles              / iter, (double)(sqr_fp12_cycles            / iter) / total_cycles*100.0f);
+  printf("mul_fp12_cycles                = %llu (%.2f%%)\n", mul_fp12_cycles              / iter, (double)(mul_fp12_cycles            / iter) / total_cycles*100.0f);
   printf("cyclotomic_sqr_fp12_cycles     = %llu (%.2f%%)\n", cyclotomic_sqr_fp12_cycles   / iter, (double)(cyclotomic_sqr_fp12_cycles / iter) / total_cycles*100.0f);
   printf("mul_by_xy00z0_fp12_cycles      = %llu (%.2f%%)\n", mul_by_xy00z0_fp12_cycles    / iter, (double)(mul_by_xy00z0_fp12_cycles  / iter) / total_cycles*100.0f);
+  printf("inverse_fp12_cycles            = %llu (%.2f%%)\n", inverse_fp12_cycles          / iter, (double)(inverse_fp12_cycles        / iter) / total_cycles*100.0f);
+  printf("frobenius_map_fp12_cycles      = %llu (%.2f%%)\n", frobenius_map_fp12_cycles    / iter, (double)(frobenius_map_fp12_cycles  / iter) / total_cycles*100.0f);
 
   printf("line_add_cycles                = %llu (%.2f%%)\n", line_add_cycles              / iter, (double)(line_add_cycles            / iter) / total_cycles*100.0f);
   printf("line_dbl_cycles                = %llu (%.2f%%)\n", line_dbl_cycles              / iter, (double)(line_dbl_cycles            / iter) / total_cycles*100.0f);
+  printf("line_by_Px2_cycles             = %llu (%.2f%%)\n", line_by_Px2_cycles           / iter, (double)(line_by_Px2_cycles         / iter) / total_cycles*100.0f);
+
   puts("");
 }
 #endif
