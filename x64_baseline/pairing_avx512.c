@@ -1,6 +1,6 @@
 // the original pairing.c file of blst
 
-#if 0
+#if 1
 
 /*
  * Copyright Supranational LLC

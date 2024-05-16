@@ -148,9 +148,9 @@ void test_pairing()
     printf("\x1b[32m  e1 == e2 \x1b[0m \n");
 
   // print out parts of the result
-  // printf("e1[0][0][0] = ");
-  // for (int i = 6; i > 0; i-- ) printf("%016llX", e1[0][0][0][i]);
-  // printf("\n");
+  printf("e1[0][0][0] = ");
+  for (int i = 6; i > 0; i-- ) printf("%016llX", e1[0][0][0][i]);
+  printf("\n");
 
   printf("- (e(P, [k]Q))^2 == e([2k]P, Q) \n");
   // compute [2k]P 
