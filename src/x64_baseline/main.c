@@ -121,7 +121,10 @@ void test_pairing()
 
   // scalar k can be modified to be any non-0 value
   // uint64_t k[4] = { rand(), rand(), rand(), rand(), };
-  uint64_t k[4] = { 3 };
+  // uint64_t k[4] = { 3 };
+  uint64_t k[4] = {
+    0x0123456789ABCDEF, 0x89ABCDEF01234567, 
+    0x0123456789ABCDEF, 0x89ABCDEF01234567, };
 
   // currently use _P = BLS12_381_G1 and _Q = BLS12_381_G2 and k = 2 
   // to conduct a very simple test

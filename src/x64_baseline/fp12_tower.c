@@ -457,50 +457,9 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
 
     vec384fp4 t0, t1, t2;
 
-    // sqr_fp4(t0, a[0][0], a[1][1]);
-    // sqr_fp4(t1, a[1][0], a[0][2]);
-    // sqr_fp4(t2, a[0][1], a[1][2]);
-
-    vec768x s0, s1, s2, s3, s4, s5, s6, s7, s8;
-
-    sqr_fp2x2(s0, a[0][0]);
-    sqr_fp2x2(s1, a[1][1]);
-    add_fp2(t0[1], a[0][0], a[1][1]);
-
-    mul_by_u_plus_1_fp2x2(s2, s1);
-    add_fp2x2(s2, s2, s0);
-    redc_fp2x2(t0[0], s2);
-
-    sqr_fp2x2(s2, t0[1]);
-    sub_fp2x2(s2, s2, s0);
-    sub_fp2x2(s2, s2, s1);
-    redc_fp2x2(t0[1], s2);
-
-    sqr_fp2x2(s3, a[1][0]);
-    sqr_fp2x2(s4, a[0][2]);
-    add_fp2(t1[1], a[1][0], a[0][2]);
-
-    mul_by_u_plus_1_fp2x2(s5, s4);
-    add_fp2x2(s5, s5, s3);
-    redc_fp2x2(t1[0], s5);
-
-    sqr_fp2x2(s5, t1[1]);
-    sub_fp2x2(s5, s5, s3);
-    sub_fp2x2(s5, s5, s4);
-    redc_fp2x2(t1[1], s5);
-
-    sqr_fp2x2(s6, a[0][1]);
-    sqr_fp2x2(s7, a[1][2]);
-    add_fp2(t2[1], a[0][1], a[1][2]);
-
-    mul_by_u_plus_1_fp2x2(s8, s7);
-    add_fp2x2(s8, s8, s6);
-    redc_fp2x2(t2[0], s8);
-
-    sqr_fp2x2(s8, t2[1]);
-    sub_fp2x2(s8, s8, s6);
-    sub_fp2x2(s8, s8, s7);
-    redc_fp2x2(t2[1], s8);    
+    sqr_fp4(t0, a[0][0], a[1][1]);
+    sqr_fp4(t1, a[1][0], a[0][2]);
+    sqr_fp4(t2, a[0][1], a[1][2]);
 
     sub_fp2(ret[0][0], t0[0],     a[0][0]);
     add_fp2(ret[0][0], ret[0][0], ret[0][0]);
