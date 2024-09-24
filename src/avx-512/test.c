@@ -15,6 +15,11 @@
 0xABCDEF0123456789, 0xABCDEF0123456789, 0xABCDEF0123456789, \
 0xABCDEF0123456789, 0xABCDEF0123456789, 0x19CDEF0123456789
 
+// f := 0x19FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+#define TV_F \
+0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, \
+0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0x19FFFFFFFFFFFFFF,
+
 // ----------------------------------------------------------------------------
 
 void fp_test()
@@ -41,13 +46,13 @@ void fp_test()
   add_fp_8x1w(r_8x1w, a_8x1w, b_8x1w);
   get_channel_8x1w(r48, r_8x1w, 0);
   mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
-  mpi_print("* add_fp_8x1w R: ", r64, SWORDS);
+  mpi_print("* add_fp_8x1w result = 0x", r64, SWORDS);
 
   add_fp_4x2w(r_4x2w, a_4x2w, b_4x2w);
   get_channel_4x2w(r48, r_4x2w, 0);
   mpi48_carryp(r48);
   mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
-  mpi_print("* add_fp_4x2w R: ", r64, SWORDS);
+  mpi_print("* add_fp_4x2w result = 0x", r64, SWORDS);
 
 }
 

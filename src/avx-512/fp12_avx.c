@@ -59,10 +59,10 @@ static void add_mod_384_4x2w(__m512i *r, const __m512i *a, const __m512i *b, con
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
   const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
-  const __m512i p0 = VSET(sp[0], sp[4], sp[0], sp[4], sp[0], sp[4], sp[0], sp[4]);
-  const __m512i p1 = VSET(sp[1], sp[5], sp[1], sp[5], sp[1], sp[5], sp[1], sp[5]);
-  const __m512i p2 = VSET(sp[2], sp[6], sp[2], sp[6], sp[2], sp[6], sp[2], sp[6]);
-  const __m512i p3 = VSET(sp[3], sp[7], sp[3], sp[7], sp[3], sp[7], sp[3], sp[7]);
+  const __m512i p0 = VSET(sp[4], sp[0], sp[4], sp[0], sp[4], sp[0], sp[4], sp[0]);
+  const __m512i p1 = VSET(sp[5], sp[1], sp[5], sp[1], sp[5], sp[1], sp[5], sp[1]);
+  const __m512i p2 = VSET(sp[6], sp[2], sp[6], sp[2], sp[6], sp[2], sp[6], sp[2]);
+  const __m512i p3 = VSET(sp[7], sp[3], sp[7], sp[3], sp[7], sp[3], sp[7], sp[3]);
   const __m512i bmask = VSET1(BMASK); 
   __m512i r0, r1, r2, r3, smask, t0;
 
