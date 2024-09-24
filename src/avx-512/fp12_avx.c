@@ -131,16 +131,16 @@ void assa_fp2_4x2x1w(__m512i *r, const __m512i *a, const __m512i *b)
   __m512i t0, t1, t2, t3, t4, t5, t6, t7;
 
   // r = D1+H1 | D0+H0 | C1 | C0 | B1 | B0 | A1+E1 | A0+E0
-  r0 = VMADD(a0, 0x3C, a0, b0); r1 = VMADD(a1, 0x3C, a1, b1);
-  r2 = VMADD(a2, 0x3C, a2, b2); r3 = VMADD(a3, 0x3C, a3, b3);
-  r4 = VMADD(a4, 0x3C, a4, b4); r5 = VMADD(a5, 0x3C, a5, b5);
-  r6 = VMADD(a6, 0x3C, a6, b6); r7 = VMADD(a7, 0x3C, a7, b7);
+  r0 = VMADD(a0, 0xC3, a0, b0); r1 = VMADD(a1, 0xC3, a1, b1);
+  r2 = VMADD(a2, 0xC3, a2, b2); r3 = VMADD(a3, 0xC3, a3, b3);
+  r4 = VMADD(a4, 0xC3, a4, b4); r5 = VMADD(a5, 0xC3, a5, b5);
+  r6 = VMADD(a6, 0xC3, a6, b6); r7 = VMADD(a7, 0xC3, a7, b7);
 
   // t = p | p | G1 | G0 | F1 | F0 | p | p
-  t0 = VMBLEND(0x3C, b0, p0); t1 = VMBLEND(0x3C, b1, p1);
-  t2 = VMBLEND(0x3C, b2, p2); t3 = VMBLEND(0x3C, b3, p3);
-  t4 = VMBLEND(0x3C, b4, p4); t5 = VMBLEND(0x3C, b5, p5);
-  t6 = VMBLEND(0x3C, b6, p6); t7 = VMBLEND(0x3C, b7, p7); 
+  t0 = VMBLEND(0xC3, b0, p0); t1 = VMBLEND(0xC3, b1, p1);
+  t2 = VMBLEND(0xC3, b2, p2); t3 = VMBLEND(0xC3, b3, p3);
+  t4 = VMBLEND(0xC3, b4, p4); t5 = VMBLEND(0xC3, b5, p5);
+  t6 = VMBLEND(0xC3, b6, p6); t7 = VMBLEND(0xC3, b7, p7); 
 
   // r = D1+H1-p | D0+H0-p | C1-G1 | C0-G0 | B1-F1 | B0-F0 | A1+E1-p | A0+E0-p
   r0 = VSUB(r0, t0); r1 = VSUB(r1, t1); r2 = VSUB(r2, t2); r3 = VSUB(r3, t3);
@@ -196,16 +196,16 @@ void cyclotomic_sqr_fp12_vec(__m512i *ra, __m512i *rbc, const __m512i *a, const 
 
   // compute A in 1x2x2x2w 
   // a = z1 | z0
-  sqr_fp4_1x2x2x2w(ta, a);              //        t1 |        t0      
-  as_fp2_2x2x2w(ra, ta, a);             //     t1+z1 |     t0-z0     
+  // sqr_fp4_1x2x2x2w(ta, a);              //        t1 |        t0      
+  // as_fp2_2x2x2w(ra, ta, a);             //     t1+z1 |     t0-z0     
   add_fp2_2x2x2w(ra, ra, ra);           // 2*(t1+z1) | 2*(t0-z0) 
   add_fp2_2x2x2w(ra, ra, ta);           // 3*t1+2*z1 | 3*t0-2*z0
 
   // compute B and C in 2x2x2x1w
   // bc = z5 | z4 | z3 | z2
-  sqr_fp4_2x2x2x1w(tbc, bc);            //              t3 |        t2 |       t1  |              t0 
-  mul_by_u_plus_1_fp2_1w();             //        t3*(u+1)
-  some_permute(tbc, tbc);               //              t1 |        t0 |       t2  |        t3*(u+1)
+  // sqr_fp4_2x2x2x1w(tbc, bc);            //              t3 |        t2 |       t1  |              t0 
+  // mul_by_u_plus_1_fp2_1w();             //        t3*(u+1)
+  // some_permute(tbc, tbc);               //              t1 |        t0 |       t2  |        t3*(u+1)
   assa_fp2_4x2x1w(rbc, tbc, bc);        //           t1+z5 |     t0-z4 |    t2-z3  |     t3*(u+1)+z2
   add_fp2_4x2x1w(rbc, rbc, rbc);        //       2*(t1+z5) | 2*(t0-z4) | 2*(t2-z3) | 2*(t3*(u+1)+z2)
   add_fp2_4x2x1w(rbc, rbc, tbc);        //       3*t1+2*z5 | 3*t0-2*z4 | 3*t2-2*z3 | 3*t3*(u+1)+2*z2
