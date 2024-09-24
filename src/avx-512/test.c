@@ -92,10 +92,10 @@ void fp2_test()
   mpi48_carryp(r48);
   mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
   mpi_print("* as_fp2_2x2x2w r0 = 0x", r64, SWORDS);
-  get_channel_4x2w(r48, r_2x2x2w, 2);
+  get_channel_4x2w(r48, r_2x2x2w, 4);
   mpi48_carryp(r48);
   mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
-  mpi_print("* as_fp2_2x2x2w r2 = 0x", r64, SWORDS);
+  mpi_print("* as_fp2_2x2x2w r4 = 0x", r64, SWORDS);
 }
 
 // ----------------------------------------------------------------------------
