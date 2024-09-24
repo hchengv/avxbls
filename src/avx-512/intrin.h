@@ -6,6 +6,7 @@
 
 // integer arithmetic (AVX-512IFMA)
 #define VADD(X, Y)            _mm512_add_epi64(X, Y)
+#define VMADD(W, X, Y, Z)     _mm512_mask_add_epi64(W, X, Y, Z)
 #define VSUB(X, Y)            _mm512_sub_epi64(X, Y)
 #define VMACLO(X, Y, Z)       _mm512_madd52lo_epu64(X, Y, Z)
 #define VMACHI(X, Y, Z)       _mm512_madd52hi_epu64(X, Y, Z)
@@ -28,6 +29,7 @@
 
 // permutation (256/512-bit, intra) & shuffle (128-bit) & blend
 #define VSHUF(X, Y)           _mm512_shuffle_epi32(X, Y)
+#define VZSHUF(X, Y, Z)       _mm512_maskz_shuffle_epi32(X, Y, Z)
 #define VPERM(X, Y)           _mm512_permutex_epi64(X, Y)
 #define VPERMV(X, Y)          _mm512_permutexvar_epi64(X, Y)
 #define VMBLEND(X, Y, Z)      _mm512_mask_blend_epi64(X, Y, Z)

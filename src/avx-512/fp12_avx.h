@@ -11,6 +11,7 @@
 #define BRADIX  48
 #define NWORDS  8
 #define VWORDS  4 // NWORDS / 2
+#define SWORDS  6
 #define BMASK   0xFFFFFFFFFFFFULL
 #define BALIGN  4 // 52 (AVX-512IFMA) - 48 (BRADIX) = 4 
 
@@ -31,10 +32,10 @@ static uint64_t BLS12_381_P_R48[NWORDS] = {
 #define MONT_W_R48 0xFFFCFFFCFFFDULL
 
 // ----------------------------------------------------------------------------
-// prototypes: modular operations
+// prototypes: Fp operations
 
 void add_fp_8x1w(__m512i *r, const __m512i *a, const __m512i *b);
-
+void add_fp_4x2w(__m512i *r, const __m512i *a, const __m512i *b);
 
 // ----------------------------------------------------------------------------
 // utils 
@@ -47,7 +48,6 @@ static void mpi_print(const char *c, const uint64_t *a, int len)
   for (i = len-1; i > 0; i--) printf("%016lX", a[i]);
   printf("%016lX\n", a[0]);
 }
-
 
 static void mpi_conv_64to48(uint64_t *r, const uint64_t *a, int rlen, int alen)
 {
@@ -95,6 +95,16 @@ static void mpi_conv_48to64(uint64_t *r, const uint64_t *a, int rlen, int alen)
   for (; i < rlen; i++) r[i] = 0;
 }
 
+static void mpi48_carryp(uint64_t *a)
+{
+  int i;
+
+  for (i = 0; i < NWORDS-1; i++) {
+    a[i+1] += a[i]>>BRADIX;
+    a[i] &= BMASK;
+  }
+}
+
 static void get_channel_8x1w(uint64_t *r, const __m512i *a, const int ch) 
 {
   int i;
@@ -104,7 +114,17 @@ static void get_channel_8x1w(uint64_t *r, const __m512i *a, const int ch)
   }
 }
 
+static void get_channel_4x2w(uint64_t *r, const __m512i *a, const int ch) 
+{
+  int i;
 
+  for(i = 0; i < VWORDS; i++) {
+    r[i] = ((uint64_t *)&a[i])[ch];
+    r[i+VWORDS] = ((uint64_t *)&a[i])[ch+1];
+  }
+}
+
+// ----------------------------------------------------------------------------
 
 #endif
 

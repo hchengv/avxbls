@@ -19,24 +19,36 @@
 
 void fp_test()
 {
-  uint64_t a64[6] = { TV_A }, b64[6] = { TV_B }, r64[6] = { 0 };
+  uint64_t a64[SWORDS] = { TV_A }, b64[SWORDS] = { TV_B }, r64[SWORDS];
   uint64_t a48[NWORDS], b48[NWORDS], r48[NWORDS];
   __m512i a_8x1w[NWORDS], b_8x1w[NWORDS], r_8x1w[NWORDS];
+  __m512i a_4x2w[VWORDS], b_4x2w[VWORDS], r_4x2w[VWORDS];
   int i;
 
-  mpi_conv_64to48(a48, a64, NWORDS, 6);
-  mpi_conv_64to48(b48, b64, NWORDS, 6);
+  mpi_conv_64to48(a48, a64, NWORDS, SWORDS);
+  mpi_conv_64to48(b48, b64, NWORDS, SWORDS);
 
   for (i = 0; i < NWORDS; i++) {
     a_8x1w[i] = VSET1(a48[i]);
     b_8x1w[i] = VSET1(b48[i]);
   }
 
+  for (i = 0; i < VWORDS; i++) {
+    a_4x2w[i] = VSET(0, 0, 0, 0, 0, 0, a48[i+VWORDS], a48[i]);
+    b_4x2w[i] = VSET(0, 0, 0, 0, 0, 0, b48[i+VWORDS], b48[i]);
+  }
+
   add_fp_8x1w(r_8x1w, a_8x1w, b_8x1w);
   get_channel_8x1w(r48, r_8x1w, 0);
+  mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
+  mpi_print("* add_fp_8x1w R: ", r64, SWORDS);
 
-  mpi_conv_48to64(r64, r48, 6, NWORDS);
-  mpi_print("* add_fp_8x1w R: ", r64, 6);
+  add_fp_4x2w(r_4x2w, a_4x2w, b_4x2w);
+  get_channel_4x2w(r48, r_4x2w, 0);
+  mpi48_carryp(r48);
+  mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
+  mpi_print("* add_fp_4x2w R: ", r64, SWORDS);
+
 }
 
 // ----------------------------------------------------------------------------
