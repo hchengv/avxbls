@@ -46,14 +46,40 @@ void fp_test()
   add_fp_8x1w(r_8x1w, a_8x1w, b_8x1w);
   get_channel_8x1w(r48, r_8x1w, 0);
   mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
-  mpi_print("* add_fp_8x1w result = 0x", r64, SWORDS);
+  mpi_print("* add_fp_8x1w r0 = 0x", r64, SWORDS);
 
   add_fp_4x2w(r_4x2w, a_4x2w, b_4x2w);
   get_channel_4x2w(r48, r_4x2w, 0);
   mpi48_carryp(r48);
   mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
-  mpi_print("* add_fp_4x2w result = 0x", r64, SWORDS);
+  mpi_print("* add_fp_4x2w r0 = 0x", r64, SWORDS);
 
+}
+
+// ----------------------------------------------------------------------------
+
+void fp2_test()
+{
+  uint64_t a64[SWORDS] = { TV_A }, b64[SWORDS] = { TV_B }, r64[SWORDS];
+  uint64_t a48[NWORDS], b48[NWORDS], r48[NWORDS];
+  __m512i a_4x2x1w[NWORDS], b_4x2x1w[NWORDS], r_4x2x1w[NWORDS];
+  int i;
+
+  mpi_conv_64to48(a48, a64, NWORDS, SWORDS);
+  mpi_conv_64to48(b48, b64, NWORDS, SWORDS);
+
+  for (i = 0; i < NWORDS; i++) {
+    a_4x2x1w[i] = VSET1(a48[i]);
+    b_4x2x1w[i] = VSET1(b48[i]);
+  }
+
+  assa_fp2_4x2x1w(r_4x2x1w, a_4x2x1w, b_4x2x1w);
+  get_channel_8x1w(r48, r_4x2x1w, 0);
+  mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
+  mpi_print("* assa_fp2_4x2x1w r0 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r_4x2x1w, 2);
+  mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
+  mpi_print("* assa_fp2_4x2x1w r2 = 0x", r64, SWORDS);
 }
 
 // ----------------------------------------------------------------------------
@@ -61,6 +87,7 @@ void fp_test()
 int main()
 {
   fp_test();
+  fp2_test();
 
   return 0;
 }

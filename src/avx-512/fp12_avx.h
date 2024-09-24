@@ -19,7 +19,7 @@
 // p := 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab;
 
 // prime p of the base field
-static uint64_t BLS12_381_P_R48[NWORDS] = {
+static uint64_t P48[NWORDS] = {
   0xFFFFFFFFAAABULL, 0xB153FFFFB9FEULL, 0xF6241EABFFFEULL, 0x6730D2A0F6B0ULL,
   0x4B84F38512BFULL, 0x434BACD76477ULL, 0xE69A4B1BA7B6ULL, 0x1A0111EA397FULL, };
 
@@ -36,6 +36,11 @@ static uint64_t BLS12_381_P_R48[NWORDS] = {
 
 void add_fp_8x1w(__m512i *r, const __m512i *a, const __m512i *b);
 void add_fp_4x2w(__m512i *r, const __m512i *a, const __m512i *b);
+
+// ----------------------------------------------------------------------------
+// prototypes: Fp2 operations
+
+void assa_fp2_4x2x1w(__m512i *r, const __m512i *a, const __m512i *b);
 
 // ----------------------------------------------------------------------------
 // utils 
