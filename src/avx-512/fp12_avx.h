@@ -15,10 +15,10 @@
 #define BALIGN  4 // 52 (AVX-512IFMA) - 48 (BRADIX) = 4 
 
 // ----------------------------------------------------------------------------
-// p := 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab
+// p := 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab;
 
 // prime p of the base field
-const uint64_t BLS12_381_P_R48[NWORDS] = {
+static uint64_t BLS12_381_P_R48[NWORDS] = {
   0xFFFFFFFFAAABULL, 0xB153FFFFB9FEULL, 0xF6241EABFFFEULL, 0x6730D2A0F6B0ULL,
   0x4B84F38512BFULL, 0x434BACD76477ULL, 0xE69A4B1BA7B6ULL, 0x1A0111EA397FULL, };
 
@@ -59,7 +59,7 @@ static void mpi_conv_64to48(uint64_t *r, const uint64_t *a, int rlen, int alen)
   temp = 0;
   while ((i < rlen) && (j < alen)) {
     word = ((temp >> shr_pos) | (a[j] << shl_pos));
-    r[i] = (word & VBMASK);
+    r[i] = (word & BMASK);
     shr_pos -= 16, shl_pos += 16;
     if ((shr_pos > 0) && (shl_pos < 64)) temp = a[j++];
     if (shr_pos <= 0) shr_pos += 64;
@@ -68,7 +68,7 @@ static void mpi_conv_64to48(uint64_t *r, const uint64_t *a, int rlen, int alen)
     if (shr_pos == 64) temp = 0;
     i++;
   }
-  if (i < rlen) r[i++] = ((temp >> shr_pos) & VBMASK);
+  if (i < rlen) r[i++] = ((temp >> shr_pos) & BMASK);
   for (; i < rlen; i++) r[i] = 0;
 }
 

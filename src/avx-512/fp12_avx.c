@@ -14,7 +14,7 @@ static void add_mod_384_8x1w(__m512i *r, const __m512i *a, const __m512i *b, con
   const __m512i p0 = VSET1(sp[0]), p1 = VSET1(sp[1]), p2 = VSET1(sp[2]);
   const __m512i p3 = VSET1(sp[3]), p4 = VSET1(sp[4]), p5 = VSET1(sp[5]);
   const __m512i p6 = VSET1(sp[6]), p7 = VSET1(sp[7]), bmask = VSET1(BMASK);
-  __m512i r0, r1, r2, r3, r4, r5, r6, r7, smask;
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7, smask, t0;
 
   // r = a + b
   r0 = VADD(a0, b0); r1 = VADD(a1, b1); r2 = VADD(a2, b2); r3 = VADD(a3, b3);
@@ -25,17 +25,17 @@ static void add_mod_384_8x1w(__m512i *r, const __m512i *a, const __m512i *b, con
   r4 = VSUB(r4, p4); r5 = VSUB(r5, p5); r6 = VSUB(r6, p6); r7 = VSUB(r7, p7);
 
   // get sign mask 
-  r1 = VADD(r1, VSRA(r0, BRADIX));
-  r2 = VADD(r2, VSRA(r1, BRADIX));
-  r3 = VADD(r3, VSRA(r2, BRADIX));
-  r4 = VADD(r4, VSRA(r3, BRADIX));
-  r5 = VADD(r5, VSRA(r4, BRADIX));
-  r6 = VADD(r6, VSRA(r5, BRADIX));
-  r7 = VADD(r7, VSRA(r6, BRADIX));
+  t0 = VADD(r1, VSRA(r0, BRADIX));
+  t0 = VADD(r2, VSRA(t0, BRADIX));
+  t0 = VADD(r3, VSRA(t0, BRADIX));
+  t0 = VADD(r4, VSRA(t0, BRADIX));
+  t0 = VADD(r5, VSRA(t0, BRADIX));
+  t0 = VADD(r6, VSRA(t0, BRADIX));
+  t0 = VADD(r7, VSRA(t0, BRADIX));
 
   // if r is non-negative, smask = all-0 
   // if r is     negative, smask = all-1
-  smask = VSRA(r7, 63);
+  smask = VSRA(t0, 63);
   // r = r + (p & smask)
   r0 = VADD(r0, VAND(p0, smask)); r1 = VADD(r1, VAND(p1, smask)); 
   r2 = VADD(r2, VAND(p2, smask)); r3 = VADD(r3, VAND(p3, smask)); 
@@ -76,26 +76,26 @@ static void add_fp2_4x2x1w(__m512i *r, const __m512i *a, const __m512i *b)
 // Fp12 operations
 
 // To understand the comments, see Listing 21 in "Guide to Pairing-Based Cryptography". 
-void cyclotomic_sqr_fp12_vec(__m512i *ra, __m512i *rbc, const __m512i *a, const __m512i *bc)
-{
-  __m512i ta[VWORDS], tbc[NWORDS]; 
+// void cyclotomic_sqr_fp12_vec(__m512i *ra, __m512i *rbc, const __m512i *a, const __m512i *bc)
+// {
+//   __m512i ta[VWORDS], tbc[NWORDS]; 
 
-  // compute A in 1x2x2x2w 
-  // a: z0 | z1 
-  sqr_fp4_1x2x2x2w(ta, a);              //        t0 |        t1
-  mix_sa_fp2_2x2x2w(ra, ta, a);         //     t0-z0 |     t1+z1
-  add_fp2_2x2x2w(ra, ra, ra);           // 2*(t0-z0) | 2*(t1+z1)
-  add_fp2_2x2x2w(ra, ra, ta);           // 3*t0-2*z0 | 3*t1+2*z1
+//   // compute A in 1x2x2x2w 
+//   // a: z0 | z1 
+//   sqr_fp4_1x2x2x2w(ta, a);              //        t0 |        t1
+//   mix_sa_fp2_2x2x2w(ra, ta, a);         //     t0-z0 |     t1+z1
+//   add_fp2_2x2x2w(ra, ra, ra);           // 2*(t0-z0) | 2*(t1+z1)
+//   add_fp2_2x2x2w(ra, ra, ta);           // 3*t0-2*z0 | 3*t1+2*z1
 
-  // compute B and C in 2x2x2x1w
-  // bc: z2 | z3 | z4 | z5
-  sqr_fp4_2x2x2x1w(tbc, bc);            //              t0 |        t1 |        t2 |        t3 
-  mul_by_u_plus_1_fp2_1w();             //                                             t3*(u+1)
-  some_permute(tbc, tbc);               //     t3*(u+1)    |        t2 |        t0 |        t1
-  mix_assa_fp2_4x2x1w(rbc, tbc, bc);    //     t3*(u+1)+z2 |     t2-z3 |     t0-z4 |     t1+z5 
-  add_fp2_4x2x1w(rbc, rbc, rbc);        // 2*(t3*(u+1)+z2) | 2*(t2-z3) | 2*(t0-z4) | 2*(t1+z5)
-  add_fp2_4x2x1w(rbc, rbc, tbc);        // 3*t3*(u+1)+2*z2 | 3*t2-2*z3 | 3*t0-2*z4 | 3*t1+2*z5 
-}
+//   // compute B and C in 2x2x2x1w
+//   // bc: z2 | z3 | z4 | z5
+//   sqr_fp4_2x2x2x1w(tbc, bc);            //              t0 |        t1 |        t2 |        t3 
+//   mul_by_u_plus_1_fp2_1w();             //                                             t3*(u+1)
+//   some_permute(tbc, tbc);               //     t3*(u+1)    |        t2 |        t0 |        t1
+//   mix_assa_fp2_4x2x1w(rbc, tbc, bc);    //     t3*(u+1)+z2 |     t2-z3 |     t0-z4 |     t1+z5 
+//   add_fp2_4x2x1w(rbc, rbc, rbc);        // 2*(t3*(u+1)+z2) | 2*(t2-z3) | 2*(t0-z4) | 2*(t1+z5)
+//   add_fp2_4x2x1w(rbc, rbc, tbc);        // 3*t3*(u+1)+2*z2 | 3*t2-2*z3 | 3*t0-2*z4 | 3*t1+2*z5 
+// }
 
 // ----------------------------------------------------------------------------
 
