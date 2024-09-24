@@ -24,10 +24,19 @@ void fp_test()
   __m512i a_8x1w[NWORDS], b_8x1w[NWORDS], r_8x1w[NWORDS];
   int i;
 
+  mpi_conv_64to48(a48, a64, NWORDS, 6);
+  mpi_conv_64to48(b48, b64, NWORDS, 6);
+
+  for (i = 0; i < NWORDS; i++) {
+    a_8x1w[i] = VSET1(a48[i]);
+    b_8x1w[i] = VSET1(b48[i]);
+  }
 
   add_fp_8x1w(r_8x1w, a_8x1w, b_8x1w);
+  get_channel_8x1w(r48, r_8x1w, 0);
 
-
+  mpi_conv_48to64(r64, r48, 6, NWORDS);
+  mpi_print("* add_fp_8x1w R: ", r64, 6);
 }
 
 // ----------------------------------------------------------------------------

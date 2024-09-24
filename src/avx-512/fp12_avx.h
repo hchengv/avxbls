@@ -2,6 +2,7 @@
 #define _FP12_AVX_H
 
 #include <stdint.h>
+#include <stdio.h>
 #include "intrin.h"
 
 // ----------------------------------------------------------------------------
@@ -30,9 +31,80 @@ const uint64_t BLS12_381_P_R48[NWORDS] = {
 #define MONT_W_R48 0xFFFCFFFCFFFDULL
 
 // ----------------------------------------------------------------------------
-// modular operations
+// prototypes: modular operations
 
 void add_fp_8x1w(__m512i *r, const __m512i *a, const __m512i *b);
+
+
+// ----------------------------------------------------------------------------
+// utils 
+
+static void mpi_print(const char *c, const uint64_t *a, int len)
+{
+  int i;
+
+  printf("%s", c);
+  for (i = len-1; i > 0; i--) printf("%016lX", a[i]);
+  printf("%016lX\n", a[0]);
+}
+
+
+static void mpi_conv_64to48(uint64_t *r, const uint64_t *a, int rlen, int alen)
+{
+  int i, j, shr_pos, shl_pos;
+  uint64_t word, temp;
+
+  i = j = 0;
+  shr_pos = 64; shl_pos = 0;
+  temp = 0;
+  while ((i < rlen) && (j < alen)) {
+    word = ((temp >> shr_pos) | (a[j] << shl_pos));
+    r[i] = (word & VBMASK);
+    shr_pos -= 16, shl_pos += 16;
+    if ((shr_pos > 0) && (shl_pos < 64)) temp = a[j++];
+    if (shr_pos <= 0) shr_pos += 64;
+    if (shl_pos >= 64) shl_pos -= 64;
+    // Any shift past 63 is undefined!
+    if (shr_pos == 64) temp = 0;
+    i++;
+  }
+  if (i < rlen) r[i++] = ((temp >> shr_pos) & VBMASK);
+  for (; i < rlen; i++) r[i] = 0;
+}
+
+static void mpi_conv_48to64(uint64_t *r, const uint64_t *a, int rlen, int alen)
+{
+  int i, j, bits_in_word, bits_to_shift;
+  uint64_t word;
+
+  i = j = 0;
+  bits_in_word = bits_to_shift = 0;
+  word = 0;
+  while ((i < rlen) && (j < alen)) {
+    word |= (a[j] << bits_in_word);
+    bits_to_shift = (64 - bits_in_word);
+    bits_in_word += 48;
+    if (bits_in_word >= 64) {
+      r[i++] = word;
+      word = ((bits_to_shift > 0) ? (a[j] >> bits_to_shift) : 0);
+      bits_in_word = ((bits_to_shift > 0) ? (48 - bits_to_shift) : 0);
+    }
+    j++;
+  }
+  if (i < rlen) r[i++] = word;
+  for (; i < rlen; i++) r[i] = 0;
+}
+
+static void get_channel_8x1w(uint64_t *r, const __m512i *a, const int ch) 
+{
+  int i;
+
+  for(i = 0; i < NWORDS; i++) {
+    r[i] = ((uint64_t *)&a[i])[ch];
+  }
+}
+
+
 
 #endif
 
