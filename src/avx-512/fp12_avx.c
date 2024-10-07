@@ -185,7 +185,7 @@ void assa_fp2_4x2x1w(__m512i *r, const __m512i *a, const __m512i *b)
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
 
-// a = < B1' | B1 | B0' | B0 | A1' | A1 | A0' | A0 >  
+// a = < B1' | B1 | B0' | B0 | A1' | A1 | A0' | A0 >
 // b = < D1' | D1 | D0' | D0 | C1' | C1 | C0' | C0 >
 // r = < B1'+D1' | B1+D1 | B0'+D0' | B0+D0 | A1'-C1' | A1-C1 | A0'-C0' | A0-C0 >
 void as_fp2_2x2x2w(__m512i *r, const __m512i *a, const __m512i *b)
@@ -240,6 +240,26 @@ void as_fp2_2x2x2w(__m512i *r, const __m512i *a, const __m512i *b)
 }
 
 // ----------------------------------------------------------------------------
+// Fp4 operations
+
+// r0 = a0^2 + (u+1)*a1^2
+// r1 = 2*a0*a1
+void sqr_fp4_2x2x2x1w(__m512i *r, __m512i *a)
+{
+  __m512i t0[NWORDS*2];
+
+  // a = B1 | B0 | A1 | A0 at Fp layer
+  sqr_fp2x2_4x2x1w(t0, a);              // B1^2 | B0^2 | A1^2 | A0^2
+  mul_by_u_plus_1_fp2x2_TBA();          // (u+1)*B1^2, (u+1)*A1^2
+  add_fp2x2_TBA();                      // ... | B0^2+(u+1)*B1^2 | ... | A0^2+(u+1)*(A1^2)
+  mul_fp2x2_2x4x1w();                   //   B0*B1 | ... |   A0*A1 | ...
+  add_fp2x2_TBA();                      // 2*B0*B1 | ... | 2*A0*A1 | ...  
+  some_blend();                         // 2*B0*B1 | B0^2+(u+1)*B1^2 | 2*A0*A1 | A0^2+(u+1)*(A1^2)
+  redc_fp2x2_2x2x2w();                  // 2*B0*B1 | B0^2+(u+1)*B1^2 | 2*A0*A1 | A0^2+(u+1)*(A1^2)
+}
+
+
+// ----------------------------------------------------------------------------
 // Fp12 operations
 
 // To understand the comments, see Listing 21 in "Guide to Pairing-Based Cryptography". 
@@ -248,14 +268,14 @@ void cyclotomic_sqr_fp12_vec(__m512i *ra, __m512i *rbc, const __m512i *a, const 
   __m512i ta[VWORDS], tbc[NWORDS]; 
 
   // compute A in 1x2x2x2w 
-  // a = z1 | z0
+  // a = z1 | z0 at Fp2 layer
   // sqr_fp4_1x2x2x2w(ta, a);              //        t1 |        t0      
-  // as_fp2_2x2x2w(ra, ta, a);             //     t1+z1 |     t0-z0     
+  as_fp2_2x2x2w(ra, ta, a);             //     t1+z1 |     t0-z0     
   add_fp2_2x2x2w(ra, ra, ra);           // 2*(t1+z1) | 2*(t0-z0) 
   add_fp2_2x2x2w(ra, ra, ta);           // 3*t1+2*z1 | 3*t0-2*z0
 
   // compute B and C in 2x2x2x1w
-  // bc = z5 | z4 | z3 | z2
+  // bc = z5 | z4 | z3 | z2 at Fp2 layer
   // sqr_fp4_2x2x2x1w(tbc, bc);            //              t3 |        t2 |       t1  |              t0 
   // mul_by_u_plus_1_fp2_1w();             //        t3*(u+1)
   // some_permute(tbc, tbc);               //              t1 |        t0 |       t2  |        t3*(u+1)
