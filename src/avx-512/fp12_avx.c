@@ -64,6 +64,7 @@ void mul_mp_8x1w_v1(__m512i *r, const __m512i *a, const __m512i *b)
   const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
   const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
   const __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
+  const __m512i bmask = VSET1(BMASK);
   __m512i ta0, ta1, ta2, ta3;
   __m512i tb0, tb1, tb2, tb3;
   __m512i z0  = VZERO, z1  = VZERO, z2  = VZERO, z3  = VZERO;
@@ -208,6 +209,23 @@ void mul_mp_8x1w_v1(__m512i *r, const __m512i *a, const __m512i *b)
   z8  = VADD(z8 , m4); z9  = VADD(z9 , m5);
   z10 = VADD(z10, m6); z11 = VADD(z11, m7);
 
+  // carry propagation 
+  z1  = VADD(z1,  VSRA(z0,  BRADIX)); z0  = VAND(z0,  bmask);
+  z2  = VADD(z2,  VSRA(z1,  BRADIX)); z1  = VAND(z1,  bmask);
+  z3  = VADD(z3,  VSRA(z2,  BRADIX)); z2  = VAND(z2,  bmask);
+  z4  = VADD(z4,  VSRA(z3,  BRADIX)); z3  = VAND(z3,  bmask);
+  z5  = VADD(z5,  VSRA(z4,  BRADIX)); z4  = VAND(z4,  bmask);
+  z6  = VADD(z6,  VSRA(z5,  BRADIX)); z5  = VAND(z5,  bmask);
+  z7  = VADD(z7,  VSRA(z6,  BRADIX)); z6  = VAND(z6,  bmask);
+  z8  = VADD(z8,  VSRA(z7,  BRADIX)); z7  = VAND(z7,  bmask);
+  z9  = VADD(z9,  VSRA(z8,  BRADIX)); z8  = VAND(z8,  bmask);
+  z10 = VADD(z10, VSRA(z9,  BRADIX)); z9  = VAND(z9,  bmask);
+  z11 = VADD(z11, VSRA(z10, BRADIX)); z10 = VAND(z10, bmask);
+  z12 = VADD(z12, VSRA(z11, BRADIX)); z11 = VAND(z11, bmask);
+  z13 = VADD(z13, VSRA(z12, BRADIX)); z12 = VAND(z12, bmask);
+  z14 = VADD(z14, VSRA(z13, BRADIX)); z13 = VAND(z13, bmask);
+  z15 = VADD(z15, VSRA(z14, BRADIX)); z14 = VAND(z14, bmask);
+
   r[0 ] = z0 ; r[1 ] = z1 ; r[2 ] = z2 ; r[3 ] = z3 ;
   r[4 ] = z4 ; r[5 ] = z5 ; r[6 ] = z6 ; r[7 ] = z7 ;
   r[8 ] = z8 ; r[9 ] = z9 ; r[10] = z10; r[11] = z11;
@@ -221,6 +239,7 @@ void mul_mp_8x1w_v2(__m512i *r, const __m512i *a, const __m512i *b)
   const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
   const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
   const __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
+  const __m512i bmask = VSET1(BMASK);
   __m512i z0  = VZERO, z1  = VZERO, z2  = VZERO, z3  = VZERO;
   __m512i z4  = VZERO, z5  = VZERO, z6  = VZERO, z7  = VZERO;
   __m512i z8  = VZERO, z9  = VZERO, z10 = VZERO, z11 = VZERO;
@@ -229,6 +248,7 @@ void mul_mp_8x1w_v2(__m512i *r, const __m512i *a, const __m512i *b)
   __m512i y4  = VZERO, y5  = VZERO, y6  = VZERO, y7  = VZERO;
   __m512i y8  = VZERO, y9  = VZERO, y10 = VZERO, y11 = VZERO;
   __m512i y12 = VZERO, y13 = VZERO, y14 = VZERO, y15 = VZERO;
+
 
   z0 = VMACLO(z0, a0, b0);
   y0 = VMACHI(y0, a0, b0);
@@ -319,6 +339,24 @@ void mul_mp_8x1w_v2(__m512i *r, const __m512i *a, const __m512i *b)
   y14 = VSHL(y14, BALIGN);
 
   z15 = y14;
+
+  // carry propagation 
+  z1  = VADD(z1,  VSRA(z0,  BRADIX)); z0  = VAND(z0,  bmask);
+  z2  = VADD(z2,  VSRA(z1,  BRADIX)); z1  = VAND(z1,  bmask);
+  z3  = VADD(z3,  VSRA(z2,  BRADIX)); z2  = VAND(z2,  bmask);
+  z4  = VADD(z4,  VSRA(z3,  BRADIX)); z3  = VAND(z3,  bmask);
+  z5  = VADD(z5,  VSRA(z4,  BRADIX)); z4  = VAND(z4,  bmask);
+  z6  = VADD(z6,  VSRA(z5,  BRADIX)); z5  = VAND(z5,  bmask);
+  z7  = VADD(z7,  VSRA(z6,  BRADIX)); z6  = VAND(z6,  bmask);
+  z8  = VADD(z8,  VSRA(z7,  BRADIX)); z7  = VAND(z7,  bmask);
+  z9  = VADD(z9,  VSRA(z8,  BRADIX)); z8  = VAND(z8,  bmask);
+  z10 = VADD(z10, VSRA(z9,  BRADIX)); z9  = VAND(z9,  bmask);
+  z11 = VADD(z11, VSRA(z10, BRADIX)); z10 = VAND(z10, bmask);
+  z12 = VADD(z12, VSRA(z11, BRADIX)); z11 = VAND(z11, bmask);
+  z13 = VADD(z13, VSRA(z12, BRADIX)); z12 = VAND(z12, bmask);
+  z14 = VADD(z14, VSRA(z13, BRADIX)); z13 = VAND(z13, bmask);
+  z15 = VADD(z15, VSRA(z14, BRADIX)); z14 = VAND(z14, bmask);
+
 
   r[0 ] = z0 ; r[1 ] = z1 ; r[2 ] = z2 ; r[3 ] = z3 ;
   r[4 ] = z4 ; r[5 ] = z5 ; r[6 ] = z6 ; r[7 ] = z7 ;
