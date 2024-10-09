@@ -1,4 +1,4 @@
-# avxbls: AVX-512 implementations of BLS12-381 signature 
+# avxbls: AVX-512 implementations of optimal ate pairing on BLS12-381
 
 <!--- ==================================================================== --->
 
