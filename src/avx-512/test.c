@@ -111,6 +111,17 @@ void fp2_test()
   mpi48_carryp(r48);
   mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
   mpi_print("* as_fp2_2x2x2w r4 = 0x", r64, SWORDS);
+
+
+  for (i = 0; i < NWORDS; i++) 
+    a_4x2x1w[i] = VSET(0, 0, 0, 0, 0, 0, b48[i], a48[i]);
+  sqr_fp2x2_4x2x1w(r_4x2x1w, a_4x2x1w);
+  get_channel_8x1w(r48, r_4x2x1w, 0);
+  mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
+  mpi_print("* sqr_fp2x2_4x2x1w r0 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r_4x2x1w, 1);
+  mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
+  mpi_print("* sqr_fp2x2_4x2x1w r1 = 0x", r64, SWORDS);
 }
 
 // ----------------------------------------------------------------------------

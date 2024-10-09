@@ -34,6 +34,8 @@ static uint64_t P48[NWORDS] = {
 // ----------------------------------------------------------------------------
 // prototypes: mp operations
 
+#define mul_mp_8x1w mul_mp_8x1w_v1
+
 void mul_mp_8x1w_v1(__m512i *r, const __m512i *a, const __m512i *b);
 void mul_mp_8x1w_v2(__m512i *r, const __m512i *a, const __m512i *b);
 
@@ -49,9 +51,9 @@ void add_fp_4x2w(__m512i *r, const __m512i *a, const __m512i *b);
 // prototypes: Fp2 operations
 
 void assa_fp2_4x2x1w(__m512i *r, const __m512i *a, const __m512i *b);
-void as_fp2_2x2x2w(__m512i *r, const __m512i *a, const __m512i *b);
-
 void sqr_fp2x2_4x2x1w(__m512i *r, __m512i *a);
+
+void as_fp2_2x2x2w(__m512i *r, const __m512i *a, const __m512i *b);
 
 // ----------------------------------------------------------------------------
 // utils 
