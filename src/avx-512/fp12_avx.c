@@ -58,6 +58,7 @@ static void shuf_z1(__m512i *r, __m512i *a)
 // ----------------------------------------------------------------------------
 // mp operations 
 
+// Karatsuba
 void mul_mp_8x1w_v1(__m512i *r, const __m512i *a, const __m512i *b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
@@ -232,7 +233,7 @@ void mul_mp_8x1w_v1(__m512i *r, const __m512i *a, const __m512i *b)
   r[12] = z12; r[13] = z13; r[14] = z14; r[15] = z15; 
 }
 
-// integer multiplication (product-scanning)
+// product-scanning
 void mul_mp_8x1w_v2(__m512i *r, const __m512i *a, const __m512i *b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];

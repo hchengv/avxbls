@@ -43,6 +43,8 @@ void fp_test()
     b_4x2w[i] = VSET(0, 0, 0, 0, 0, 0, b48[i+VWORDS], b48[i]);
   }
 
+  puts("\nFP TEST\n");
+
   add_fp_8x1w(r_8x1w, a_8x1w, b_8x1w);
   get_channel_8x1w(r48, r_8x1w, 0);
   mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
@@ -75,9 +77,9 @@ void fp_test()
 
 void fp2_test()
 {
-  uint64_t a64[SWORDS] = { TV_A }, b64[SWORDS] = { TV_B }, r64[SWORDS];
-  uint64_t a48[NWORDS], b48[NWORDS], r48[NWORDS];
-  __m512i a_4x2x1w[NWORDS], b_4x2x1w[NWORDS], r_4x2x1w[NWORDS];
+  uint64_t a64[SWORDS] = { TV_A }, b64[SWORDS] = { TV_B }, r64[SWORDS], z64[2*SWORDS];
+  uint64_t a48[NWORDS], b48[NWORDS], r48[NWORDS], z48[2*NWORDS];
+  __m512i a_4x2x1w[NWORDS], b_4x2x1w[NWORDS], r_4x2x1w[NWORDS], z_4x2x1w[2*NWORDS];
   __m512i a_2x2x2w[NWORDS], b_2x2x2w[NWORDS], r_2x2x2w[NWORDS];
   int i;
 
@@ -93,6 +95,8 @@ void fp2_test()
     a_2x2x2w[i] = VSET(0, 0, a48[i+VWORDS], a48[i], 0, 0, a48[i+VWORDS], a48[i]);
     b_2x2x2w[i] = VSET(0, 0, b48[i+VWORDS], b48[i], 0, 0, b48[i+VWORDS], b48[i]);
   }
+
+  puts("\nFP2 TEST\n");
 
   assa_fp2_4x2x1w(r_4x2x1w, a_4x2x1w, b_4x2x1w);
   get_channel_8x1w(r48, r_4x2x1w, 0);
@@ -115,13 +119,13 @@ void fp2_test()
 
   for (i = 0; i < NWORDS; i++) 
     a_4x2x1w[i] = VSET(0, 0, 0, 0, 0, 0, b48[i], a48[i]);
-  sqr_fp2x2_4x2x1w(r_4x2x1w, a_4x2x1w);
-  get_channel_8x1w(r48, r_4x2x1w, 0);
-  mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp2x2_4x2x1w r0 = 0x", r64, SWORDS);
-  get_channel_8x1w(r48, r_4x2x1w, 1);
-  mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp2x2_4x2x1w r1 = 0x", r64, SWORDS);
+  sqr_fp2x2_4x2x1w(z_4x2x1w, a_4x2x1w);
+  for(i = 0; i < 2*NWORDS; i++) z48[i] = ((uint64_t *)&z_4x2x1w[i])[0];
+  mpi_conv_48to64(z64, z48, 2*SWORDS, 2*NWORDS);
+  mpi_print("* sqr_fp2x2_4x2x1w r0 = 0x", z64, 2*SWORDS);
+  for(i = 0; i < 2*NWORDS; i++) z48[i] = ((uint64_t *)&z_4x2x1w[i])[1];
+  mpi_conv_48to64(z64, z48, 2*SWORDS, 2*NWORDS);
+  mpi_print("* sqr_fp2x2_4x2x1w r1 = 0x", z64, 2*SWORDS);
 }
 
 // ----------------------------------------------------------------------------
