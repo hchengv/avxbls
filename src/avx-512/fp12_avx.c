@@ -12,10 +12,10 @@ static void shuf_00(__m512i *r, const __m512i *a)
   const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
   __m512i r0, r1, r2, r3, r4, r5, r6, r7;
 
-  r0 = VSHUF(a0, 0x4E); r1 = VSHUF(a1, 0x4E);
-  r2 = VSHUF(a2, 0x4E); r3 = VSHUF(a3, 0x4E);
-  r4 = VSHUF(a4, 0x4E); r5 = VSHUF(a5, 0x4E);
-  r6 = VSHUF(a6, 0x4E); r7 = VSHUF(a7, 0x4E);
+  r0 = VSHUF(a0, 0x44); r1 = VSHUF(a1, 0x44);
+  r2 = VSHUF(a2, 0x44); r3 = VSHUF(a3, 0x44);
+  r4 = VSHUF(a4, 0x44); r5 = VSHUF(a5, 0x44);
+  r6 = VSHUF(a6, 0x44); r7 = VSHUF(a7, 0x44);
 
   r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
@@ -29,10 +29,10 @@ static void shuf_01(__m512i *r, const __m512i *a)
   const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
   __m512i r0, r1, r2, r3, r4, r5, r6, r7;
 
-  r0 = VSHUF(a0, 0x44); r1 = VSHUF(a1, 0x44);
-  r2 = VSHUF(a2, 0x44); r3 = VSHUF(a3, 0x44);
-  r4 = VSHUF(a4, 0x44); r5 = VSHUF(a5, 0x44);
-  r6 = VSHUF(a6, 0x44); r7 = VSHUF(a7, 0x44);
+  r0 = VSHUF(a0, 0x4E); r1 = VSHUF(a1, 0x4E);
+  r2 = VSHUF(a2, 0x4E); r3 = VSHUF(a3, 0x4E);
+  r4 = VSHUF(a4, 0x4E); r5 = VSHUF(a5, 0x4E);
+  r6 = VSHUF(a6, 0x4E); r7 = VSHUF(a7, 0x4E);
 
   r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
@@ -47,14 +47,14 @@ static void shuf_01_x2(__m512i *r, const __m512i *a)
   __m512i r0, r1, r2 , r3 , r4 , r5 , r6 , r7 ;
   __m512i r8, r9, r10, r11, r12, r13, r14, r15;
 
-  r0  = VSHUF(a0 , 0x44); r1  = VSHUF(a1 , 0x44);
-  r2  = VSHUF(a2 , 0x44); r3  = VSHUF(a3 , 0x44);
-  r4  = VSHUF(a4 , 0x44); r5  = VSHUF(a5 , 0x44);
-  r6  = VSHUF(a6 , 0x44); r7  = VSHUF(a7 , 0x44);
-  r8  = VSHUF(a8 , 0x44); r9  = VSHUF(a9 , 0x44);
-  r10 = VSHUF(a10, 0x44); r11 = VSHUF(a11, 0x44);
-  r12 = VSHUF(a12, 0x44); r13 = VSHUF(a13, 0x44);
-  r14 = VSHUF(a14, 0x44); r15 = VSHUF(a15, 0x44);
+  r0  = VSHUF(a0 , 0x4E); r1  = VSHUF(a1 , 0x4E);
+  r2  = VSHUF(a2 , 0x4E); r3  = VSHUF(a3 , 0x4E);
+  r4  = VSHUF(a4 , 0x4E); r5  = VSHUF(a5 , 0x4E);
+  r6  = VSHUF(a6 , 0x4E); r7  = VSHUF(a7 , 0x4E);
+  r8  = VSHUF(a8 , 0x4E); r9  = VSHUF(a9 , 0x4E);
+  r10 = VSHUF(a10, 0x4E); r11 = VSHUF(a11, 0x4E);
+  r12 = VSHUF(a12, 0x4E); r13 = VSHUF(a13, 0x4E);
+  r14 = VSHUF(a14, 0x4E); r15 = VSHUF(a15, 0x4E);
 
   r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
   r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
@@ -531,7 +531,7 @@ static void asx4_fpx2_8x1w(__m512i *r, const __m512i *a, const __m512i *b)
   r0 = VMSUB(r0, 0x55, r0, b0); r1 = VMSUB(r1, 0x55, r1, b1);
   r2 = VMSUB(r2, 0x55, r2, b2); r3 = VMSUB(r3, 0x55, r3, b3);
   r4 = VMSUB(r4, 0x55, r4, b4); r5 = VMSUB(r5, 0x55, r5, b5);
-  r6 = VMSUB(r8, 0x55, r6, b6); r7 = VMSUB(r7, 0x55, r7, b7);
+  r6 = VMSUB(r6, 0x55, r6, b6); r7 = VMSUB(r7, 0x55, r7, b7);
   // r = H+P-p | G-O | F+N-p | E-M | D+L-p | C-K | B+J-p | A-I
   r8  = VSUB(r8 , t0); r9  = VSUB(r9 , t1);
   r10 = VSUB(r10, t2); r11 = VSUB(r11, t3);
@@ -777,7 +777,7 @@ void mul_by_u_plus_1_fp2x2_4x2x1w(__m512i *r, const __m512i *a)
 
   // a = A1 | A0 at Fp layer 
   shuf_01_x2(tt0, a);                   //     A0 |    A1
-  asx4_fpx2_8x1w(r, a, tt0);            //  A0+A1 | A0-A1
+  asx4_fpx2_8x1w(r, tt0, a);            //  A0+A1 | A0-A1
 }
 
 // ----------------------------------------------------------------------------
