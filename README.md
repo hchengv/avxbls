@@ -5,7 +5,7 @@
 ## Overview 
 
 AVXBLS is on the basis of [BLST](https://github.com/supranational/blst) and
-provides latency-optimized and throughput-optimized AVX-512 implementations of
-BLS12-381 signature. 
+provides latency-optimized AVX-512 implementations of optimal ate pairing on
+BLS12-381. 
 
 <!--- ==================================================================== --->
