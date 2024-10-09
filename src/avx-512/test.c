@@ -126,6 +126,14 @@ void fp2_test()
   for(i = 0; i < 2*NWORDS; i++) z48[i] = ((uint64_t *)&z_4x2x1w[i])[1];
   mpi_conv_48to64(z64, z48, 2*SWORDS, 2*NWORDS);
   mpi_print("* sqr_fp2x2_4x2x1w r1 = 0x", z64, 2*SWORDS);
+
+  mul_by_u_plus_1_fp2x2_4x2x1w(z_4x2x1w, z_4x2x1w);
+  for(i = 0; i < 2*NWORDS; i++) z48[i] = ((uint64_t *)&z_4x2x1w[i])[0];
+  mpi_conv_48to64(z64, z48, 2*SWORDS, 2*NWORDS);
+  mpi_print("* mul_by_u_plus_1_fp2x2_4x2x1w r0 = 0x", z64, 2*SWORDS);
+  for(i = 0; i < 2*NWORDS; i++) z48[i] = ((uint64_t *)&z_4x2x1w[i])[1];
+  mpi_conv_48to64(z64, z48, 2*SWORDS, 2*NWORDS);
+  mpi_print("* mul_by_u_plus_1_fp2x2_4x2x1w r1 = 0x", z64, 2*SWORDS);
 }
 
 // ----------------------------------------------------------------------------

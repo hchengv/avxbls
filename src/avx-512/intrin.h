@@ -8,6 +8,7 @@
 #define VADD(X, Y)            _mm512_add_epi64(X, Y)
 #define VMADD(W, X, Y, Z)     _mm512_mask_add_epi64(W, X, Y, Z)
 #define VSUB(X, Y)            _mm512_sub_epi64(X, Y)
+#define VMSUB(W, X, Y, Z)     _mm512_mask_sub_epi64(W, X, Y, Z)
 #define VMACLO(X, Y, Z)       _mm512_madd52lo_epu64(X, Y, Z)
 #define VMACHI(X, Y, Z)       _mm512_madd52hi_epu64(X, Y, Z)
 
