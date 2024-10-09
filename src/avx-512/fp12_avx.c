@@ -38,6 +38,8 @@ static void shuf_01(__m512i *r, const __m512i *a)
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
 
+// a = < H | G | F | E | D | C | B | A >
+// r = < G | H | E | F | C | D | A | B >
 static void shuf_01_x2(__m512i *r, const __m512i *a)
 {
   const __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
@@ -77,6 +79,80 @@ static void shuf_z1(__m512i *r, const __m512i *a)
 
   r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
+}
+
+// a = < H | G | F | E | D | C | B | A >
+// r = < 0 | 0 | H | G | 0 | 0 | D | C >
+static void perm_zz32_x2(__m512i *r, const __m512i *a)
+{
+  const __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
+  const __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
+  const __m512i a8  = a[8 ], a9  = a[9 ], a10 = a[10], a11 = a[11];
+  const __m512i a12 = a[12], a13 = a[13], a14 = a[14], a15 = a[15];
+  __m512i r0, r1, r2 , r3 , r4 , r5 , r6 , r7 ;
+  __m512i r8, r9, r10, r11, r12, r13, r14, r15;
+
+  r0  = VZPERM(0x33, a0 , 0xEE); r1  = VZPERM(0x33, a1 , 0xEE);
+  r2  = VZPERM(0x33, a2 , 0xEE); r3  = VZPERM(0x33, a3 , 0xEE);
+  r4  = VZPERM(0x33, a4 , 0xEE); r5  = VZPERM(0x33, a5 , 0xEE);
+  r6  = VZPERM(0x33, a6 , 0xEE); r7  = VZPERM(0x33, a7 , 0xEE);
+  r8  = VZPERM(0x33, a8 , 0xEE); r9  = VZPERM(0x33, a9 , 0xEE);
+  r10 = VZPERM(0x33, a10, 0xEE); r11 = VZPERM(0x33, a11, 0xEE);
+  r12 = VZPERM(0x33, a12, 0xEE); r13 = VZPERM(0x33, a13, 0xEE);
+  r14 = VZPERM(0x33, a14, 0xEE); r15 = VZPERM(0x33, a15, 0xEE);
+
+  r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
+  r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
+  r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
+  r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
+}
+
+// a = < H | G | F | E | D | C | B | A >
+// r = < F | E | 0 | 0 | B | A | 0 | 0 >
+static void perm_10zz(__m512i *r, const __m512i *a)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7;
+
+  r0 = VZPERM(0xCC, a0, 0x88); r1 = VZPERM(0xCC, a1, 0x88);
+  r2 = VZPERM(0xCC, a2, 0x88); r3 = VZPERM(0xCC, a3, 0x88);
+  r4 = VZPERM(0xCC, a4, 0x88); r5 = VZPERM(0xCC, a5, 0x88);
+  r6 = VZPERM(0xCC, a6, 0x88); r7 = VZPERM(0xCC, a7, 0x88);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+  r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
+}
+
+// a = < H | G | F | E | D | C | B | A >
+// b = < P | O | N | M | L | K | J | I >
+// r = < H | G | N | M | D | C | J | I >
+static void blend_0x33_x2(__m512i *r, const __m512i *a, const __m512i *b)
+{
+  const __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
+  const __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
+  const __m512i a8  = a[8 ], a9  = a[9 ], a10 = a[10], a11 = a[11];
+  const __m512i a12 = a[12], a13 = a[13], a14 = a[14], a15 = a[15];
+  const __m512i b0  = b[0 ], b1  = b[1 ], b2  = b[2 ], b3  = b[3 ];
+  const __m512i b4  = b[4 ], b5  = b[5 ], b6  = b[6 ], b7  = b[7 ];
+  const __m512i b8  = b[8 ], b9  = b[9 ], b10 = b[10], b11 = b[11];
+  const __m512i b12 = b[12], b13 = b[13], b14 = b[14], b15 = b[15];
+  __m512i r0, r1, r2 , r3 , r4 , r5 , r6 , r7 ;
+  __m512i r8, r9, r10, r11, r12, r13, r14, r15;
+
+  r0  = VMBLEND(0x33, a0 , b0 ); r1  = VMBLEND(0x33, a1 , b1 );
+  r2  = VMBLEND(0x33, a2 , b2 ); r3  = VMBLEND(0x33, a3 , b3 );
+  r4  = VMBLEND(0x33, a4 , b4 ); r5  = VMBLEND(0x33, a5 , b5 );
+  r6  = VMBLEND(0x33, a6 , b6 ); r7  = VMBLEND(0x33, a7 , b7 );
+  r8  = VMBLEND(0x33, a8 , b8 ); r9  = VMBLEND(0x33, a9 , b9 );
+  r10 = VMBLEND(0x33, a10, b10); r11 = VMBLEND(0x33, a11, b11);
+  r12 = VMBLEND(0x33, a12, b12); r13 = VMBLEND(0x33, a13, b13);
+  r14 = VMBLEND(0x33, a14, b14); r15 = VMBLEND(0x33, a15, b15);
+
+  r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
+  r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
+  r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
+  r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
 }
 
 // ----------------------------------------------------------------------------
@@ -443,6 +519,80 @@ void add_fp_8x1w(__m512i *r, const __m512i *a, const __m512i *b)
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
 
+void add_fpx2_8x1w(__m512i *r, const __m512i *a, const __m512i *b)
+{
+  const __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
+  const __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
+  const __m512i a8  = a[8 ], a9  = a[9 ], a10 = a[10], a11 = a[11];
+  const __m512i a12 = a[12], a13 = a[13], a14 = a[14], a15 = a[15];
+  const __m512i b0  = b[0 ], b1  = b[1 ], b2  = b[2 ], b3  = b[3 ];
+  const __m512i b4  = b[4 ], b5  = b[5 ], b6  = b[6 ], b7  = b[7 ];
+  const __m512i b8  = b[8 ], b9  = b[9 ], b10 = b[10], b11 = b[11];
+  const __m512i b12 = b[12], b13 = b[13], b14 = b[14], b15 = b[15];
+  const __m512i p0 = VSET1(P48[0]), p1 = VSET1(P48[1]), p2 = VSET1(P48[2]);
+  const __m512i p3 = VSET1(P48[3]), p4 = VSET1(P48[4]), p5 = VSET1(P48[5]);
+  const __m512i p6 = VSET1(P48[6]), p7 = VSET1(P48[7]);
+  const __m512i bmask = VSET1(BMASK);
+  __m512i r0, r1, r2 , r3 , r4 , r5 , r6 , r7 ;
+  __m512i r8, r9, r10, r11, r12, r13, r14, r15, smask, t0;
+
+  // r = a + b
+  r0  = VADD(a0 , b0 ); r1  = VADD(a1 , b1 );
+  r2  = VADD(a2 , b2 ); r3  = VADD(a3 , b3 );
+  r4  = VADD(a4 , b4 ); r5  = VADD(a5 , b5 );
+  r6  = VADD(a6 , b6 ); r7  = VADD(a7 , b7 );
+  r8  = VADD(a8 , b8 ); r9  = VADD(a9 , b9 );
+  r10 = VADD(a10, b10); r11 = VADD(a11, b11);
+  r12 = VADD(a12, b12); r13 = VADD(a13, b13);
+  r14 = VADD(a14, b14); r15 = VADD(a15, b15);
+
+  // r = r - p*2^384
+  r8  = VSUB(r8 , p0); r9  = VSUB(r9 , p1);
+  r10 = VSUB(r10, p2); r11 = VSUB(r11, p3);
+  r12 = VSUB(r12, p4); r13 = VSUB(r13, p5);
+  r14 = VSUB(r14, p6); r15 = VSUB(r15, p7);
+
+  // get sign mask
+  r1 = VADD(r1 , VSRA(r0, BRADIX)); r0 = VAND(r0, bmask);
+  r2 = VADD(r2 , VSRA(r1, BRADIX)); r1 = VAND(r1, bmask);
+  r3 = VADD(r3 , VSRA(r2, BRADIX)); r2 = VAND(r2, bmask);
+  r4 = VADD(r4 , VSRA(r3, BRADIX)); r3 = VAND(r3, bmask);
+  r5 = VADD(r5 , VSRA(r4, BRADIX)); r4 = VAND(r4, bmask);
+  r6 = VADD(r6 , VSRA(r5, BRADIX)); r5 = VAND(r5, bmask);
+  r7 = VADD(r7 , VSRA(r6, BRADIX)); r6 = VAND(r6, bmask);
+  r8 = VADD(r8 , VSRA(r7, BRADIX)); r7 = VAND(r7, bmask);
+  t0 = VADD(r9 , VSRA(r8, BRADIX));
+  t0 = VADD(r10, VSRA(t0, BRADIX));
+  t0 = VADD(r11, VSRA(t0, BRADIX));
+  t0 = VADD(r12, VSRA(t0, BRADIX));
+  t0 = VADD(r13, VSRA(t0, BRADIX));
+  t0 = VADD(r14, VSRA(t0, BRADIX));
+  t0 = VADD(r15, VSRA(t0, BRADIX));
+
+  // if r is non-negative, smask = all-0 
+  // if r is     negative, smask = all-1
+  smask = VSRA(t0, 63);
+  // r = r + (p & smask)*2^384
+  r8  = VADD(r8 , VAND(p0, smask)); r9  = VADD(r9 , VAND(p1, smask));
+  r10 = VADD(r10, VAND(p2, smask)); r11 = VADD(r11, VAND(p3, smask));
+  r12 = VADD(r12, VAND(p4, smask)); r13 = VADD(r13, VAND(p5, smask));
+  r14 = VADD(r14, VAND(p6, smask)); r15 = VADD(r15, VAND(p7, smask));
+
+  // carry propagation 
+  r9  = VADD(r9 , VSRA(r8 , BRADIX)); r8  = VAND(r8 , bmask);
+  r10 = VADD(r10, VSRA(r9 , BRADIX)); r9  = VAND(r9 , bmask);
+  r11 = VADD(r11, VSRA(r10, BRADIX)); r10 = VAND(r10, bmask);
+  r12 = VADD(r12, VSRA(r11, BRADIX)); r11 = VAND(r11, bmask);
+  r13 = VADD(r13, VSRA(r12, BRADIX)); r12 = VAND(r12, bmask);
+  r14 = VADD(r14, VSRA(r13, BRADIX)); r13 = VAND(r13, bmask);
+  r15 = VADD(r15, VSRA(r14, BRADIX)); r14 = VAND(r14, bmask);
+
+  r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
+  r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
+  r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
+  r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
+}
+
 void sub_fp_8x1w(__m512i *r, const __m512i *a, const __m512i *b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
@@ -632,6 +782,11 @@ static void add_fp2_4x2x1w(__m512i *r, const __m512i *a, const __m512i *b)
   add_fp_8x1w(r, a, b);
 }
 
+static void add_fp2x2_4x2x1w(__m512i *r, const __m512i *a, const __m512i *b)
+{
+  add_fpx2_8x1w(r, a, b);
+}
+
 static void add_fp2_2x2x2w(__m512i *r, const __m512i *a, const __m512i *b)
 {
   add_fp_4x2w(r, a, b);
@@ -787,15 +942,17 @@ void mul_by_u_plus_1_fp2x2_4x2x1w(__m512i *r, const __m512i *a)
 // r1 = 2*a0*a1
 void sqr_fp4_2x2x2x1w(__m512i *r, __m512i *a)
 {
-  __m512i tt0[2*NWORDS], tt1[2*NWORDS];
+  __m512i tt0[2*NWORDS], tt1[2*NWORDS], t0[NWORDS];
 
   // a = B1 | B0 | A1 | A0 at Fp2 layer
-  sqr_fp2x2_4x2x1w(tt0, a);                 // B1^2 |       B0^2 | A1^2 |       A0^2
-  mul_by_u_plus_1_fp2x2_4x2x1w(tt1, tt0);   //  ... | (u+1)*B1^2 |  ... | (u+1)*A1^2
-  // add_fp2x2_TBA();                         // ... | B0^2+(u+1)*B1^2 | ... | A0^2+(u+1)*(A1^2)
-  // mul_fp2x2_2x4x1w();                      //   B0*B1 | ... |   A0*A1 | ...
-  // add_fp2x2_TBA();                         // 2*B0*B1 | ... | 2*A0*A1 | ...  
-  // some_blend();                            // 2*B0*B1 | B0^2+(u+1)*B1^2 | 2*A0*A1 | A0^2+(u+1)*(A1^2)
+  sqr_fp2x2_4x2x1w(tt0, a);                 //       B1^2 |            B0^2 |       A1^2 |              A0^2
+  mul_by_u_plus_1_fp2x2_4x2x1w(tt1, tt0);   // (u+1)*B1^2 |             ... | (u+1)*A1^2 |               ...
+  perm_zz32_x2(tt1, tt1);                   //          0 |      (u+1)*B1^2 |          0 |        (u+1)*A1^2
+  add_fp2x2_4x2x1w(tt0, tt0, tt1);          //        ... | B0^2+(u+1)*B1^2 |        ... | A0^2+(u+1)*(A1^2)
+  perm_10zz(t0, a);                         //         B0 |               0 |         A0 |                 0
+  mul_fp2x2_2x4x1w(tt1, a, t0);             //      B0*B1 |               0 |      A0*A1 |                 0
+  add_fp2x2_4x2x1w(tt1, tt1, tt1);          //    2*B0*B1 |               0 |    2*A0*A1 |                 0  
+  blend_0x33_x2(tt0, tt1, tt0);             //    2*B0*B1 | B0^2+(u+1)*B1^2 |    2*A0*A1 | A0^2+(u+1)*(A1^2)
   // redc_fp2x2_4x2x1w();                     // 2*B0*B1 | B0^2+(u+1)*B1^2 | 2*A0*A1 | A0^2+(u+1)*(A1^2)
 }
 

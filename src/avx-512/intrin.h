@@ -32,6 +32,7 @@
 #define VSHUF(X, Y)           _mm512_shuffle_epi32(X, Y)
 #define VZSHUF(X, Y, Z)       _mm512_maskz_shuffle_epi32(X, Y, Z)
 #define VPERM(X, Y)           _mm512_permutex_epi64(X, Y)
+#define VZPERM(X, Y, Z)       _mm512_maskz_permutex_epi64(X, Y, Z) 
 #define VPERMV(X, Y)          _mm512_permutexvar_epi64(X, Y)
 #define VMBLEND(X, Y, Z)      _mm512_mask_blend_epi64(X, Y, Z)
 
