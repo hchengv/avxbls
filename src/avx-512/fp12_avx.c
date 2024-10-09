@@ -777,7 +777,7 @@ void mul_by_u_plus_1_fp2x2_4x2x1w(__m512i *r, const __m512i *a)
 
   // a = A1 | A0 at Fp layer 
   shuf_01_x2(tt0, a);                   //     A0 |    A1
-  asx4_fpx2_8x1w(r, tt0, a);            //  A0+A1 | A0-A1
+  asx4_fpx2_8x1w(r, a, tt0);            //  A0+A1 | A0-A1
 }
 
 // ----------------------------------------------------------------------------
