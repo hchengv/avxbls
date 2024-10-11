@@ -40,7 +40,7 @@ void mul_mp_8x1w_v1(__m512i *r, const __m512i *a, const __m512i *b);
 void mul_mp_8x1w_v2(__m512i *r, const __m512i *a, const __m512i *b);
 
 // ----------------------------------------------------------------------------
-// prototypes: Fp operations
+// prototypes: Fp single-length operations
 
 void add_fp_8x1w(__m512i *r, const __m512i *a, const __m512i *b);
 void sub_fp_8x1w(__m512i *r, const __m512i *a, const __m512i *b);
@@ -48,13 +48,22 @@ void sub_fp_8x1w(__m512i *r, const __m512i *a, const __m512i *b);
 void add_fp_4x2w(__m512i *r, const __m512i *a, const __m512i *b);
 
 // ----------------------------------------------------------------------------
-// prototypes: Fp2 operations
+// prototypes: Fp double-length operations
+
+void redc_fpx2_8x1w(__m512i *r, const __m512i *a);
+
+// ----------------------------------------------------------------------------
+// prototypes: Fp2 single-length operations
 
 void assa_fp2_4x2x1w(__m512i *r, const __m512i *a, const __m512i *b);
-void sqr_fp2x2_4x2x1w(__m512i *r, __m512i *a);
-void mul_by_u_plus_1_fp2x2_4x2x1w(__m512i *r, const __m512i *a);
 
 void as_fp2_2x2x2w(__m512i *r, const __m512i *a, const __m512i *b);
+
+// ----------------------------------------------------------------------------
+// prototypes: Fp2 double-length operations
+
+void sqr_fp2x2_4x2x1w(__m512i *r, __m512i *a);
+void mul_by_u_plus_1_fp2x2_4x2x1w(__m512i *r, const __m512i *a);
 
 // ----------------------------------------------------------------------------
 // utils 

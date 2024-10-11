@@ -65,12 +65,16 @@ void fp_test()
   mpi_conv_48to64(z64, z48, 2*SWORDS, 2*NWORDS);
   mpi_print("* mul_mp_8x1w_v2 r0 = 0x", z64, 2*SWORDS);
 
+  redc_fpx2_8x1w(r_8x1w, z_8x1w);
+  get_channel_8x1w(r48, r_8x1w, 0);
+  mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
+  mpi_print("* redc_fpx2_8x1w r0 = 0x", r64, SWORDS);
+
   add_fp_4x2w(r_4x2w, a_4x2w, b_4x2w);
   get_channel_4x2w(r48, r_4x2w, 0);
   mpi48_carryp(r48);
   mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
   mpi_print("* add_fp_4x2w r0 = 0x", r64, SWORDS);
-
 }
 
 // ----------------------------------------------------------------------------
