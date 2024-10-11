@@ -841,6 +841,7 @@ static void asx4_fpx2_8x1w(__m512i *r, const __m512i *a, const __m512i *b)
 }
 
 // Montgomery reduction
+// TODO: add final subtraction!
 void redc_fpx2_8x1w(__m512i *r, const __m512i *a)
 {
   __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
