@@ -850,7 +850,7 @@ void redc_fpx2_8x1w(__m512i *r, const __m512i *a)
   __m512i y0  = VZERO, y1  = VZERO, y2  = VZERO, y3  = VZERO;
   __m512i y4  = VZERO, y5  = VZERO, y6  = VZERO, y7  = VZERO;
   __m512i y8  = VZERO, y9  = VZERO, y10 = VZERO, y11 = VZERO;
-  __m512i y12 = VZERO, y13 = VZERO, y14 = VZERO, y15 = VZERO;
+  __m512i y12 = VZERO, y13 = VZERO, y14 = VZERO;
   const __m512i p0 = VSET1(P48[0]), p1 = VSET1(P48[1]), p2 = VSET1(P48[2]);
   const __m512i p3 = VSET1(P48[3]), p4 = VSET1(P48[4]), p5 = VSET1(P48[5]);
   const __m512i p6 = VSET1(P48[6]), p7 = VSET1(P48[7]);
