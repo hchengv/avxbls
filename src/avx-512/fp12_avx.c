@@ -857,7 +857,7 @@ void redc_fpx2_8x1w(__m512i *r, const __m512i *a)
   const __m512i bmask = VSET1(BMASK), montw = VSET1(MONT_W_R48), zero = VZERO;
   __m512i r0, r1, r2, r3, r4, r5, r6, r7, smask, u;
 
-  u  = VMACLO(zero, a0, montw);
+  u  = VAND(VMACLO(zero, a0, montw), bmask);
   a0 = VMACLO(a0, u, p0); a1 = VMACLO(a1, u, p1); a2 = VMACLO(a2, u, p2);
   a3 = VMACLO(a3, u, p3); a4 = VMACLO(a4, u, p4); a5 = VMACLO(a5, u, p5);
   a6 = VMACLO(a6, u, p6); a7 = VMACLO(a7, u, p7); 
@@ -866,7 +866,7 @@ void redc_fpx2_8x1w(__m512i *r, const __m512i *a)
   y6 = VMACHI(y6, u, p6); y7 = VMACHI(y7, u, p7); 
   a1 = VADD(VADD(a1, VSRA(a0, BRADIX)), VSHL(y0, BALIGN));
 
-  u  = VMACLO(zero, a1, montw);
+  u  = VAND(VMACLO(zero, a1, montw), bmask);
   a1 = VMACLO(a1, u, p0); a2 = VMACLO(a2, u, p1); a3 = VMACLO(a3, u, p2);
   a4 = VMACLO(a4, u, p3); a5 = VMACLO(a5, u, p4); a6 = VMACLO(a6, u, p5);
   a7 = VMACLO(a7, u, p6); a8 = VMACLO(a8, u, p7); 
@@ -875,7 +875,7 @@ void redc_fpx2_8x1w(__m512i *r, const __m512i *a)
   y7 = VMACHI(y7, u, p6); y8 = VMACHI(y8, u, p7); 
   a2 = VADD(VADD(a2, VSRA(a1, BRADIX)), VSHL(y1, BALIGN));
 
-  u  = VMACLO(zero, a2, montw);
+  u  = VAND(VMACLO(zero, a2, montw), bmask);
   a2 = VMACLO(a2, u, p0); a3 = VMACLO(a3, u, p1); a4 = VMACLO(a4, u, p2);
   a5 = VMACLO(a5, u, p3); a6 = VMACLO(a6, u, p4); a7 = VMACLO(a7, u, p5);
   a8 = VMACLO(a8, u, p6); a9 = VMACLO(a9, u, p7); 
@@ -884,7 +884,7 @@ void redc_fpx2_8x1w(__m512i *r, const __m512i *a)
   y8 = VMACHI(y8, u, p6); y9 = VMACHI(y9, u, p7); 
   a3 = VADD(VADD(a3, VSRA(a2, BRADIX)), VSHL(y2, BALIGN));
 
-  u  = VMACLO(zero, a3, montw);
+  u  = VAND(VMACLO(zero, a3, montw), bmask);
   a3 = VMACLO(a3, u, p0); a4  = VMACLO(a4,  u, p1); a5 = VMACLO(a5, u, p2);
   a6 = VMACLO(a6, u, p3); a7  = VMACLO(a7,  u, p4); a8 = VMACLO(a8, u, p5);
   a9 = VMACLO(a9, u, p6); a10 = VMACLO(a10, u, p7); 
@@ -893,7 +893,7 @@ void redc_fpx2_8x1w(__m512i *r, const __m512i *a)
   y9 = VMACHI(y9, u, p6); y10 = VMACHI(y10, u, p7); 
   a4 = VADD(VADD(a4, VSRA(a3, BRADIX)), VSHL(y3, BALIGN));
 
-  u   = VMACLO(zero, a4, montw);
+  u   = VAND(VMACLO(zero, a4, montw), bmask);
   a4  = VMACLO(a4 , u, p0); a5  = VMACLO(a5 , u, p1); a6 = VMACLO(a6, u, p2);
   a7  = VMACLO(a7 , u, p3); a8  = VMACLO(a8 , u, p4); a9 = VMACLO(a9, u, p5);
   a10 = VMACLO(a10, u, p6); a11 = VMACLO(a11, u, p7); 
@@ -902,7 +902,7 @@ void redc_fpx2_8x1w(__m512i *r, const __m512i *a)
   y10 = VMACHI(y10, u, p6); y11 = VMACHI(y11, u, p7); 
   a5  = VADD(VADD(a5, VSRA(a4, BRADIX)), VSHL(y4, BALIGN));
 
-  u   = VMACLO(zero, a5, montw);
+  u   = VAND(VMACLO(zero, a5, montw), bmask);
   a5  = VMACLO(a5 , u, p0); a6  = VMACLO(a6 , u, p1); a7  = VMACLO(a7 , u, p2);
   a8  = VMACLO(a8 , u, p3); a9  = VMACLO(a9 , u, p4); a10 = VMACLO(a10, u, p5);
   a11 = VMACLO(a11, u, p6); a12 = VMACLO(a12, u, p7); 
@@ -911,7 +911,7 @@ void redc_fpx2_8x1w(__m512i *r, const __m512i *a)
   y11 = VMACHI(y11, u, p6); y12 = VMACHI(y12, u, p7); 
   a6  = VADD(VADD(a6, VSRA(a5, BRADIX)), VSHL(y5, BALIGN));  
 
-  u   = VMACLO(zero, a6, montw);
+  u   = VAND(VMACLO(zero, a6, montw), bmask);
   a6  = VMACLO(a6 , u, p0); a7  = VMACLO(a7 , u, p1); a8  = VMACLO(a8 , u, p2);
   a9  = VMACLO(a9 , u, p3); a10 = VMACLO(a10, u, p4); a11 = VMACLO(a11, u, p5);
   a12 = VMACLO(a12, u, p6); a13 = VMACLO(a13, u, p7); 
@@ -920,7 +920,7 @@ void redc_fpx2_8x1w(__m512i *r, const __m512i *a)
   y12 = VMACHI(y12, u, p6); y13 = VMACHI(y13, u, p7); 
   a7  = VADD(VADD(a7, VSRA(a6, BRADIX)), VSHL(y6, BALIGN));  
 
-  u   = VMACLO(zero, a7, montw);
+  u   = VAND(VMACLO(zero, a7, montw), bmask);
   a7  = VMACLO(a7 , u, p0); a8  = VMACLO(a8 , u, p1); a9  = VMACLO(a9 , u, p2);
   a10 = VMACLO(a10, u, p3); a11 = VMACLO(a11, u, p4); a12 = VMACLO(a12, u, p5);
   a13 = VMACLO(a13, u, p6); a14 = VMACLO(a14, u, p7); 
