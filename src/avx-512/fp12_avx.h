@@ -65,6 +65,8 @@ void as_fp2_2x2x2w(__m512i *r, const __m512i *a, const __m512i *b);
 void sqr_fp2x2_4x2x1w(__m512i *r, __m512i *a);
 void mul_by_u_plus_1_fp2x2_4x2x1w(__m512i *r, const __m512i *a);
 
+void mul_fp2x2_2x4x1w(__m512i *r, const __m512i *a, const __m512i *b);
+
 // ----------------------------------------------------------------------------
 // prototypes: Fp4 operations
 
