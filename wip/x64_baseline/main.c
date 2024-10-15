@@ -405,9 +405,9 @@ void test_subroutine()
 
 int main()
 {
-  // test_pairing();
+  test_pairing();
   // timing();
-  test_subroutine();
+  // test_subroutine();
 
   return 0;
 }

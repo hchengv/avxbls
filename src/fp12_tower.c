@@ -430,7 +430,7 @@ void inverse_fp12(vec384fp12 ret, const vec384fp12 a)
 
 typedef vec384x vec384fp4[2];
 
-static void sqr_fp4(vec384fp4 ret, const vec384x a0, const vec384x a1)
+void sqr_fp4(vec384fp4 ret, const vec384x a0, const vec384x a1)
 {
     vec768x t0, t1, t2;
 
@@ -455,7 +455,7 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
   #endif
 
 // scalar implementation
-#if 0
+#if 1
     vec384fp4 t0, t1, t2;
 
     sqr_fp4(t0, a[0][0], a[1][1]);
@@ -486,7 +486,7 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
     add_fp2(ret[1][2], t1[1],     a[1][2]);
     add_fp2(ret[1][2], ret[1][2], ret[1][2]);
     add_fp2(ret[1][2], ret[1][2], t1[1]);
-#endif
+#elif
 
     __m512i rbc_2x2x2x1w[NWORDS], bc_2x2x2x1w[NWORDS];
     uint64_t t[8][NWORDS], r48[NWORDS];
@@ -527,6 +527,8 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
     mpi_conv_48to64(ret[1][2][0], r48, SWORDS, NWORDS);
     get_channel_8x1w(r48, rbc_2x2x2x1w, 7);
     mpi_conv_48to64(ret[1][2][1], r48, SWORDS, NWORDS);
+
+#endif
 
   #ifdef PROFILING
     uint64_t end_cycles = read_tsc();
