@@ -36,16 +36,16 @@ static void profiling_reset() {
 
 static void profiling_dump(uint64_t total_cycles, int iter){
   puts("");
-  printf("sqr_fp12_cycles                = %llu (%.2f%%)\n", sqr_fp12_cycles              / iter, (double)(sqr_fp12_cycles            / iter) / total_cycles*100.0f);
-  printf("mul_fp12_cycles                = %llu (%.2f%%)\n", mul_fp12_cycles              / iter, (double)(mul_fp12_cycles            / iter) / total_cycles*100.0f);
-  printf("cyclotomic_sqr_fp12_cycles     = %llu (%.2f%%)\n", cyclotomic_sqr_fp12_cycles   / iter, (double)(cyclotomic_sqr_fp12_cycles / iter) / total_cycles*100.0f);
-  printf("mul_by_xy00z0_fp12_cycles      = %llu (%.2f%%)\n", mul_by_xy00z0_fp12_cycles    / iter, (double)(mul_by_xy00z0_fp12_cycles  / iter) / total_cycles*100.0f);
-  printf("inverse_fp12_cycles            = %llu (%.2f%%)\n", inverse_fp12_cycles          / iter, (double)(inverse_fp12_cycles        / iter) / total_cycles*100.0f);
-  printf("frobenius_map_fp12_cycles      = %llu (%.2f%%)\n", frobenius_map_fp12_cycles    / iter, (double)(frobenius_map_fp12_cycles  / iter) / total_cycles*100.0f);
+  printf("sqr_fp12_cycles                = %lu (%.2f%%)\n", sqr_fp12_cycles              / iter, (double)(sqr_fp12_cycles            / iter) / total_cycles*100.0f);
+  printf("mul_fp12_cycles                = %lu (%.2f%%)\n", mul_fp12_cycles              / iter, (double)(mul_fp12_cycles            / iter) / total_cycles*100.0f);
+  printf("cyclotomic_sqr_fp12_cycles     = %lu (%.2f%%)\n", cyclotomic_sqr_fp12_cycles   / iter, (double)(cyclotomic_sqr_fp12_cycles / iter) / total_cycles*100.0f);
+  printf("mul_by_xy00z0_fp12_cycles      = %lu (%.2f%%)\n", mul_by_xy00z0_fp12_cycles    / iter, (double)(mul_by_xy00z0_fp12_cycles  / iter) / total_cycles*100.0f);
+  printf("inverse_fp12_cycles            = %lu (%.2f%%)\n", inverse_fp12_cycles          / iter, (double)(inverse_fp12_cycles        / iter) / total_cycles*100.0f);
+  printf("frobenius_map_fp12_cycles      = %lu (%.2f%%)\n", frobenius_map_fp12_cycles    / iter, (double)(frobenius_map_fp12_cycles  / iter) / total_cycles*100.0f);
 
-  printf("line_add_cycles                = %llu (%.2f%%)\n", line_add_cycles              / iter, (double)(line_add_cycles            / iter) / total_cycles*100.0f);
-  printf("line_dbl_cycles                = %llu (%.2f%%)\n", line_dbl_cycles              / iter, (double)(line_dbl_cycles            / iter) / total_cycles*100.0f);
-  printf("line_by_Px2_cycles             = %llu (%.2f%%)\n", line_by_Px2_cycles           / iter, (double)(line_by_Px2_cycles         / iter) / total_cycles*100.0f);
+  printf("line_add_cycles                = %lu (%.2f%%)\n", line_add_cycles              / iter, (double)(line_add_cycles            / iter) / total_cycles*100.0f);
+  printf("line_dbl_cycles                = %lu (%.2f%%)\n", line_dbl_cycles              / iter, (double)(line_dbl_cycles            / iter) / total_cycles*100.0f);
+  printf("line_by_Px2_cycles             = %lu (%.2f%%)\n", line_by_Px2_cycles           / iter, (double)(line_by_Px2_cycles         / iter) / total_cycles*100.0f);
 
   puts("");
 }
@@ -203,32 +203,32 @@ void timing()
   printf("- add_mod_384:        ");
   LOAD_CACHE(add_mod_384(r, a, b, BLS12_381_P), 1000);
   MEASURE_CYCLES(add_mod_384(r, a, b, BLS12_381_P), 10000);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("- sub_mod_384:        ");
   LOAD_CACHE(sub_mod_384(r, a, b, BLS12_381_P), 1000);
   MEASURE_CYCLES(sub_mod_384(r, a, b, BLS12_381_P), 10000);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("- mul_mont_384:       ");
   LOAD_CACHE(mul_mont_384(r, a, b, BLS12_381_P, p0), 1000);
   MEASURE_CYCLES(mul_mont_384(r, a, b, BLS12_381_P, p0), 10000);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("- sqr_mont_384:       ");
   LOAD_CACHE(sqr_mont_384(r, a, BLS12_381_P, p0), 1000);
   MEASURE_CYCLES(sqr_mont_384(r, a, BLS12_381_P, p0), 10000);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("- mul_384:            ");
   LOAD_CACHE(mul_384(z, a, b), 1000);
   MEASURE_CYCLES(mul_384(z, a, b), 10000);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("- redc_mont_384:      ");
   LOAD_CACHE(redc_mont_384(r, z, BLS12_381_P, p0), 1000);
   MEASURE_CYCLES(redc_mont_384(r, z, BLS12_381_P, p0), 10000);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("-------------------------------------------------------------\n");
   printf("fp2 arith:\n");
@@ -240,37 +240,37 @@ void timing()
   printf("- add_mod_384x384:    ");
   LOAD_CACHE(add_mod_384x384(z, m, n, BLS12_381_P), 1000);
   MEASURE_CYCLES(add_mod_384x384(z, m, n, BLS12_381_P), 10000);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("- sub_mod_384x384:    ");
   LOAD_CACHE(sub_mod_384x384(z, m, n, BLS12_381_P), 1000);
   MEASURE_CYCLES(sub_mod_384x384(z, m, n, BLS12_381_P), 10000);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("- mul_fp2x2:          ");
   LOAD_CACHE(mul_fp2x2(y, c, d), 1000);
   MEASURE_CYCLES(mul_fp2x2(y, c, d), 10000);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("- sqr_fp2x2:          ");
   LOAD_CACHE(sqr_fp2x2(y, c), 1000);
   MEASURE_CYCLES(sqr_fp2x2(y, c), 10000);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("- redc_fp2x2:         ");
   LOAD_CACHE(redc_fp2x2(s, y), 1000);
   MEASURE_CYCLES(redc_fp2x2(s, y), 10000);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("- mul_mont_384x:      ");
   LOAD_CACHE(mul_mont_384x(s, c, d, BLS12_381_P, p0), 1000);
   MEASURE_CYCLES(mul_mont_384x(s, c, d, BLS12_381_P, p0), 10000);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("- sqr_mont_384x:      ");
   LOAD_CACHE(sqr_mont_384x(s, c, BLS12_381_P, p0), 1000);
   MEASURE_CYCLES(sqr_mont_384x(s, c, BLS12_381_P, p0), 10000);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("-------------------------------------------------------------\n");
   printf("fp6 arith:\n");
@@ -281,22 +281,22 @@ void timing()
   printf("- mul_fp6x2:          ");
   LOAD_CACHE(mul_fp6x2(x, e, h), 100);
   MEASURE_CYCLES(mul_fp6x2(x, e, h), 1000);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("- redc_fp6x2:         ");
   LOAD_CACHE(redc_fp6x2(e, x), 1000);
   MEASURE_CYCLES(redc_fp6x2(e, x), 10000);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("- mul_fp6:            ");
   LOAD_CACHE(mul_fp6(t, e, h), 100);
   MEASURE_CYCLES(mul_fp6(t, e, h), 1000);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("- sqr_fp6:            ");
   LOAD_CACHE(sqr_fp6(t, e), 100);
   MEASURE_CYCLES(sqr_fp6(t, e), 1000);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("-------------------------------------------------------------\n");
   printf("fp12 arith:\n");
@@ -306,12 +306,12 @@ void timing()
   printf("- mul_fp12:           ");
   LOAD_CACHE(mul_fp12(u, g, l), 10);
   MEASURE_CYCLES(mul_fp12(u, g, l), 100);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("- sqr_fp12:           ");
   LOAD_CACHE(sqr_fp12(u, g), 10);
   MEASURE_CYCLES(sqr_fp12(u, g), 100);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("-------------------------------------------------------------\n");
   printf("pairing:\n");
@@ -332,7 +332,7 @@ void timing()
   profiling_reset();
   #endif
   MEASURE_CYCLES(miller_loop_n(f, Q, P, 1), 100);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
   #ifdef PROFILING
   profiling_dump(diff_cycles, 100);
   #endif
@@ -343,7 +343,7 @@ void timing()
   profiling_reset();
   #endif
   MEASURE_CYCLES(final_exp(e1, f), 100);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
   #ifdef PROFILING
   profiling_dump(diff_cycles, 100);
   #endif
@@ -351,7 +351,7 @@ void timing()
   printf("- optimal_ate_pairing:");
   LOAD_CACHE(optimal_ate_pairing(e1, Q, P, 1), 10);
   MEASURE_CYCLES(optimal_ate_pairing(e1, Q, P, 1), 100);
-  printf("  #cycle = %lld\n", diff_cycles);
+  printf("  #cycle = %ld\n", diff_cycles);
 
   printf("=============================================================\n");
 }
