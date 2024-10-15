@@ -488,45 +488,33 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
     add_fp2(ret[1][2], ret[1][2], t1[1]);
 #else
 
-    __m512i rbc_2x2x2x1w[NWORDS], bc_2x2x2x1w[NWORDS];
-    uint64_t t[8][NWORDS], r48[NWORDS];
+    __m512i rbc_2x2x2x1w[NWORDS], bc_2x2x2x1w[NWORDS], t_2x2x2x1w[SWORDS];
+    uint64_t r48[NWORDS];
     int i;
 
     // form < a12 | a01 | a02 | a10 >
-    // TODO: to optimize 
-    conv_64to48_fp(t[0], a[1][0][0]);
-    conv_64to48_fp(t[1], a[1][0][1]);
-    conv_64to48_fp(t[2], a[0][2][0]);
-    conv_64to48_fp(t[3], a[0][2][1]);
-    conv_64to48_fp(t[4], a[0][1][0]);
-    conv_64to48_fp(t[5], a[0][1][1]);
-    conv_64to48_fp(t[6], a[1][2][0]);
-    conv_64to48_fp(t[7], a[1][2][1]);
-
-    for (i = 0; i < NWORDS; i++) {
-      bc_2x2x2x1w[i] = VSET(t[7][i], t[6][i], t[5][i], t[4][i], 
-                            t[3][i], t[2][i], t[1][i], t[0][i]);
+    for (i = 0; i < SWORDS; i++) {
+      t_2x2x2x1w[i] = VSET( a[1][2][1][i], a[1][2][0][i], 
+                            a[0][1][1][i], a[0][1][0][i], 
+                            a[0][2][1][i], a[0][2][0][i], 
+                            a[1][0][1][i], a[1][0][0][i] );
     }
+    conv_64to48_fp_8x1w(bc_2x2x2x1w, t_2x2x2x1w);
 
     cyclotomic_sqr_fp12_vec_v1(ret[0][0], ret[1][1], rbc_2x2x2x1w, 
                                  a[0][0],   a[1][1],  bc_2x2x2x1w);
 
-    get_channel_8x1w(r48, rbc_2x2x2x1w, 0);
-    conv_48to64_fp(ret[1][0][0], r48);
-    get_channel_8x1w(r48, rbc_2x2x2x1w, 1);
-    conv_48to64_fp(ret[1][0][1], r48);
-    get_channel_8x1w(r48, rbc_2x2x2x1w, 2);
-    conv_48to64_fp(ret[0][2][0], r48);
-    get_channel_8x1w(r48, rbc_2x2x2x1w, 3);
-    conv_48to64_fp(ret[0][2][1], r48);
-    get_channel_8x1w(r48, rbc_2x2x2x1w, 4);
-    conv_48to64_fp(ret[0][1][0], r48);
-    get_channel_8x1w(r48, rbc_2x2x2x1w, 5);
-    conv_48to64_fp(ret[0][1][1], r48);
-    get_channel_8x1w(r48, rbc_2x2x2x1w, 6);
-    conv_48to64_fp(ret[1][2][0], r48);
-    get_channel_8x1w(r48, rbc_2x2x2x1w, 7);
-    conv_48to64_fp(ret[1][2][1], r48);
+    conv_48to64_fp_8x1w(t_2x2x2x1w, rbc_2x2x2x1w);
+    for(i = 0; i < SWORDS; i++) {
+      ret[1][0][0][i] = ((uint64_t *)&t_2x2x2x1w[i])[0];
+      ret[1][0][1][i] = ((uint64_t *)&t_2x2x2x1w[i])[1];
+      ret[0][2][0][i] = ((uint64_t *)&t_2x2x2x1w[i])[2];
+      ret[0][2][1][i] = ((uint64_t *)&t_2x2x2x1w[i])[3];
+      ret[0][1][0][i] = ((uint64_t *)&t_2x2x2x1w[i])[4];
+      ret[0][1][1][i] = ((uint64_t *)&t_2x2x2x1w[i])[5];
+      ret[1][2][0][i] = ((uint64_t *)&t_2x2x2x1w[i])[6];
+      ret[1][2][1][i] = ((uint64_t *)&t_2x2x2x1w[i])[7];
+    }
 
 #endif
 

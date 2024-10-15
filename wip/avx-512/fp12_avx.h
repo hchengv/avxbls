@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "intrin.h"
+#include "fields.h"
 
 // ----------------------------------------------------------------------------
 // 48-bit-per-limb representation: 8 * 48-bit = 384-bit
@@ -102,6 +103,26 @@ static void conv_64to48_fp(uint64_t *r, const uint64_t *a)
   r[7] =  (a[5] >> 16)                 & BMASK;
 }
 
+static void conv_64to48_fp_8x1w(__m512i *r, const __m512i *a)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2];
+  const __m512i a3 = a[3], a4 = a[4], a5 = a[5];
+  const __m512i bmask = VSET1(BMASK);
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7;
+
+  r0 = VAND(                       a0,       bmask);
+  r1 = VAND(VOR(VSHR(a0, 48), VSHL(a1, 16)), bmask);
+  r2 = VAND(VOR(VSHR(a1, 32), VSHL(a2, 32)), bmask);
+  r3 = VAND(    VSHR(a2, 16),                bmask);
+  r4 = VAND(                       a3,       bmask);
+  r5 = VAND(VOR(VSHR(a3, 48), VSHL(a4, 16)), bmask);
+  r6 = VAND(VOR(VSHR(a4, 32), VSHL(a5, 32)), bmask);
+  r7 = VAND(    VSHR(a5, 16),                bmask);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+  r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
+}
+
 static void mpi_conv_64to48(uint64_t *r, const uint64_t *a, int rlen, int alen)
 {
   int i, j, shr_pos, shl_pos;
@@ -133,6 +154,30 @@ static void conv_48to64_fp(uint64_t *r, const uint64_t *a)
   r[3] = (a[5] << 48) | a[4];
   r[4] = (a[6] << 32) | a[5] >> 16;
   r[5] = (a[7] << 16) | a[6] >> 32;  
+}
+
+static void conv_48to64_fp_8x1w(__m512i *r, const __m512i *a)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
+  __m512i r0, r1, r2, r3, r4, r5;
+
+  r0 = VOR(VSHL(a1, 48),      a0     );
+  r1 = VOR(VSHL(a2, 32), VSHR(a1, 16));
+  r2 = VOR(VSHL(a3, 16), VSHR(a2, 32));
+  r3 = VOR(VSHL(a5, 48),      a4     );
+  r4 = VOR(VSHL(a6, 32), VSHR(a5, 16));
+  r5 = VOR(VSHL(a7, 16), VSHR(a6, 32));
+
+  r[0] = (a[1] << 48) | a[0];
+  r[1] = (a[2] << 32) | a[1] >> 16;
+  r[2] = (a[3] << 16) | a[2] >> 32;
+  r[3] = (a[5] << 48) | a[4];
+  r[4] = (a[6] << 32) | a[5] >> 16;
+  r[5] = (a[7] << 16) | a[6] >> 32; 
+
+  r[0] = r0; r[1] = r1; r[2] = r2; 
+  r[3] = r3; r[4] = r4; r[5] = r5; 
 }
 
 static void mpi_conv_48to64(uint64_t *r, const uint64_t *a, int rlen, int alen)
