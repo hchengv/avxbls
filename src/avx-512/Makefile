@@ -1,5 +1,5 @@
 CC     = gcc-9 
-SRCS   = fp12_avx.c test.c
+SRCS   = fp12_avx.c test.c rdtsc64.S
 FLAGS  = -O2 -mavx512ifma -fomit-frame-pointer -m64 -mbmi2 -march=native -fwrapv -mtune=native
 OUTPUT = test 
 

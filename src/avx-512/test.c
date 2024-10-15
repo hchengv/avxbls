@@ -2,6 +2,20 @@
 #include <string.h>
 
 
+// for measuring CPU cycles
+
+extern uint64_t read_tsc();
+
+
+#define LOAD_CACHE(X, ITER) for (i = 0; i < (ITER); i++) (X)
+
+#define MEASURE_CYCLES(X, ITER)                    \
+  start_cycles = read_tsc();                       \
+  for (i = 0; i < (ITER); i++) (X);                \
+  end_cycles = read_tsc();                         \
+  diff_cycles = (end_cycles-start_cycles)/(ITER)
+
+
 // ----------------------------------------------------------------------------
 // test vectors
 
@@ -159,6 +173,8 @@ void fp4_test()
   uint64_t a48[NWORDS], b48[NWORDS], r48[NWORDS], z48[2*NWORDS];
   __m512i a_2x2x2x1w[NWORDS], b_2x2x2x1w[NWORDS], r_2x2x2x1w[NWORDS], z[2*NWORDS];
   int i;
+  uint64_t start_cycles, end_cycles, diff_cycles;
+
 
   mpi_conv_64to48(a48, a64, NWORDS, SWORDS);
   mpi_conv_64to48(b48, b64, NWORDS, SWORDS);
@@ -182,6 +198,11 @@ void fp4_test()
   get_channel_8x1w(r48, r_2x2x2x1w, 3);
   mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
   mpi_print("* sqr_fp4_2x2x2x1w r11 = 0x", r64, SWORDS);
+
+  printf("- sqr_fp4_2x2x2x1w:        ");
+  LOAD_CACHE(sqr_fp4_2x2x2x1w(r_2x2x2x1w, a_2x2x2x1w), 1000);
+  MEASURE_CYCLES(sqr_fp4_2x2x2x1w(r_2x2x2x1w, a_2x2x2x1w), 10000);
+  printf("  #cycle = %ld\n", diff_cycles); 
 }
 
 // ----------------------------------------------------------------------------
