@@ -2,10 +2,10 @@
 #include <string.h>
 
 
+// ----------------------------------------------------------------------------
 // for measuring CPU cycles
 
 extern uint64_t read_tsc();
-
 
 #define LOAD_CACHE(X, ITER) for (i = 0; i < (ITER); i++) (X)
 
@@ -14,7 +14,6 @@ extern uint64_t read_tsc();
   for (i = 0; i < (ITER); i++) (X);                \
   end_cycles = read_tsc();                         \
   diff_cycles = (end_cycles-start_cycles)/(ITER)
-
 
 // ----------------------------------------------------------------------------
 // test vectors

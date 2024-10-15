@@ -29,11 +29,10 @@
 #define VEXTR64(X, Y)         _mm256_extract_epi64(X, Y) 
 
 // permutation (256/512-bit, intra) & shuffle (128-bit) & blend
-#define VSHUF(X, Y)           _mm512_shuffle_epi32(X, Y)
-#define VZSHUF(X, Y, Z)       _mm512_maskz_shuffle_epi32(X, Y, Z)
-#define VPERM(X, Y)           _mm512_permutex_epi64(X, Y)
-#define VZPERM(X, Y, Z)       _mm512_maskz_permutex_epi64(X, Y, Z) 
-#define VPERMV(X, Y)          _mm512_permutexvar_epi64(X, Y)
+#define VSHUF(X, Y)           _mm512_shuffle_epi32(X, Y)            // 128-bit 
+#define VZSHUF(X, Y, Z)       _mm512_maskz_shuffle_epi32(X, Y, Z)   // 128-bit
+#define VPERM(X, Y)           _mm512_permutex_epi64(X, Y)           // 256-bit
+#define VZPERM(X, Y, Z)       _mm512_maskz_permutex_epi64(X, Y, Z)  // 256-bit
+#define VPERMV(X, Y)          _mm512_permutexvar_epi64(X, Y)        // 512-bit
 #define VMBLEND(X, Y, Z)      _mm512_mask_blend_epi64(X, Y, Z)
-
 #endif 

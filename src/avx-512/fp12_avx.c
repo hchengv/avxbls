@@ -106,6 +106,41 @@ static void perm_2332(__m512i *r, const __m512i *a)
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
 
+static void perm_var(__m512i *r, const __m512i *a, const __m512i mask)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7;
+
+  r0 = VPERMV(mask, a0); r1 = VPERMV(mask, a1);
+  r2 = VPERMV(mask, a2); r3 = VPERMV(mask, a3);
+  r4 = VPERMV(mask, a4); r5 = VPERMV(mask, a5);
+  r6 = VPERMV(mask, a6); r7 = VPERMV(mask, a7);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+  r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
+}
+
+// a = < H | G | F | E | D | C | B | A >
+// b = < P | O | N | M | L | K | J | I >
+// r = < P | O | F | E | D | C | B | A >
+static void blend_0xC0(__m512i *r, const __m512i *a, const __m512i *b)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
+  const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+  const __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7;
+
+  r0 = VMBLEND(0xC0, a0, b0); r1 = VMBLEND(0xC0, a1, b1);
+  r2 = VMBLEND(0xC0, a2, b2); r3 = VMBLEND(0xC0, a3, b3);
+  r4 = VMBLEND(0xC0, a4, b4); r5 = VMBLEND(0xC0, a5, b5);
+  r6 = VMBLEND(0xC0, a6, b6); r7 = VMBLEND(0xC0, a7, b7);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+  r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
+}
+
 // ----------------------------------------------------------------------------
 // vector double-length transform 
 
@@ -629,6 +664,72 @@ void sub_fp_8x1w(__m512i *r, const __m512i *a, const __m512i *b)
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
 
+// a = < H | G | F | E | D | C | B | A >
+// b = < P | O | N | M | L | K | J | I >
+// r = < H+P | G-O | F+N | E-M | D+L | C-K | B+J | A-I >
+static void asx4_fp_8x1w(__m512i *r, const __m512i *a, const __m512i *b)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
+  const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+  const __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
+  const __m512i p0 = VSET1(P48[0]), p1 = VSET1(P48[1]), p2 = VSET1(P48[2]);
+  const __m512i p3 = VSET1(P48[3]), p4 = VSET1(P48[4]), p5 = VSET1(P48[5]);
+  const __m512i p6 = VSET1(P48[6]), p7 = VSET1(P48[7]);
+  const __m512i bmask = VSET1(BMASK);
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7, smask;
+  __m512i t0, t1, t2, t3, t4, t5, t6, t7;
+
+  // r = H+P | G | F+N | E | D+L | C | B+J | A
+  r0  = VMADD(a0, 0xAA, a0, b0); r1  = VMADD(a1, 0xAA, a1, b1);
+  r2  = VMADD(a2, 0xAA, a2, b2); r3  = VMADD(a3, 0xAA, a3, b3);
+  r4  = VMADD(a4, 0xAA, a4, b4); r5  = VMADD(a5, 0xAA, a5, b5);
+  r6  = VMADD(a6, 0xAA, a6, b6); r7  = VMADD(a7, 0xAA, a7, b7);
+
+  // t = p | O | p | M | p | K | p | I
+  t0 = VMBLEND(0xAA, b0, p0); t1 = VMBLEND(0xAA, b1, p1);
+  t2 = VMBLEND(0xAA, b2, p2); t3 = VMBLEND(0xAA, b3, p3);
+  t4 = VMBLEND(0xAA, b4, p4); t5 = VMBLEND(0xAA, b5, p5);
+  t6 = VMBLEND(0xAA, b6, p6); t7 = VMBLEND(0xAA, b7, p7); 
+
+  // r = H+P-p | G-O | F+N-p | E-M | D+L-p | C-K | B+J-p | A-I
+  r0 = VSUB(r0, t0); r1 = VSUB(r1, t1);
+  r2 = VSUB(r2, t2); r3 = VSUB(r3, t3);
+  r4 = VSUB(r4, t4); r5 = VSUB(r5, t5);
+  r6 = VSUB(r6, t6); r7 = VSUB(r7, t7);
+
+  // get sign mask 
+  t0 = VADD(r1, VSRA(r0, BRADIX));
+  t0 = VADD(r2, VSRA(t0, BRADIX));
+  t0 = VADD(r3, VSRA(t0, BRADIX));
+  t0 = VADD(r4, VSRA(t0, BRADIX));
+  t0 = VADD(r5, VSRA(t0, BRADIX));
+  t0 = VADD(r6, VSRA(t0, BRADIX));
+  t0 = VADD(r7, VSRA(t0, BRADIX));
+
+  // if r is non-negative, smask = all-0 
+  // if r is     negative, smask = all-1
+  smask = VSRA(t0, 63);
+  // r = r + (p & smask)
+  r0 = VADD(r0, VAND(p0, smask)); r1 = VADD(r1, VAND(p1, smask)); 
+  r2 = VADD(r2, VAND(p2, smask)); r3 = VADD(r3, VAND(p3, smask)); 
+  r4 = VADD(r4, VAND(p4, smask)); r5 = VADD(r5, VAND(p5, smask)); 
+  r6 = VADD(r6, VAND(p6, smask)); r7 = VADD(r7, VAND(p7, smask)); 
+
+  // carry propagation 
+  r1 = VADD(r1, VSRA(r0, BRADIX)); r0 = VAND(r0, bmask);
+  r2 = VADD(r2, VSRA(r1, BRADIX)); r1 = VAND(r1, bmask);
+  r3 = VADD(r3, VSRA(r2, BRADIX)); r2 = VAND(r2, bmask);
+  r4 = VADD(r4, VSRA(r3, BRADIX)); r3 = VAND(r3, bmask);
+  r5 = VADD(r5, VSRA(r4, BRADIX)); r4 = VAND(r4, bmask);
+  r6 = VADD(r6, VSRA(r5, BRADIX)); r5 = VAND(r5, bmask);
+  r7 = VADD(r7, VSRA(r6, BRADIX)); r6 = VAND(r6, bmask);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+  r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
+}
+
+
 void add_fp_4x2w(__m512i *r, const __m512i *a, const __m512i *b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
@@ -1047,6 +1148,17 @@ void assa_fp2_4x2x1w(__m512i *r, const __m512i *a, const __m512i *b)
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
 
+// r0 = a0-a1
+// r1 = a0+a1
+void mul_by_u_plus_1_fp2_4x2x1w(__m512i *r, const __m512i *a)
+{
+  __m512i t0[NWORDS];
+
+  // a = A1 | A0 at Fp layer 
+  shuf_01(t0, a);                       //     A0 |    A1
+  asx4_fp_8x1w(r, a, t0);               //  A0+A1 | A0-A1
+}
+
 static void add_fp2_2x2x2w(__m512i *r, const __m512i *a, const __m512i *b)
 {
   add_fp_4x2w(r, a, b);
@@ -1116,7 +1228,7 @@ static void add_fp2x2_4x2x1w(__m512i *r, const __m512i *a, const __m512i *b)
 
 // r0 = (a0+a1)*(a0-a1)
 // r1 = 2*a0*a1
-void sqr_fp2x2_4x2x1w(__m512i *r, __m512i *a)
+void sqr_fp2x2_4x2x1w(__m512i *r, const __m512i *a)
 {
   __m512i t0[NWORDS], t1[NWORDS], t2[NWORDS];
 
@@ -1166,7 +1278,7 @@ void redc_fp2x2_4x2x1w(__m512i *r, const __m512i *a)
 // r0 = a0^2 + (u+1)*a1^2
 // r1 = 2*a0*a1
 // TODO: is x2 version really faster than x1 version in AVX implementation?
-void sqr_fp4_2x2x2x1w(__m512i *r, __m512i *a)
+void sqr_fp4_2x2x2x1w(__m512i *r, const __m512i *a)
 {
   __m512i tt0[2*NWORDS], tt1[2*NWORDS], t0[NWORDS];
 
@@ -1188,7 +1300,8 @@ void sqr_fp4_2x2x2x1w(__m512i *r, __m512i *a)
 // To understand the comments, see Listing 21 in "Guide to Pairing-Based Cryptography". 
 void cyclotomic_sqr_fp12_vec(__m512i *ra, __m512i *rbc, const __m512i *a, const __m512i *bc)
 {
-  __m512i ta[VWORDS], tbc[NWORDS]; 
+  __m512i ta[VWORDS], tbc[NWORDS], t0[NWORDS]; 
+  const __m512i m0 = VSET(3, 2, 1, 0, 5, 4, 7, 6);
 
   // compute A in 1x2x2x2w 
   // a = z1 | z0 at Fp2 layer
@@ -1199,9 +1312,10 @@ void cyclotomic_sqr_fp12_vec(__m512i *ra, __m512i *rbc, const __m512i *a, const 
 
   // compute B and C in 2x2x2x1w
   // bc = z5 | z4 | z3 | z2 at Fp2 layer
-  // sqr_fp4_2x2x2x1w(tbc, bc);            //              t3 |        t2 |       t1  |              t0 
-  // mul_by_u_plus_1_fp2_1w();             //        t3*(u+1)
-  // some_permute(tbc, tbc);               //              t1 |        t0 |       t2  |        t3*(u+1)
+  sqr_fp4_2x2x2x1w(tbc, bc);            //              t3 |        t2 |        t1 |              t0 
+  mul_by_u_plus_1_fp2_4x2x1w(t0, tbc);  //        t3*(u+1) |       ... |       ... |             ...
+  blend_0xC0(tbc, tbc, t0);             //        t3*(u+1) |        t2 |        t1 |              t0
+  perm_var(tbc, tbc, m0);               //              t1 |        t0 |       t2  |        t3*(u+1)        
   assa_fp2_4x2x1w(rbc, tbc, bc);        //           t1+z5 |     t0-z4 |    t2-z3  |     t3*(u+1)+z2
   add_fp2_4x2x1w(rbc, rbc, rbc);        //       2*(t1+z5) | 2*(t0-z4) | 2*(t2-z3) | 2*(t3*(u+1)+z2)
   add_fp2_4x2x1w(rbc, rbc, tbc);        //       3*t1+2*z5 | 3*t0-2*z4 | 3*t2-2*z3 | 3*t3*(u+1)+2*z2
