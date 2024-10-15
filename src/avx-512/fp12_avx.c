@@ -841,7 +841,6 @@ static void asx4_fpx2_8x1w(__m512i *r, const __m512i *a, const __m512i *b)
 }
 
 // Montgomery reduction
-// TODO: add final subtraction!
 void redc_fpx2_8x1w(__m512i *r, const __m512i *a)
 {
   __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
@@ -856,7 +855,7 @@ void redc_fpx2_8x1w(__m512i *r, const __m512i *a)
   const __m512i p3 = VSET1(P48[3]), p4 = VSET1(P48[4]), p5 = VSET1(P48[5]);
   const __m512i p6 = VSET1(P48[6]), p7 = VSET1(P48[7]);
   const __m512i bmask = VSET1(BMASK), montw = VSET1(MONT_W_R48), zero = VZERO;
-  __m512i r0, r1, r2, r3, r4, r5, r6, r7, smask, u;
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7, smask, u, t0;
 
   u  = VAND(VMACLO(zero, a0, montw), bmask);
   a0 = VMACLO(a0, u, p0); a1 = VMACLO(a1, u, p1); a2 = VMACLO(a2, u, p2);
@@ -938,16 +937,43 @@ void redc_fpx2_8x1w(__m512i *r, const __m512i *a)
   a14 = VADD(a14, VSHL(y13, BALIGN));
   a15 = VADD(a15, VSHL(y14, BALIGN));
 
-  a9  = VADD(a9 , VSRA(a8 , BRADIX)); a8  = VAND(a8 , bmask);
-  a10 = VADD(a10, VSRA(a9 , BRADIX)); a9  = VAND(a9 , bmask);
-  a11 = VADD(a11, VSRA(a10, BRADIX)); a10 = VAND(a10, bmask);
-  a12 = VADD(a12, VSRA(a11, BRADIX)); a11 = VAND(a11, bmask);
-  a13 = VADD(a13, VSRA(a12, BRADIX)); a12 = VAND(a12, bmask);
-  a14 = VADD(a14, VSRA(a13, BRADIX)); a13 = VAND(a13, bmask);
-  a15 = VADD(a15, VSRA(a14, BRADIX)); a14 = VAND(a14, bmask);
+  // final subtraction 
+  r0 = a8 ; r1 = a9 ; r2 = a10; r3 = a11;
+  r4 = a12; r5 = a13; r6 = a14; r7 = a15;
 
-  r[0] = a8 ; r[1] = a9 ; r[2] = a10; r[3] = a11;
-  r[4] = a12; r[5] = a13; r[6] = a14; r[7] = a15;
+  // r = r - p
+  r0 = VSUB(r0, p0); r1 = VSUB(r1, p1); r2 = VSUB(r2, p2); r3 = VSUB(r3, p3);
+  r4 = VSUB(r4, p4); r5 = VSUB(r5, p5); r6 = VSUB(r6, p6); r7 = VSUB(r7, p7);
+
+  // get sign mask 
+  t0 = VADD(r1, VSRA(r0, BRADIX));
+  t0 = VADD(r2, VSRA(t0, BRADIX));
+  t0 = VADD(r3, VSRA(t0, BRADIX));
+  t0 = VADD(r4, VSRA(t0, BRADIX));
+  t0 = VADD(r5, VSRA(t0, BRADIX));
+  t0 = VADD(r6, VSRA(t0, BRADIX));
+  t0 = VADD(r7, VSRA(t0, BRADIX));
+
+  // if r is non-negative, smask = all-0 
+  // if r is     negative, smask = all-1
+  smask = VSRA(t0, 63);
+  // r = r + (p & smask)
+  r0 = VADD(r0, VAND(p0, smask)); r1 = VADD(r1, VAND(p1, smask)); 
+  r2 = VADD(r2, VAND(p2, smask)); r3 = VADD(r3, VAND(p3, smask)); 
+  r4 = VADD(r4, VAND(p4, smask)); r5 = VADD(r5, VAND(p5, smask)); 
+  r6 = VADD(r6, VAND(p6, smask)); r7 = VADD(r7, VAND(p7, smask)); 
+
+  // carry propagation 
+  r1 = VADD(r1, VSRA(r0, BRADIX)); r0 = VAND(r0, bmask);
+  r2 = VADD(r2, VSRA(r1, BRADIX)); r1 = VAND(r1, bmask);
+  r3 = VADD(r3, VSRA(r2, BRADIX)); r2 = VAND(r2, bmask);
+  r4 = VADD(r4, VSRA(r3, BRADIX)); r3 = VAND(r3, bmask);
+  r5 = VADD(r5, VSRA(r4, BRADIX)); r4 = VAND(r4, bmask);
+  r6 = VADD(r6, VSRA(r5, BRADIX)); r5 = VAND(r5, bmask);
+  r7 = VADD(r7, VSRA(r6, BRADIX)); r6 = VAND(r6, bmask);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+  r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
 
 // ----------------------------------------------------------------------------

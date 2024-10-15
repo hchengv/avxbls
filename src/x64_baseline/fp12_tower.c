@@ -449,6 +449,25 @@ static void sqr_fp4(vec384fp4 ret, const vec384x a0, const vec384x a1)
     redc_fp2x2(ret[1], t2);
 }
 
+//tested subroutine
+void sqr_fp4_test(vec384fp4 ret, const vec384x a0, const vec384x a1)
+{
+    vec768x t0, t1, t2;
+
+    sqr_fp2x2(t0, a0);
+    sqr_fp2x2(t1, a1);
+    add_fp2(ret[1], a0, a1);
+
+    mul_by_u_plus_1_fp2x2(t2, t1);
+    add_fp2x2(t2, t2, t0);
+    redc_fp2x2(ret[0], t2);
+
+    sqr_fp2x2(t2, ret[1]);
+    sub_fp2x2(t2, t2, t0);
+    sub_fp2x2(t2, t2, t1);
+    redc_fp2x2(ret[1], t2);
+}
+
 void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
 {
   #ifdef PROFILING

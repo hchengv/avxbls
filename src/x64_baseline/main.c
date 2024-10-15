@@ -356,11 +356,49 @@ void timing()
   printf("=============================================================\n");
 }
 
+// ----------------------------------------------------------------------------
+// test vectors
+
+// a := 0x1123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF;
+#define TV_A \
+0x0123456789ABCDEF, 0x0123456789ABCDEF, 0x0123456789ABCDEF, \
+0x0123456789ABCDEF, 0x0123456789ABCDEF, 0x1123456789ABCDEF
+
+// b := 0x19CDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789;
+#define TV_B \
+0xABCDEF0123456789, 0xABCDEF0123456789, 0xABCDEF0123456789, \
+0xABCDEF0123456789, 0xABCDEF0123456789, 0x19CDEF0123456789
+
+// ----------------------------------------------------------------------------
+
+static void mpi_print(const char *c, const uint64_t *a, int len)
+{
+  int i;
+
+  printf("%s", c);
+  for (i = len-1; i > 0; i--) printf("%016lX", a[i]);
+  printf("%016lX\n", a[0]);
+}
+
+void test_subroutine()
+{
+  vec384fp4 r;
+  vec384x a0 = { {TV_A}, {TV_B} }, a1 = { {TV_A}, {TV_B} };
+
+  sqr_fp4_test(r, a0, a1);
+
+  mpi_print("* sqr_fp4 r00 = 0x", r[0][0], 6);
+  mpi_print("* sqr_fp4 r01 = 0x", r[0][1], 6);
+  mpi_print("* sqr_fp4 r10 = 0x", r[1][0], 6);
+  mpi_print("* sqr_fp4 r11 = 0x", r[1][1], 6);
+}
+// ----------------------------------------------------------------------------
 
 int main()
 {
-  test_pairing();
-  timing();
+  // test_pairing();
+  // timing();
+  test_subroutine();
 
   return 0;
 }

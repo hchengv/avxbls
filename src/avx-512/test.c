@@ -161,16 +161,16 @@ void fp4_test()
   sqr_fp4_2x2x2x1w(r_2x2x2x1w, a_2x2x2x1w);
   get_channel_8x1w(r48, r_2x2x2x1w, 0);
   mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp4_2x2x2x1w r0 = 0x", r64, SWORDS);
+  mpi_print("* sqr_fp4_2x2x2x1w r00 = 0x", r64, SWORDS);
   get_channel_8x1w(r48, r_2x2x2x1w, 1);
   mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp4_2x2x2x1w r1 = 0x", r64, SWORDS);
+  mpi_print("* sqr_fp4_2x2x2x1w r01 = 0x", r64, SWORDS);
   get_channel_8x1w(r48, r_2x2x2x1w, 2);
   mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp4_2x2x2x1w r0 = 0x", r64, SWORDS);
+  mpi_print("* sqr_fp4_2x2x2x1w r10 = 0x", r64, SWORDS);
   get_channel_8x1w(r48, r_2x2x2x1w, 3);
   mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp4_2x2x2x1w r1 = 0x", r64, SWORDS);
+  mpi_print("* sqr_fp4_2x2x2x1w r11 = 0x", r64, SWORDS);
 }
 
 // ----------------------------------------------------------------------------
