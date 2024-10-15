@@ -462,9 +462,8 @@ void sqr_fp4_test(vec384fp4 ret, const vec384x a0, const vec384x a1)
     add_fp2x2(t2, t2, t0);
     redc_fp2x2(ret[0], t2);
 
-    sqr_fp2x2(t2, ret[1]);
-    sub_fp2x2(t2, t2, t0);
-    sub_fp2x2(t2, t2, t1);
+    mul_fp2x2(t2, a0, a1);
+    add_fp2x2(t2, t2, t2);
     redc_fp2x2(ret[1], t2);
 }
 
