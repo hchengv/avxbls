@@ -63,10 +63,10 @@ static void perm_10zz(__m512i *r, const __m512i *a)
   const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
   __m512i r0, r1, r2, r3, r4, r5, r6, r7;
 
-  r0 = VZPERM(0xCC, a0, 0x88); r1 = VZPERM(0xCC, a1, 0x88);
-  r2 = VZPERM(0xCC, a2, 0x88); r3 = VZPERM(0xCC, a3, 0x88);
-  r4 = VZPERM(0xCC, a4, 0x88); r5 = VZPERM(0xCC, a5, 0x88);
-  r6 = VZPERM(0xCC, a6, 0x88); r7 = VZPERM(0xCC, a7, 0x88);
+  r0 = VZPERM(0xCC, a0, 0x44); r1 = VZPERM(0xCC, a1, 0x44);
+  r2 = VZPERM(0xCC, a2, 0x44); r3 = VZPERM(0xCC, a3, 0x44);
+  r4 = VZPERM(0xCC, a4, 0x44); r5 = VZPERM(0xCC, a5, 0x44);
+  r6 = VZPERM(0xCC, a6, 0x44); r7 = VZPERM(0xCC, a7, 0x44);
 
   r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
@@ -172,14 +172,14 @@ static void perm_10zz_x2(__m512i *r, const __m512i *a)
   __m512i r0, r1, r2 , r3 , r4 , r5 , r6 , r7 ;
   __m512i r8, r9, r10, r11, r12, r13, r14, r15;
 
-  r0  = VZPERM(0xCC, a0 , 0x88); r1  = VZPERM(0xCC, a1 , 0x88);
-  r2  = VZPERM(0xCC, a2 , 0x88); r3  = VZPERM(0xCC, a3 , 0x88);
-  r4  = VZPERM(0xCC, a4 , 0x88); r5  = VZPERM(0xCC, a5 , 0x88);
-  r6  = VZPERM(0xCC, a6 , 0x88); r7  = VZPERM(0xCC, a7 , 0x88);
-  r8  = VZPERM(0xCC, a8 , 0x88); r9  = VZPERM(0xCC, a9 , 0x88);
-  r10 = VZPERM(0xCC, a10, 0x88); r11 = VZPERM(0xCC, a11, 0x88);
-  r12 = VZPERM(0xCC, a12, 0x88); r13 = VZPERM(0xCC, a13, 0x88);
-  r14 = VZPERM(0xCC, a14, 0x88); r15 = VZPERM(0xCC, a15, 0x88);
+  r0  = VZPERM(0xCC, a0 , 0x44); r1  = VZPERM(0xCC, a1 , 0x44);
+  r2  = VZPERM(0xCC, a2 , 0x44); r3  = VZPERM(0xCC, a3 , 0x44);
+  r4  = VZPERM(0xCC, a4 , 0x44); r5  = VZPERM(0xCC, a5 , 0x44);
+  r6  = VZPERM(0xCC, a6 , 0x44); r7  = VZPERM(0xCC, a7 , 0x44);
+  r8  = VZPERM(0xCC, a8 , 0x44); r9  = VZPERM(0xCC, a9 , 0x44);
+  r10 = VZPERM(0xCC, a10, 0x44); r11 = VZPERM(0xCC, a11, 0x44);
+  r12 = VZPERM(0xCC, a12, 0x44); r13 = VZPERM(0xCC, a13, 0x44);
+  r14 = VZPERM(0xCC, a14, 0x44); r15 = VZPERM(0xCC, a15, 0x44);
 
   r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
   r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
@@ -1150,9 +1150,9 @@ void mul_fp2x2_2x4x1w(__m512i *r, const __m512i *a, const __m512i *b)
   // b = B1 | B0 | ... | ... at Fp layer
   perm_3322(t0, a);                     //        A1 |        A1 |   A0 |   A0
   perm_2332(t1, b);                     //        B0 |        B1 |   B1 |   B0
-  mul_mp_8x1w(tt0, a, b);               //      A1B0 |      A1B1 | A0B1 | A0B0
+  mul_mp_8x1w(tt0, t0, t1);             //      A1B0 |      A1B1 | A0B1 | A0B0
   perm_10zz_x2(tt1, tt0);               //      A0B1 |      A0B0 |    0 |    0 
-  asx4_fpx2_8x1w(r, tt0, tt1);          // A0B1+A1B0 | A0B0-A1B1 |  ... |  ...
+  asx4_fpx2_8x1w(r, tt1, tt0);          // A0B1+A1B0 | A0B0-A1B1 |  ... |  ...
 }
 
 void redc_fp2x2_4x2x1w(__m512i *r, const __m512i *a)
