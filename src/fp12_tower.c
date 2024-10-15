@@ -494,14 +494,14 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
 
     // form < a12 | a01 | a02 | a10 >
     // TODO: to optimize 
-    mpi_conv_64to48(t[0], a[1][0][0], NWORDS, SWORDS);
-    mpi_conv_64to48(t[1], a[1][0][1], NWORDS, SWORDS);
-    mpi_conv_64to48(t[2], a[0][2][0], NWORDS, SWORDS);
-    mpi_conv_64to48(t[3], a[0][2][1], NWORDS, SWORDS);
-    mpi_conv_64to48(t[4], a[0][1][0], NWORDS, SWORDS);
-    mpi_conv_64to48(t[5], a[0][1][1], NWORDS, SWORDS);
-    mpi_conv_64to48(t[6], a[1][2][0], NWORDS, SWORDS);
-    mpi_conv_64to48(t[7], a[1][2][1], NWORDS, SWORDS);
+    conv_64to48_fp(t[0], a[1][0][0]);
+    conv_64to48_fp(t[1], a[1][0][1]);
+    conv_64to48_fp(t[2], a[0][2][0]);
+    conv_64to48_fp(t[3], a[0][2][1]);
+    conv_64to48_fp(t[4], a[0][1][0]);
+    conv_64to48_fp(t[5], a[0][1][1]);
+    conv_64to48_fp(t[6], a[1][2][0]);
+    conv_64to48_fp(t[7], a[1][2][1]);
 
     for (i = 0; i < NWORDS; i++) {
       bc_2x2x2x1w[i] = VSET(t[7][i], t[6][i], t[5][i], t[4][i], 
@@ -512,21 +512,21 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
                                  a[0][0],   a[1][1],  bc_2x2x2x1w);
 
     get_channel_8x1w(r48, rbc_2x2x2x1w, 0);
-    mpi_conv_48to64(ret[1][0][0], r48, SWORDS, NWORDS);
+    conv_48to64_fp(ret[1][0][0], r48);
     get_channel_8x1w(r48, rbc_2x2x2x1w, 1);
-    mpi_conv_48to64(ret[1][0][1], r48, SWORDS, NWORDS);
+    conv_48to64_fp(ret[1][0][1], r48);
     get_channel_8x1w(r48, rbc_2x2x2x1w, 2);
-    mpi_conv_48to64(ret[0][2][0], r48, SWORDS, NWORDS);
+    conv_48to64_fp(ret[0][2][0], r48);
     get_channel_8x1w(r48, rbc_2x2x2x1w, 3);
-    mpi_conv_48to64(ret[0][2][1], r48, SWORDS, NWORDS);
+    conv_48to64_fp(ret[0][2][1], r48);
     get_channel_8x1w(r48, rbc_2x2x2x1w, 4);
-    mpi_conv_48to64(ret[0][1][0], r48, SWORDS, NWORDS);
+    conv_48to64_fp(ret[0][1][0], r48);
     get_channel_8x1w(r48, rbc_2x2x2x1w, 5);
-    mpi_conv_48to64(ret[0][1][1], r48, SWORDS, NWORDS);
+    conv_48to64_fp(ret[0][1][1], r48);
     get_channel_8x1w(r48, rbc_2x2x2x1w, 6);
-    mpi_conv_48to64(ret[1][2][0], r48, SWORDS, NWORDS);
+    conv_48to64_fp(ret[1][2][0], r48);
     get_channel_8x1w(r48, rbc_2x2x2x1w, 7);
-    mpi_conv_48to64(ret[1][2][1], r48, SWORDS, NWORDS);
+    conv_48to64_fp(ret[1][2][1], r48);
 
 #endif
 

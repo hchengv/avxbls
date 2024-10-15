@@ -91,6 +91,18 @@ static void mpi_print(const char *c, const uint64_t *a, int len)
   printf("%016lX\n", a[0]);
 }
 
+static void conv_64to48_fp(uint64_t *r, const uint64_t *a)
+{
+  r[0] =                  a[0]         & BMASK;
+  r[1] = ((a[0] >> 48) | (a[1] << 16)) & BMASK;
+  r[2] = ((a[1] >> 32) | (a[2] << 32)) & BMASK;
+  r[3] =  (a[2] >> 16)                 & BMASK;
+  r[4] =                  a[3]         & BMASK;
+  r[5] = ((a[3] >> 48) | (a[4] << 16)) & BMASK;
+  r[6] = ((a[4] >> 32) | (a[5] << 32)) & BMASK;
+  r[7] =  (a[5] >> 16)                 & BMASK;
+}
+
 static void mpi_conv_64to48(uint64_t *r, const uint64_t *a, int rlen, int alen)
 {
   int i, j, shr_pos, shl_pos;
@@ -112,6 +124,16 @@ static void mpi_conv_64to48(uint64_t *r, const uint64_t *a, int rlen, int alen)
   }
   if (i < rlen) r[i++] = ((temp >> shr_pos) & BMASK);
   for (; i < rlen; i++) r[i] = 0;
+}
+
+static void conv_48to64_fp(uint64_t *r, const uint64_t *a)
+{
+  r[0] = (a[1] << 48) | a[0];
+  r[1] = (a[2] << 32) | a[1] >> 16;
+  r[2] = (a[3] << 16) | a[2] >> 32;
+  r[3] = (a[5] << 48) | a[4];
+  r[4] = (a[6] << 32) | a[5] >> 16;
+  r[5] = (a[7] << 16) | a[6] >> 32;  
 }
 
 static void mpi_conv_48to64(uint64_t *r, const uint64_t *a, int rlen, int alen)
