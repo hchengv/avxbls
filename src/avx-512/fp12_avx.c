@@ -1114,8 +1114,8 @@ void mul_by_u_plus_1_fp2x2_4x2x1w(__m512i *r, const __m512i *a)
   asx4_fpx2_8x1w(r, a, tt0);            //  A0+A1 | A0-A1
 }
 
-// r0 = a0b1+a1b0
-// r1 = a0b0-a1b1
+// r0 = a0b0-a1b1
+// r1 = a0b1+a1b0
 void mul_fp2x2_2x4x1w(__m512i *r, const __m512i *a, const __m512i *b)
 {
   __m512i t0[NWORDS], t1[NWORDS], tt0[2*NWORDS], tt1[2*NWORDS];

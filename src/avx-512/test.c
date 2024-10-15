@@ -179,6 +179,7 @@ int main()
 {
   fp_test();
   fp2_test();
+  fp4_test();
 
   return 0;
 }
