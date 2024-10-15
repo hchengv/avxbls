@@ -152,7 +152,7 @@ void test_pairing()
 
   // print out parts of the result
   printf("e1[0][0][0] = ");
-  for (int i = 6; i > 0; i-- ) printf("%016llX", e1[0][0][0][i]);
+  for (int i = 6; i > 0; i-- ) printf("%016lX", e1[0][0][0][i]);
   printf("\n");
 
   printf("- (e(P, [k]Q))^2 == e([2k]P, Q) \n");
@@ -360,7 +360,7 @@ void timing()
 int main()
 {
   test_pairing();
-  // timing();
+  timing();
 
   return 0;
 }
