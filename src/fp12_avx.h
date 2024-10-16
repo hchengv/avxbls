@@ -35,10 +35,12 @@ static uint64_t P48[NWORDS] = {
 // ----------------------------------------------------------------------------
 // prototypes: mp operations
 
-#define mul_mp_8x1w mul_mp_8x1w_v1
+#define mul_mp_8x1w mul_mp_8x1w_v2
 
 void mul_mp_8x1w_v1(__m512i *r, const __m512i *a, const __m512i *b);
 void mul_mp_8x1w_v2(__m512i *r, const __m512i *a, const __m512i *b);
+void mul_mp_8x1w_v3(__m512i *r, const __m512i *a, const __m512i *b);
+void mul_mp_8x1w_v4(__m512i *r, const __m512i *a, const __m512i *b);
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp single-length operations

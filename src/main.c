@@ -419,10 +419,10 @@ void fp_test()
   mpi_conv_48to64(z64, z48, 2*SWORDS, 2*NWORDS);
   mpi_print("* mul_mp_8x1w_v1 r0 = 0x", z64, 2*SWORDS);
 
-  mul_mp_8x1w_v2(z_8x1w, a_8x1w, b_8x1w);
+  mul_mp_8x1w_v3(z_8x1w, a_8x1w, b_8x1w);
   for(i = 0; i < 2*NWORDS; i++) z48[i] = ((uint64_t *)&z_8x1w[i])[0];
   mpi_conv_48to64(z64, z48, 2*SWORDS, 2*NWORDS);
-  mpi_print("* mul_mp_8x1w_v2 r0 = 0x", z64, 2*SWORDS);
+  mpi_print("* mul_mp_8x1w_v3 r0 = 0x", z64, 2*SWORDS);
 
   redc_fpx2_8x1w(r_8x1w, z_8x1w);
   get_channel_8x1w(r48, r_8x1w, 0);
@@ -543,23 +543,18 @@ void fp4_test()
   get_channel_8x1w(r48, r_2x2x2x1w, 3);
   mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
   mpi_print("* sqr_fp4_2x2x2x1w r11 = 0x", r64, SWORDS);
-
-  printf("- sqr_fp4_2x2x2x1w:        ");
-  LOAD_CACHE(sqr_fp4_2x2x2x1w(r_2x2x2x1w, a_2x2x2x1w), 1000);
-  MEASURE_CYCLES(sqr_fp4_2x2x2x1w(r_2x2x2x1w, a_2x2x2x1w), 10000);
-  printf("  #cycle = %ld\n", diff_cycles); 
 }
 
 // ----------------------------------------------------------------------------
 
 int main()
 {
-  // test_pairing();
-  // timing();
+  test_pairing();
+  timing();
 
-  fp_test();
-  fp2_test();
-  fp4_test();
+  // fp_test();
+  // fp2_test();
+  // fp4_test();
 
   return 0;
 }

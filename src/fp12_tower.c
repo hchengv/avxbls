@@ -454,8 +454,10 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
     uint64_t start_cycles = read_tsc();
   #endif
 
-// scalar implementation
+
 #if 0
+    // scalar implementation
+
     vec384fp4 t0, t1, t2;
 
     sqr_fp4(t0, a[0][0], a[1][1]);
@@ -486,7 +488,9 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
     add_fp2(ret[1][2], t1[1],     a[1][2]);
     add_fp2(ret[1][2], ret[1][2], ret[1][2]);
     add_fp2(ret[1][2], ret[1][2], t1[1]);
+    
 #else
+    // vector implementation
 
     __m512i rbc_2x2x2x1w[NWORDS], bc_2x2x2x1w[NWORDS], t_2x2x2x1w[SWORDS];
     uint64_t r48[NWORDS];
