@@ -457,11 +457,11 @@ void test_fp4()
 
 int main()
 {
-  // test_pairing();
-  // timing_pairing();
+  test_pairing();
+  timing_pairing();
 
   // test_fp();
-  test_fp2();
+  // test_fp2();
   // test_fp4();
 
   return 0;
