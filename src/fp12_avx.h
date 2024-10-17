@@ -87,8 +87,10 @@ void sqr_fp4_2x2x2x1w(__m512i *r, const __m512i *a);
 // prototypes: Fp12 operations
 
 void cyclotomic_sqr_fp12_vec_v1(vec384x ra0, vec384x ra1, __m512i *rbc, 
-                                const vec384x a0, const vec384x a1, const __m512i *bc);
-void cyclotomic_sqr_fp12_vec_v2(__m512i *ra, __m512i *rbc, const __m512i *a, const __m512i *bc);
+                                const vec384x a0, const vec384x a1, 
+                                const __m512i *bc);
+void cyclotomic_sqr_fp12_vec_v2(__m512i *ra, __m512i *rbc, 
+                                const __m512i *a, const __m512i *bc);
 
 // ----------------------------------------------------------------------------
 // utils 
@@ -132,6 +134,20 @@ static void conv_64to48_fp_8x1w(__m512i *r, const __m512i *a)
 
   r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
+}
+
+static void conv_64to48_fp_4x2w(__m512i *r, const __m512i *a)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2];
+  const __m512i bmask = VSET1(BMASK);
+  __m512i r0, r1, r2, r3;
+
+  r0 = VAND(                       a0,       bmask);
+  r1 = VAND(VOR(VSHR(a0, 48), VSHL(a1, 16)), bmask);
+  r2 = VAND(VOR(VSHR(a1, 32), VSHL(a2, 32)), bmask);
+  r3 = VAND(    VSHR(a2, 16),                bmask);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
 }
 
 static void conv_64to48_mpi(uint64_t *r, const uint64_t *a, int rlen, int alen)
@@ -180,15 +196,20 @@ static void conv_48to64_fp_8x1w(__m512i *r, const __m512i *a)
   r4 = VOR(VSHL(a6, 32), VSHR(a5, 16));
   r5 = VOR(VSHL(a7, 16), VSHR(a6, 32));
 
-  r[0] = (a[1] << 48) | a[0];
-  r[1] = (a[2] << 32) | a[1] >> 16;
-  r[2] = (a[3] << 16) | a[2] >> 32;
-  r[3] = (a[5] << 48) | a[4];
-  r[4] = (a[6] << 32) | a[5] >> 16;
-  r[5] = (a[7] << 16) | a[6] >> 32; 
-
   r[0] = r0; r[1] = r1; r[2] = r2; 
   r[3] = r3; r[4] = r4; r[5] = r5; 
+}
+
+static void conv_48to64_fp_4x2w(__m512i *r, const __m512i *a)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  __m512i r0, r1, r2;
+
+  r0 = VOR(VSHL(a1, 48),      a0     );
+  r1 = VOR(VSHL(a2, 32), VSHR(a1, 16));
+  r2 = VOR(VSHL(a3, 16), VSHR(a2, 32));
+
+  r[0] = r0; r[1] = r1; r[2] = r2; 
 }
 
 static void conv_48to64_mpi(uint64_t *r, const uint64_t *a, int rlen, int alen)
@@ -222,6 +243,18 @@ static void carryp_mpi48(uint64_t *a)
     a[i+1] += a[i]>>BRADIX;
     a[i] &= BMASK;
   }
+}
+
+static void carryp_fp_4x2w(__m512i *a)
+{
+  __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i bmask = VSET1(BMASK);
+
+  a1 = VADD(a1, VSRA(a0, BRADIX)); a0 = VAND(a0, bmask);
+  a2 = VADD(a2, VSRA(a1, BRADIX)); a1 = VAND(a1, bmask);
+  a3 = VADD(a3, VSRA(a2, BRADIX)); a2 = VAND(a2, bmask);
+
+  a[0] = a0; a[1] = a1; a[2] = a2; a[3] = a3;
 }
 
 static void get_channel_8x1w(uint64_t *r, const __m512i *a, const int ch) 

@@ -454,7 +454,6 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
     uint64_t start_cycles = read_tsc();
   #endif
 
-
 #if 0
     // scalar implementation
 
@@ -509,8 +508,7 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
                                  a[0][0],   a[1][1],  bc_2x2x2x1w);
 
     conv_48to64_fp_8x1w(t_2x2x2x1w, rbc_2x2x2x1w);
-    
-    for(i = 0; i < SWORDS; i++) {
+    for (i = 0; i < SWORDS; i++) {
       ret[1][0][0][i] = ((uint64_t *)&t_2x2x2x1w[i])[0];
       ret[1][0][1][i] = ((uint64_t *)&t_2x2x2x1w[i])[1];
       ret[0][2][0][i] = ((uint64_t *)&t_2x2x2x1w[i])[2];
@@ -520,24 +518,24 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
       ret[1][2][0][i] = ((uint64_t *)&t_2x2x2x1w[i])[6];
       ret[1][2][1][i] = ((uint64_t *)&t_2x2x2x1w[i])[7];
     }
+
 #else
   // vector implementation v2
 
-    __m512i ra_1x2x2x2w[VWORDS], a_1x2x2x2w[VWORDS];
+    __m512i ra_1x2x2x2w[VWORDS], a_1x2x2x2w[VWORDS], t_1x2x2x2w[SWORDS/2];
     __m512i rbc_2x2x2x1w[NWORDS], bc_2x2x2x1w[NWORDS], t_2x2x2x1w[SWORDS];
     uint64_t z00[NWORDS], z01[NWORDS], z10[NWORDS], z11[NWORDS];
     uint64_t r48[NWORDS];
     int i;
 
     // form < a11 | a00 >
-    conv_64to48_fp(z00, a[0][0][0]);
-    conv_64to48_fp(z01, a[0][0][1]);
-    conv_64to48_fp(z10, a[1][1][0]);
-    conv_64to48_fp(z11, a[1][1][1]);
-    for (i = 0; i < VWORDS; i++) {
-      a_1x2x2x2w[i] = VSET( z11[i+VWORDS], z11[i], z10[i+VWORDS], z10[i],
-                            z01[i+VWORDS], z01[i], z00[i+VWORDS], z00[i]);
+    for (i = 0; i < SWORDS/2; i++) {
+      t_1x2x2x2w[i] = VSET( a[1][1][1][i+SWORDS], a[1][1][1][i],
+                            a[1][1][0][i+SWORDS], a[1][1][0][i],
+                            a[0][0][1][i+SWORDS], a[0][0][1][i],
+                            a[0][0][0][i+SWORDS], a[0][0][0][i] );
     }
+    conv_64to48_fp_4x2w(a_1x2x2x2w, t_1x2x2x2w);
 
     // form < a12 | a01 | a02 | a10 >
     for (i = 0; i < SWORDS; i++) {
@@ -548,26 +546,26 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
     }
     conv_64to48_fp_8x1w(bc_2x2x2x1w, t_2x2x2x1w);
 
-    cyclotomic_sqr_fp12_vec_v2(ra_1x2x2x2w, rbc_2x2x2x1w, a_1x2x2x2w, bc_2x2x2x1w);
+    cyclotomic_sqr_fp12_vec_v2(ra_1x2x2x2w, rbc_2x2x2x1w, 
+                                a_1x2x2x2w,  bc_2x2x2x1w);
 
-    get_channel_4x2w(z00, ra_1x2x2x2w, 0);
-    get_channel_4x2w(z01, ra_1x2x2x2w, 2);
-    get_channel_4x2w(z10, ra_1x2x2x2w, 4);
-    get_channel_4x2w(z11, ra_1x2x2x2w, 6);
+    conv_48to64_fp_4x2w(t_1x2x2x2w, ra_1x2x2x2w);
 
-    carryp_mpi48(z00);
-    carryp_mpi48(z01);
-    carryp_mpi48(z10);
-    carryp_mpi48(z11);
+    carryp_fp_4x2w(t_1x2x2x2w);
 
-    conv_48to64_fp(ret[0][0][0], z00);
-    conv_48to64_fp(ret[0][0][1], z01);
-    conv_48to64_fp(ret[1][1][0], z10);
-    conv_48to64_fp(ret[1][1][1], z11);
+    for(i = 0; i < SWORDS/2; i++) {
+      ret[0][0][0][i]        = ((uint64_t *)&t_1x2x2x2w[i])[0];
+      ret[0][0][0][i+SWORDS] = ((uint64_t *)&t_1x2x2x2w[i])[1];
+      ret[0][0][1][i]        = ((uint64_t *)&t_1x2x2x2w[i])[2];
+      ret[0][0][1][i+SWORDS] = ((uint64_t *)&t_1x2x2x2w[i])[3];
+      ret[1][1][0][i]        = ((uint64_t *)&t_1x2x2x2w[i])[4];
+      ret[1][1][0][i+SWORDS] = ((uint64_t *)&t_1x2x2x2w[i])[5];
+      ret[1][1][1][i]        = ((uint64_t *)&t_1x2x2x2w[i])[6];
+      ret[1][1][1][i+SWORDS] = ((uint64_t *)&t_1x2x2x2w[i])[7];
+    }
 
     conv_48to64_fp_8x1w(t_2x2x2x1w, rbc_2x2x2x1w);
-
-    for(i = 0; i < SWORDS; i++) {
+    for (i = 0; i < SWORDS; i++) {
       ret[1][0][0][i] = ((uint64_t *)&t_2x2x2x1w[i])[0];
       ret[1][0][1][i] = ((uint64_t *)&t_2x2x2x1w[i])[1];
       ret[0][2][0][i] = ((uint64_t *)&t_2x2x2x1w[i])[2];
