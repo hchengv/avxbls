@@ -263,19 +263,19 @@ static void mul_n_sqr_vec(vec384fp12 ret, const vec384fp12 a, size_t n)
 
   // form < a11 | a00 >
   for (i = 0; i < SWORDS/2; i++) {
-    t_1x2x2x2w[i] = VSET( a[1][1][1][i+SWORDS/2], a[1][1][1][i],
-                          a[1][1][0][i+SWORDS/2], a[1][1][0][i],
-                          a[0][0][1][i+SWORDS/2], a[0][0][1][i],
-                          a[0][0][0][i+SWORDS/2], a[0][0][0][i] );
+    t_1x2x2x2w[i] = VSET( ret[1][1][1][i+SWORDS/2], ret[1][1][1][i],
+                          ret[1][1][0][i+SWORDS/2], ret[1][1][0][i],
+                          ret[0][0][1][i+SWORDS/2], ret[0][0][1][i],
+                          ret[0][0][0][i+SWORDS/2], ret[0][0][0][i] );
   }
   conv_64to48_fp_4x2w(a_1x2x2x2w, t_1x2x2x2w);
 
   // form < a12 | a01 | a02 | a10 >
   for (i = 0; i < SWORDS; i++) {
-    t_2x2x2x1w[i] = VSET( a[1][2][1][i], a[1][2][0][i], 
-                          a[0][1][1][i], a[0][1][0][i], 
-                          a[0][2][1][i], a[0][2][0][i], 
-                          a[1][0][1][i], a[1][0][0][i] );
+    t_2x2x2x1w[i] = VSET( ret[1][2][1][i], ret[1][2][0][i], 
+                          ret[0][1][1][i], ret[0][1][0][i], 
+                          ret[0][2][1][i], ret[0][2][0][i], 
+                          ret[1][0][1][i], ret[1][0][0][i] );
   }
   conv_64to48_fp_8x1w(bc_2x2x2x1w, t_2x2x2x1w);
 
