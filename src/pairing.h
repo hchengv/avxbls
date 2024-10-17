@@ -4,6 +4,7 @@
 #include "fields.h"
 #include "point.h"
 #include "consts.h"
+#include "fp12_avx.h"
 
 void miller_loop_n(vec384fp12 ret, const POINTonE2_affine Q[],
                                    const POINTonE1_affine P[], size_t n);
