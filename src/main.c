@@ -464,7 +464,7 @@ void test_fp12()
 
   puts("\nFP12 TIMING\n");
 
-  printf("- final_exp:          ");
+  printf("- cyclotomic_sqr_fp12: ");
   LOAD_CACHE(cyclotomic_sqr_fp12(r, a), 100);
   MEASURE_CYCLES(cyclotomic_sqr_fp12(r, a), 1000);
   printf("  #cycle = %ld\n", diff_cycles);
