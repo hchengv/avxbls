@@ -524,7 +524,6 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
 
     __m512i ra_1x2x2x2w[VWORDS], a_1x2x2x2w[VWORDS], t_1x2x2x2w[SWORDS/2];
     __m512i rbc_2x2x2x1w[NWORDS], bc_2x2x2x1w[NWORDS], t_2x2x2x1w[SWORDS];
-    uint64_t z00[NWORDS], z01[NWORDS], z10[NWORDS], z11[NWORDS];
     uint64_t r48[NWORDS];
     int i;
 
@@ -549,10 +548,8 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
     cyclotomic_sqr_fp12_vec_v2(ra_1x2x2x2w, rbc_2x2x2x1w, 
                                 a_1x2x2x2w,  bc_2x2x2x1w);
 
+    carryp_fp_4x2w(ra_1x2x2x2w);
     conv_48to64_fp_4x2w(t_1x2x2x2w, ra_1x2x2x2w);
-
-    carryp_fp_4x2w(t_1x2x2x2w);
-
     for(i = 0; i < SWORDS/2; i++) {
       ret[0][0][0][i         ] = ((uint64_t *)&t_1x2x2x2w[i])[0];
       ret[0][0][0][i+SWORDS/2] = ((uint64_t *)&t_1x2x2x2w[i])[1];
