@@ -900,11 +900,12 @@ void mul_mp_4x2w_v1(__m512i *r, const __m512i *a, const __m512i *b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
   const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
-  __m512i z0 = VZERO, z1 = VZERO, z2 = VZERO, z3 = VZERO;
-  __m512i z4 = VZERO, z5 = VZERO, z6 = VZERO, z7 = VZERO;
-  __m512i y0 = VZERO, y1 = VZERO, y2 = VZERO, y3 = VZERO;
-  __m512i y4 = VZERO, y5 = VZERO, y6 = VZERO, y7 = VZERO;
-  __m512i tb;
+  __m512i z0 = VZERO, z1 = VZERO, z2  = VZERO, z3  = VZERO;
+  __m512i z4 = VZERO, z5 = VZERO, z6  = VZERO, z7  = VZERO;
+  __m512i z8 = VZERO, z9 = VZERO, z10 = VZERO, z11 = VZERO;
+  __m512i y0 = VZERO, y1 = VZERO, y2  = VZERO, y3  = VZERO;
+  __m512i y4 = VZERO, y5 = VZERO, y6  = VZERO, y7  = VZERO;
+  __m512i y8 = VZERO, y9 = VZERO, y10 = VZERO, tb;
 
   tb = VSHUF(b0, 0x44);
   z0 = VMACLO(z0, tb, a0); z1 = VMACLO(z1, tb, a1);
@@ -932,10 +933,43 @@ void mul_mp_4x2w_v1(__m512i *r, const __m512i *a, const __m512i *b)
 
   tb = VSHUF(b0, 0xEE);
   z4 = VMACLO(z4, tb, a0); z5 = VMACLO(z5, tb, a1);
-  z5 = VMACLO(z5, tb, a2); z6 = VMACLO(z6, tb, a3);
-  y3 = VMACHI(y3, tb, a0); y4 = VMACHI(y4, tb, a1);
-  y5 = VMACHI(y5, tb, a2); y6 = VMACHI(y6, tb, a3);
+  z6 = VMACLO(z6, tb, a2); z7 = VMACLO(z7, tb, a3);
+  y4 = VMACHI(y4, tb, a0); y5 = VMACHI(y5, tb, a1);
+  y6 = VMACHI(y6, tb, a2); y7 = VMACHI(y7, tb, a3);
 
+  tb = VSHUF(b1, 0xEE);
+  z5 = VMACLO(z5, tb, a0); z6 = VMACLO(z6, tb, a1);
+  z7 = VMACLO(z7, tb, a2); z8 = VMACLO(z8, tb, a3);
+  y5 = VMACHI(y5, tb, a0); y6 = VMACHI(y6, tb, a1);
+  y7 = VMACHI(y7, tb, a2); y8 = VMACHI(y8, tb, a3);
+
+  tb = VSHUF(b2, 0xEE);
+  z6 = VMACLO(z6, tb, a0); z7 = VMACLO(z7, tb, a1);
+  z8 = VMACLO(z8, tb, a2); z9 = VMACLO(z9, tb, a3);
+  y6 = VMACHI(y6, tb, a0); y7 = VMACHI(y7, tb, a1);
+  y8 = VMACHI(y8, tb, a2); y9 = VMACHI(y9, tb, a3);
+
+  tb = VSHUF(b3, 0xEE);
+  z7 = VMACLO(z7, tb, a0); z8 = VMACLO(z8, tb, a1);
+  z9 = VMACLO(z9, tb, a2); z10 = VMACLO(z10, tb, a3);
+  y7 = VMACHI(y7, tb, a0); y8 = VMACHI(y8, tb, a1);
+  y9 = VMACHI(y9, tb, a2); y10 = VMACHI(y10, tb, a3);
+
+  z1  = VADD(z1 , VSHL(y0 , BALIGN));
+  z2  = VADD(z2 , VSHL(y1 , BALIGN));
+  z3  = VADD(z3 , VSHL(y2 , BALIGN));
+  z4  = VADD(z4 , VSHL(y3 , BALIGN));
+  z5  = VADD(z5 , VSHL(y4 , BALIGN));
+  z6  = VADD(z6 , VSHL(y5 , BALIGN));
+  z7  = VADD(z7 , VSHL(y6 , BALIGN));
+  z8  = VADD(z8 , VSHL(y7 , BALIGN));
+  z9  = VADD(z9 , VSHL(y8 , BALIGN));
+  z10 = VADD(z10, VSHL(y9 , BALIGN));
+  z11 = VADD(z11, VSHL(y10, BALIGN));
+
+  r[0 ] = z0 ; r[1 ] = z1 ; r[2 ] = z2 ; r[3 ] = z3 ;
+  r[4 ] = z4 ; r[5 ] = z5 ; r[6 ] = z6 ; r[7 ] = z7 ;
+  r[8 ] = z8 ; r[9 ] = z9 ; r[10] = z10; r[11] = z11;
 }
 
 // ----------------------------------------------------------------------------
@@ -1493,6 +1527,108 @@ void redc_fpx2_8x1w(__m512i *r, const __m512i *a)
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
 
+void redc_fpx2_4x2w(__m512i *r, const __m512i *a)
+{
+  __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
+  __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
+  __m512i a8  = a[8 ], a9  = a[9 ], a10 = a[10], a11 = a[11];
+  __m512i y0  = VZERO, y1  = VZERO, y2  = VZERO, y3  = VZERO;
+  __m512i y4  = VZERO, y5  = VZERO, y6  = VZERO, y7  = VZERO;
+  __m512i y8  = VZERO, y9  = VZERO, y10 = VZERO;
+  const __m512i p0 = VSET(P48[4], P48[0], P48[4], P48[0], P48[4], P48[0], P48[4], P48[0]);
+  const __m512i p1 = VSET(P48[5], P48[1], P48[5], P48[1], P48[5], P48[1], P48[5], P48[1]);
+  const __m512i p2 = VSET(P48[6], P48[2], P48[6], P48[2], P48[6], P48[2], P48[6], P48[2]);
+  const __m512i p3 = VSET(P48[7], P48[3], P48[7], P48[3], P48[7], P48[3], P48[7], P48[3]);
+  const __m512i bmask = VSET1(BMASK), montw = VSET1(MONT_W_R48), zero = VZERO;
+  __m512i r0, r1, r2, r3, smask, u;
+
+  u  = VSHUF(VAND(VMACLO(zero, a0, montw), bmask), 0x44);
+  a0 = VMACLO(a0, u, p0); a1 = VMACLO(a1, u, p1);
+  a2 = VMACLO(a2, u, p2); a3 = VMACLO(a3, u, p3);
+  y0 = VMACHI(y0, u, p0); y1 = VMACHI(y1, u, p1);
+  y2 = VMACHI(y2, u, p2); y3 = VMACHI(y3, u, p3);
+  a4 = VMADD(a4, 0x55, a4, VSHUF(a0, 0x4E  ));
+  a1 = VMADD(a1, 0x55, a1, VSRA (a0, BRADIX));
+  a1 = VADD(a1, VSHL(y0, BALIGN));
+
+  u  = VSHUF(VAND(VMACLO(zero, a1, montw), bmask), 0x44);
+  a1 = VMACLO(a1, u, p0); a2 = VMACLO(a2, u, p1);
+  a3 = VMACLO(a3, u, p2); a4 = VMACLO(a4, u, p3);
+  y1 = VMACHI(y1, u, p0); y2 = VMACHI(y2, u, p1);
+  y3 = VMACHI(y3, u, p2); y4 = VMACHI(y4, u, p3);
+  a5 = VMADD(a5, 0x55, a5, VSHUF(a1, 0x4E  ));
+  a2 = VMADD(a2, 0x55, a2, VSRA (a1, BRADIX));
+  a2 = VADD(a2, VSHL(y1, BALIGN));
+
+  u  = VSHUF(VAND(VMACLO(zero, a2, montw), bmask), 0x44);
+  a2 = VMACLO(a2, u, p0); a3 = VMACLO(a3, u, p1);
+  a4 = VMACLO(a4, u, p2); a5 = VMACLO(a5, u, p3);
+  y2 = VMACHI(y2, u, p0); y3 = VMACHI(y3, u, p1);
+  y4 = VMACHI(y4, u, p2); y5 = VMACHI(y5, u, p3);
+  a6 = VMADD(a6, 0x55, a6, VSHUF(a2, 0x4E  ));
+  a3 = VMADD(a3, 0x55, a3, VSRA (a2, BRADIX));
+  a3 = VADD(a3, VSHL(y2, BALIGN));
+
+  u  = VSHUF(VAND(VMACLO(zero, a3, montw), bmask), 0x44);
+  a3 = VMACLO(a3, u, p0); a4 = VMACLO(a4, u, p1);
+  a5 = VMACLO(a5, u, p2); a6 = VMACLO(a6, u, p3);
+  y3 = VMACHI(y3, u, p0); y4 = VMACHI(y4, u, p1);
+  y5 = VMACHI(y5, u, p2); y6 = VMACHI(y6, u, p3);
+  a7 = VMADD(a7, 0x55, a7, VSHUF(a3, 0x4E  ));
+  a4 = VMADD(a4, 0x55, a4, VSRA (a3, BRADIX));
+  a4 = VADD(a4, VSHL(y3, BALIGN));
+
+  u  = VSHUF(VAND(VMACLO(zero, a4, montw), bmask), 0x44);
+  a4 = VMACLO(a4, u, p0); a5 = VMACLO(a5, u, p1);
+  a6 = VMACLO(a6, u, p2); a7 = VMACLO(a7, u, p3);
+  y4 = VMACHI(y4, u, p0); y5 = VMACHI(y5, u, p1);
+  y6 = VMACHI(y6, u, p2); y7 = VMACHI(y7, u, p3);
+  a8 = VMADD(a8, 0x55, a8, VSHUF(a4, 0x4E  ));
+  a5 = VMADD(a5, 0x55, a5, VSRA (a4, BRADIX));
+  a5 = VADD(a5, VSHL(y4, BALIGN));
+
+  u  = VSHUF(VAND(VMACLO(zero, a5, montw), bmask), 0x44);
+  a5 = VMACLO(a5, u, p0); a6 = VMACLO(a6, u, p1);
+  a7 = VMACLO(a7, u, p2); a8 = VMACLO(a8, u, p3);
+  y5 = VMACHI(y5, u, p0); y6 = VMACHI(y6, u, p1);
+  y7 = VMACHI(y7, u, p2); y8 = VMACHI(y8, u, p3);
+  a9 = VMADD(a9, 0x55, a9, VSHUF(a5, 0x4E  ));
+  a6 = VMADD(a6, 0x55, a6, VSRA (a5, BRADIX));
+  a6 = VADD(a6, VSHL(y5, BALIGN));
+
+  u   = VSHUF(VAND(VMACLO(zero, a6, montw), bmask), 0x44);
+  a6  = VMACLO(a6, u, p0); a7  = VMACLO(a7, u, p1);
+  a8  = VMACLO(a8, u, p2); a9  = VMACLO(a9, u, p3);
+  y6  = VMACHI(y6, u, p0); y7  = VMACHI(y7, u, p1);
+  y8  = VMACHI(y8, u, p2); y9  = VMACHI(y9, u, p3);
+  a10 = VMADD(a10, 0x55, a10, VSHUF(a6, 0x4E  ));
+  a7  = VMADD(a7 , 0x55, a7 , VSRA (a6, BRADIX));
+  a7  = VADD(a7, VSHL(y6, BALIGN));
+
+  u   = VSHUF(VAND(VMACLO(zero, a7, montw), bmask), 0x44);
+  a7  = VMACLO(a7, u, p0); a8   = VMACLO(a8 , u, p1);
+  a9  = VMACLO(a9, u, p2); a10  = VMACLO(a10, u, p3);
+  y7  = VMACHI(y7, u, p0); y8   = VMACHI(y8 , u, p1);
+  y9  = VMACHI(y9, u, p2); y10  = VMACHI(y10, u, p3);
+  a11 = VMADD(a11, 0x55, a11, VSHUF(a7, 0x4E  ));
+  a8  = VMADD(a8 , 0x55, a8 , VSRA (a7, BRADIX));
+  a8  = VADD(a8, VSHL(y7, BALIGN));
+
+  a9  = VADD(a9 , VSHL(y8 , BALIGN));
+  a10 = VADD(a10, VSHL(y9 , BALIGN));
+  a11 = VADD(a11, VSHL(y10, BALIGN));
+
+  // carry propagation 
+  r0 = a8; r1 = a9; r2 = a10; r3 = a11;
+  // r0 is finally 49-bit not 48-bit
+  r1 = VADD(r1, VSRA(r0, BRADIX)); r0 = VAND(r0, bmask);
+  r2 = VADD(r2, VSRA(r1, BRADIX)); r1 = VAND(r1, bmask);
+  r3 = VADD(r3, VSRA(r2, BRADIX)); r2 = VAND(r2, bmask);
+  r0 = VMADD(r0, 0xAA, r0, VSHUF(VSRA(r3, BRADIX), 0x4E)); r3 = VAND(r3, bmask);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3; 
+}
+
 // ----------------------------------------------------------------------------
 // Fp2 single length operations
 
@@ -1634,6 +1770,22 @@ void as_fp2_2x2x2w(__m512i *r, const __m512i *a, const __m512i *b)
   r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3; 
 }
 
+// r0 = (a0+a1)*(a0-a1)
+// r1 = 2*a0*a1
+void sqr_fp2_2x2x2w(__m512i *r, const __m512i *a)
+{
+  __m512i t0[VWORDS], t1[VWORDS], t2[VWORDS], t3[3*VWORDS];
+
+  // a = A1 | A0 at Fp layer
+  perm_1010_hl(t0, a);                  //      A0 |              A0
+  perm_1032_hl(t1, a);                  //      A0 |              A1 
+  perm_zz32_hl(t2, a);                  //       0 |              A1
+  add_fp_4x2w(t0, t0, t1);              //    2*A0 |           A0+A1
+  sub_fp_4x2w(t2, a, t2);               //      A1 |           A0-A1
+  mul_mp_4x2w(t3, t0, t2);              // 2*A0*A1 | (A0+A1)*(A0-A1)
+  redc_fpx2_4x2w(r, t3);                // 2*A0*A1 | (A0+A1)*(A0-A1)
+}
+
 // ----------------------------------------------------------------------------
 // Fp2 double length operations
 
@@ -1688,26 +1840,12 @@ void redc_fp2x2_4x2x1w(__m512i *r, const __m512i *a)
   redc_fpx2_8x1w(r, a);
 }
 
-// r0 = (a0+a1)*(a0-a1)
-// r1 = 2*a0*a1
-void sqr_fp2x2_2x2x2w(__m512i *r, const __m512i *a)
-{
-  __m512i t0[NWORDS], t1[NWORDS], t2[NWORDS];
-
-  // a = A1 | A0 at Fp layer
-  perm_1010_hl(t0, a);                  //      A0 |              A0
-  perm_1032_hl(t1, a);                  //      A0 |              A1 
-  perm_zz32_hl(t2, a);                  //       0 |              A1
-  add_fp_4x2w(t0, t0, t1);              //    2*A0 |           A0+A1
-  sub_fp_4x2w(t2, a, t2);               //      A1 |           A0-A1
-  mul_mp_4x2w(r, t0, t2);               // 2*A0*A1 | (A0+A1)*(A0-A1)
-}
-
 // ----------------------------------------------------------------------------
 // Fp4 operations
 
 // r0 = a0^2 + (u+1)*a1^2
 // r1 = 2*a0*a1
+// x2 version
 // TODO: is x2 version really faster than x1 version in AVX implementation?
 void sqr_fp4_2x2x2x1w(__m512i *r, const __m512i *a)
 {
@@ -1727,12 +1865,13 @@ void sqr_fp4_2x2x2x1w(__m512i *r, const __m512i *a)
 
 // r0 = a0^2 + (u+1)*a1^2
 // r1 = 2*a0*a1
+// x1 version
 void sqr_fp4_1x2x2x2w(__m512i *r, const __m512i *a)
 {
-  __m512i tt0[NWORDS], tt1[NWORDS], t0[NWORDS/2];
+  __m512i tt0[2*VWORDS], tt1[2*VWORDS], t0[VWORDS];
 
   // a = A1 | A0 at Fp2 layer
-  sqr_fp2x2_2x2x2w(tt0, a);                 //        A1^2 |              A0^2
+  sqr_fp2_2x2x2w(tt0, a);                   //        A1^2 |              A0^2
   // mul_by_u_plus_1_fp2x2_2x2x2w(tt1, tt0);   //  (u+1)*A1^2 |               ...
   //                                           //           0 |        (u+1)*A1^2
   // add_fp2x2_2x2x2w(tt0, tt0, tt1);          //         ... | A0^2+(u+1)*(A1^2)
@@ -1768,8 +1907,8 @@ void cyclotomic_sqr_fp12_vec_v1(vec384x ra0, vec384x ra1, __m512i *rbc,
   sqr_fp4_2x2x2x1w(tbc, bc);            //              t3 |        t2 |        t1 |              t0 
   mul_by_u_plus_1_fp2_4x2x1w(t0, tbc);  //        t3*(u+1) |       ... |       ... |             ...
   blend_0xC0(tbc, tbc, t0);             //        t3*(u+1) |        t2 |        t1 |              t0
-  perm_var(tbc, tbc, m0);               //              t1 |        t0 |       t2  |        t3*(u+1)        
-  assa_fp2_4x2x1w(rbc, tbc, bc);        //           t1+z5 |     t0-z4 |    t2-z3  |     t3*(u+1)+z2
+  perm_var(tbc, tbc, m0);               //              t1 |        t0 |        t2 |        t3*(u+1)        
+  assa_fp2_4x2x1w(rbc, tbc, bc);        //           t1+z5 |     t0-z4 |     t2-z3 |     t3*(u+1)+z2
   add_fp2_4x2x1w(rbc, rbc, rbc);        //       2*(t1+z5) | 2*(t0-z4) | 2*(t2-z3) | 2*(t3*(u+1)+z2)
   add_fp2_4x2x1w(rbc, rbc, tbc);        //       3*t1+2*z5 | 3*t0-2*z4 | 3*t2-2*z3 | 3*t3*(u+1)+2*z2
 }
@@ -1780,7 +1919,7 @@ void cyclotomic_sqr_fp12_vec_v2(__m512i *ra, __m512i *rbc, const __m512i *a, con
   __m512i ta[VWORDS], tbc[NWORDS], t0[NWORDS]; 
   const __m512i m0 = VSET(3, 2, 1, 0, 5, 4, 7, 6);
 
-  // compute A in 1x2x2x2w (some limbs are not fully reduced)
+  // compute A in 1x2x2x2w (some limbs are not fully shortened)
   // a = z1 | z0 at Fp2 layer
   sqr_fp4_1x2x2x2w(ta, a);              //        t1 |        t0      
   as_fp2_2x2x2w(ra, ta, a);             //     t1+z1 |     t0-z0     
@@ -1792,8 +1931,8 @@ void cyclotomic_sqr_fp12_vec_v2(__m512i *ra, __m512i *rbc, const __m512i *a, con
   sqr_fp4_2x2x2x1w(tbc, bc);            //              t3 |        t2 |        t1 |              t0 
   mul_by_u_plus_1_fp2_4x2x1w(t0, tbc);  //        t3*(u+1) |       ... |       ... |             ...
   blend_0xC0(tbc, tbc, t0);             //        t3*(u+1) |        t2 |        t1 |              t0
-  perm_var(tbc, tbc, m0);               //              t1 |        t0 |       t2  |        t3*(u+1)        
-  assa_fp2_4x2x1w(rbc, tbc, bc);        //           t1+z5 |     t0-z4 |    t2-z3  |     t3*(u+1)+z2
+  perm_var(tbc, tbc, m0);               //              t1 |        t0 |        t2 |        t3*(u+1)        
+  assa_fp2_4x2x1w(rbc, tbc, bc);        //           t1+z5 |     t0-z4 |     t2-z3 |     t3*(u+1)+z2
   add_fp2_4x2x1w(rbc, rbc, rbc);        //       2*(t1+z5) | 2*(t0-z4) | 2*(t2-z3) | 2*(t3*(u+1)+z2)
   add_fp2_4x2x1w(rbc, rbc, tbc);        //       3*t1+2*z5 | 3*t0-2*z4 | 3*t2-2*z3 | 3*t3*(u+1)+2*z2
 }

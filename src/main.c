@@ -193,133 +193,13 @@ void test_pairing()
   printf("=============================================================\n");
 }
 
-void timing()
+void timing_pairing()
 {
   uint64_t start_cycles, end_cycles, diff_cycles;
   int i;
 
   printf("timing measurement:\n");
   printf("=============================================================\n");
-  printf("fp arith:\n");
-
-  vec384 a, b, r;
-  vec768 z;
-
-  printf("- add_mod_384:        ");
-  LOAD_CACHE(add_mod_384(r, a, b, BLS12_381_P), 1000);
-  MEASURE_CYCLES(add_mod_384(r, a, b, BLS12_381_P), 10000);
-  printf("  #cycle = %ld\n", diff_cycles);
-
-  printf("- sub_mod_384:        ");
-  LOAD_CACHE(sub_mod_384(r, a, b, BLS12_381_P), 1000);
-  MEASURE_CYCLES(sub_mod_384(r, a, b, BLS12_381_P), 10000);
-  printf("  #cycle = %ld\n", diff_cycles);
-
-  printf("- mul_mont_384:       ");
-  LOAD_CACHE(mul_mont_384(r, a, b, BLS12_381_P, p0), 1000);
-  MEASURE_CYCLES(mul_mont_384(r, a, b, BLS12_381_P, p0), 10000);
-  printf("  #cycle = %ld\n", diff_cycles);
-
-  printf("- sqr_mont_384:       ");
-  LOAD_CACHE(sqr_mont_384(r, a, BLS12_381_P, p0), 1000);
-  MEASURE_CYCLES(sqr_mont_384(r, a, BLS12_381_P, p0), 10000);
-  printf("  #cycle = %ld\n", diff_cycles);
-
-  printf("- mul_384:            ");
-  LOAD_CACHE(mul_384(z, a, b), 1000);
-  MEASURE_CYCLES(mul_384(z, a, b), 10000);
-  printf("  #cycle = %ld\n", diff_cycles);
-
-  printf("- redc_mont_384:      ");
-  LOAD_CACHE(redc_mont_384(r, z, BLS12_381_P, p0), 1000);
-  MEASURE_CYCLES(redc_mont_384(r, z, BLS12_381_P, p0), 10000);
-  printf("  #cycle = %ld\n", diff_cycles);
-
-  printf("-------------------------------------------------------------\n");
-  printf("fp2 arith:\n");
-
-  vec384x c, d, s;
-  vec768x y;
-  vec768  m, n;
-
-  printf("- add_mod_384x384:    ");
-  LOAD_CACHE(add_mod_384x384(z, m, n, BLS12_381_P), 1000);
-  MEASURE_CYCLES(add_mod_384x384(z, m, n, BLS12_381_P), 10000);
-  printf("  #cycle = %ld\n", diff_cycles);
-
-  printf("- sub_mod_384x384:    ");
-  LOAD_CACHE(sub_mod_384x384(z, m, n, BLS12_381_P), 1000);
-  MEASURE_CYCLES(sub_mod_384x384(z, m, n, BLS12_381_P), 10000);
-  printf("  #cycle = %ld\n", diff_cycles);
-
-  printf("- mul_fp2x2:          ");
-  LOAD_CACHE(mul_fp2x2(y, c, d), 1000);
-  MEASURE_CYCLES(mul_fp2x2(y, c, d), 10000);
-  printf("  #cycle = %ld\n", diff_cycles);
-
-  printf("- sqr_fp2x2:          ");
-  LOAD_CACHE(sqr_fp2x2(y, c), 1000);
-  MEASURE_CYCLES(sqr_fp2x2(y, c), 10000);
-  printf("  #cycle = %ld\n", diff_cycles);
-
-  printf("- redc_fp2x2:         ");
-  LOAD_CACHE(redc_fp2x2(s, y), 1000);
-  MEASURE_CYCLES(redc_fp2x2(s, y), 10000);
-  printf("  #cycle = %ld\n", diff_cycles);
-
-  printf("- mul_mont_384x:      ");
-  LOAD_CACHE(mul_mont_384x(s, c, d, BLS12_381_P, p0), 1000);
-  MEASURE_CYCLES(mul_mont_384x(s, c, d, BLS12_381_P, p0), 10000);
-  printf("  #cycle = %ld\n", diff_cycles);
-
-  printf("- sqr_mont_384x:      ");
-  LOAD_CACHE(sqr_mont_384x(s, c, BLS12_381_P, p0), 1000);
-  MEASURE_CYCLES(sqr_mont_384x(s, c, BLS12_381_P, p0), 10000);
-  printf("  #cycle = %ld\n", diff_cycles);
-
-  printf("-------------------------------------------------------------\n");
-  printf("fp6 arith:\n");
-
-  vec384fp6 e, h, t;
-  vec768fp6 x;
-
-  printf("- mul_fp6x2:          ");
-  LOAD_CACHE(mul_fp6x2(x, e, h), 100);
-  MEASURE_CYCLES(mul_fp6x2(x, e, h), 1000);
-  printf("  #cycle = %ld\n", diff_cycles);
-
-  printf("- redc_fp6x2:         ");
-  LOAD_CACHE(redc_fp6x2(e, x), 1000);
-  MEASURE_CYCLES(redc_fp6x2(e, x), 10000);
-  printf("  #cycle = %ld\n", diff_cycles);
-
-  printf("- mul_fp6:            ");
-  LOAD_CACHE(mul_fp6(t, e, h), 100);
-  MEASURE_CYCLES(mul_fp6(t, e, h), 1000);
-  printf("  #cycle = %ld\n", diff_cycles);
-
-  printf("- sqr_fp6:            ");
-  LOAD_CACHE(sqr_fp6(t, e), 100);
-  MEASURE_CYCLES(sqr_fp6(t, e), 1000);
-  printf("  #cycle = %ld\n", diff_cycles);
-
-  printf("-------------------------------------------------------------\n");
-  printf("fp12 arith:\n");
-
-  vec384fp12 g, l, u;
-
-  printf("- mul_fp12:           ");
-  LOAD_CACHE(mul_fp12(u, g, l), 10);
-  MEASURE_CYCLES(mul_fp12(u, g, l), 100);
-  printf("  #cycle = %ld\n", diff_cycles);
-
-  printf("- sqr_fp12:           ");
-  LOAD_CACHE(sqr_fp12(u, g), 10);
-  MEASURE_CYCLES(sqr_fp12(u, g), 100);
-  printf("  #cycle = %ld\n", diff_cycles);
-
-  printf("-------------------------------------------------------------\n");
-  printf("pairing:\n");
 
   POINTonE2_affine Q[1];
   POINTonE1_affine P[1];
@@ -381,12 +261,12 @@ void timing()
 
 // ----------------------------------------------------------------------------
 
-void fp_test()
+void test_fp()
 {
   uint64_t a64[SWORDS] = { TV_A }, b64[SWORDS] = { TV_B }, r64[SWORDS], z64[2*SWORDS];
   uint64_t a48[NWORDS], b48[NWORDS], r48[NWORDS], z48[2*NWORDS];
   __m512i a_8x1w[NWORDS], b_8x1w[NWORDS], r_8x1w[NWORDS], z_8x1w[2*NWORDS];
-  __m512i a_4x2w[VWORDS], b_4x2w[VWORDS], r_4x2w[VWORDS];
+  __m512i a_4x2w[VWORDS], b_4x2w[VWORDS], r_4x2w[VWORDS], z_4x2w[3*VWORDS];
   int i;
 
   mpi_conv_64to48(a48, a64, NWORDS, SWORDS);
@@ -434,11 +314,18 @@ void fp_test()
   mpi48_carryp(r48);
   mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
   mpi_print("* add_fp_4x2w r0 = 0x", r64, SWORDS);
+
+  mul_mp_4x2w(z_4x2w, a_4x2w, b_4x2w);
+  redc_fpx2_4x2w(r_4x2w, z_4x2w);
+  get_channel_4x2w(r48, r_4x2w, 0);
+  mpi48_carryp(r48);
+  mpi_conv_48to64(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp_4x2w r0 = 0x", r64, SWORDS);
 }
 
 // ----------------------------------------------------------------------------
 
-void fp2_test()
+void test_fp2()
 {
   uint64_t a64[SWORDS] = { TV_A }, b64[SWORDS] = { TV_B }, r64[SWORDS], z64[2*SWORDS];
   uint64_t a48[NWORDS], b48[NWORDS], r48[NWORDS], z48[2*NWORDS];
@@ -512,7 +399,7 @@ void fp2_test()
 
 // ----------------------------------------------------------------------------
 
-void fp4_test()
+void test_fp4()
 {
   uint64_t a64[SWORDS] = { TV_A }, b64[SWORDS] = { TV_B }, r64[SWORDS], z64[2*SWORDS];
   uint64_t a48[NWORDS], b48[NWORDS], r48[NWORDS], z48[2*NWORDS];
@@ -549,12 +436,12 @@ void fp4_test()
 
 int main()
 {
-  test_pairing();
-  timing();
+  // test_pairing();
+  // timing_pairing();
 
-  // fp_test();
-  // fp2_test();
-  // fp4_test();
+  test_fp();
+  // test_fp2();
+  // test_fp4();
 
   return 0;
 }

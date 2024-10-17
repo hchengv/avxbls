@@ -42,6 +42,10 @@ void mul_mp_8x1w_v2(__m512i *r, const __m512i *a, const __m512i *b);
 void mul_mp_8x1w_v3(__m512i *r, const __m512i *a, const __m512i *b);
 void mul_mp_8x1w_v4(__m512i *r, const __m512i *a, const __m512i *b);
 
+#define mul_mp_4x2w mul_mp_4x2w_v1
+
+void mul_mp_4x2w_v1(__m512i *r, const __m512i *a, const __m512i *b);
+
 // ----------------------------------------------------------------------------
 // prototypes: Fp single-length operations
 
@@ -54,6 +58,8 @@ void add_fp_4x2w(__m512i *r, const __m512i *a, const __m512i *b);
 // prototypes: Fp double-length operations
 
 void redc_fpx2_8x1w(__m512i *r, const __m512i *a);
+
+void redc_fpx2_4x2w(__m512i *r, const __m512i *a);
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp2 single-length operations
