@@ -455,6 +455,23 @@ void test_fp4()
 
 // ----------------------------------------------------------------------------
 
+void test_fp12()
+{
+  vec384fp12 r, a;
+
+  uint64_t start_cycles, end_cycles, diff_cycles;
+  int i;
+
+  puts("\nFP12 TIMING\n");
+
+  printf("- final_exp:          ");
+  LOAD_CACHE(cyclotomic_sqr_fp12(r, a), 100);
+  MEASURE_CYCLES(cyclotomic_sqr_fp12(r, a), 1000);
+  printf("  #cycle = %ld\n", diff_cycles);
+}
+
+// ----------------------------------------------------------------------------
+
 int main()
 {
   test_pairing();
@@ -463,6 +480,7 @@ int main()
   // test_fp();
   // test_fp2();
   // test_fp4();
+  test_fp12();
 
   return 0;
 }
