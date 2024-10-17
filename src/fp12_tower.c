@@ -505,7 +505,7 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
     }
     conv_64to48_fp_8x1w(bc_2x2x2x1w, t_2x2x2x1w);
 
-    cyclotomic_sqr_fp12_vec_v1(ret[0][0], ret[1][1], rbc_2x2x2x1w, 
+    cyclotomic_sqr_fp12_vec_v2(ret[0][0], ret[1][1], rbc_2x2x2x1w, 
                                  a[0][0],   a[1][1],  bc_2x2x2x1w);
 
     conv_48to64_fp_8x1w(t_2x2x2x1w, rbc_2x2x2x1w);

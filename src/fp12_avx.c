@@ -295,6 +295,32 @@ static void perm_zz32_hl(__m512i *r, const __m512i *a)
   r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
 }
 
+static void perm_var_hl(__m512i *r, const __m512i *a, const __m512i mask)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7;
+
+  r0 = VPERMV(mask, a0); r1 = VPERMV(mask, a1);
+  r2 = VPERMV(mask, a2); r3 = VPERMV(mask, a3);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+}
+
+// a = < H | G | F | E | D | C | B | A >
+// b = < P | O | N | M | L | K | J | I >
+// r = < P | O | N | M | D | C | B | A >
+static void blend_0xF0_hl(__m512i *r, const __m512i *a, const __m512i *b)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+  __m512i r0, r1, r2, r3;
+
+  r0 = VMBLEND(0xF0, a0, b0); r1 = VMBLEND(0xF0, a1, b1);
+  r2 = VMBLEND(0xF0, a2, b2); r3 = VMBLEND(0xF0, a3, b3);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+}
+
 // ----------------------------------------------------------------------------
 // mp operations 
 
@@ -1851,6 +1877,25 @@ void mul_by_u_plus_1_fp2_2x2x2w(__m512i *r, const __m512i *a)
   asx2_fp_4x2w(r, a, t0);               //  A0+A1 | A0-A1
 }
 
+// r0 = a0*b0-a1*b1
+// r1 = a0*b1+a1*b0
+void mul_fp2_1x4x2w(__m512i *r, const __m512i *a, const __m512i *b)
+{
+  __m512i t0[VWORDS], t1[VWORDS], tt0[3*VWORDS];
+  const __m512i m0 = VSET(7, 6, 7, 6, 5, 4, 5, 4);
+  const __m512i m1 = VSET(5, 4, 7, 6, 7, 6, 5, 4);
+  const __m512i m2 = VSET(3, 2, 1, 0, 7, 6, 5, 4);
+
+  // a = A1 | A0 | ... | ... at Fp layer
+  // b = B1 | B0 | ... | ... at Fp layer
+  perm_var_hl(t0, a, m0);               //        A1 |        A1 |   A0 |   A0
+  perm_var_hl(t1, b, m1);               //        B0 |        B1 |   B1 |   B0
+  mul_mp_4x2w(tt0, t0, t1);             //      A1B0 |      A1B1 | A0B1 | A0B0
+  redc_fpx2_4x2w(t0, tt0);              //      A1B0 |      A1B1 | A0B1 | A0B0
+  perm_var_hl(t1, t0, m2);              //      A0B1 |      A0B0 |  ... |  ... 
+  asx2_fp_4x2w(r, t1, t0);              // A0B1+A1B0 | A0B0-A1B1 |  ... |  ...
+}
+
 // ----------------------------------------------------------------------------
 // Fp2 double length operations
 
@@ -1885,8 +1930,8 @@ void mul_by_u_plus_1_fp2x2_4x2x1w(__m512i *r, const __m512i *a)
   asx4_fpx2_8x1w(r, a, tt0);            //  A0+A1 | A0-A1
 }
 
-// r0 = a0b0-a1b1
-// r1 = a0b1+a1b0
+// r0 = a0*b0-a1*b1
+// r1 = a0*b1+a1*b0
 void mul_fp2x2_2x4x1w(__m512i *r, const __m512i *a, const __m512i *b)
 {
   __m512i t0[NWORDS], t1[NWORDS], tt0[2*NWORDS], tt1[2*NWORDS];
@@ -1933,18 +1978,18 @@ void sqr_fp4_2x2x2x1w(__m512i *r, const __m512i *a)
 // x1 version
 void sqr_fp4_1x2x2x2w(__m512i *r, const __m512i *a)
 {
-  __m512i tt0[2*VWORDS], tt1[2*VWORDS], t0[VWORDS];
+  __m512i t0[VWORDS], t1[VWORDS], t2[VWORDS];
+  const __m512i m0 = VSET(3, 2, 1, 0, 7, 6, 5, 4);
 
   // a = A1 | A0 at Fp2 layer
-  sqr_fp2_2x2x2w(tt0, a);                   //        A1^2 |              A0^2
-  mul_by_u_plus_1_fp2_2x2x2w(tt1, tt0);     //  (u+1)*A1^2 |               ...
-  //                                           //           0 |        (u+1)*A1^2
-  // add_fp2x2_2x2x2w(tt0, tt0, tt1);          //         ... | A0^2+(u+1)*(A1^2)
-  //                                           //          A0 |                 0
-  // mul_fp2x2_1x4x2w(tt1, a, t0);             //       A0*A1 |               ...
-  // add_fp2x2_2x2x2w(tt1, tt1, tt1);          //     2*A0*A1 |               ...  
-  //                                           //     2*A0*A1 | A0^2+(u+1)*(A1^2)
-  // redc_fp2x2_2x2x2w(r, tt0);                //     2*A0*A1 | A0^2+(u+1)*(A1^2)
+  sqr_fp2_2x2x2w(t0, a);                //        A1^2 |              A0^2
+  mul_by_u_plus_1_fp2_2x2x2w(t1, t0);   //  (u+1)*A1^2 |               ...
+  perm_var_hl(t1, t1, m0);              //         ... |        (u+1)*A1^2
+  add_fp2_2x2x2w(t0, t0, t1);           //         ... | A0^2+(u+1)*(A1^2)
+  perm_var_hl(t1, a, m0);               //          A0 |                 0
+  mul_fp2_1x4x2w(t2, a, t1);            //       A0*A1 |               ...
+  add_fp2_2x2x2w(t2, t2, t2);           //     2*A0*A1 |               ...  
+  blend_0xF0_hl(r, t0, t2);             //     2*A0*A1 | A0^2+(u+1)*(A1^2)
 }
 
 // ----------------------------------------------------------------------------

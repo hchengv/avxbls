@@ -88,6 +88,8 @@ void sqr_fp4_2x2x2x1w(__m512i *r, const __m512i *a);
 
 void cyclotomic_sqr_fp12_vec_v1(vec384x ra0, vec384x ra1, __m512i *rbc, 
                                 const vec384x a0, const vec384x a1, const __m512i *bc);
+void cyclotomic_sqr_fp12_vec_v2(vec384x ra0, vec384x ra1, __m512i *rbc, 
+                                const vec384x a0, const vec384x a1, const __m512i *bc);
 
 // ----------------------------------------------------------------------------
 // utils 
