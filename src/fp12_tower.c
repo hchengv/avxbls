@@ -530,10 +530,10 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
 
     // form < a11 | a00 >
     for (i = 0; i < SWORDS/2; i++) {
-      t_1x2x2x2w[i] = VSET( a[1][1][1][i+SWORDS], a[1][1][1][i],
-                            a[1][1][0][i+SWORDS], a[1][1][0][i],
-                            a[0][0][1][i+SWORDS], a[0][0][1][i],
-                            a[0][0][0][i+SWORDS], a[0][0][0][i] );
+      t_1x2x2x2w[i] = VSET( a[1][1][1][i+SWORDS/2], a[1][1][1][i],
+                            a[1][1][0][i+SWORDS/2], a[1][1][0][i],
+                            a[0][0][1][i+SWORDS/2], a[0][0][1][i],
+                            a[0][0][0][i+SWORDS/2], a[0][0][0][i] );
     }
     conv_64to48_fp_4x2w(a_1x2x2x2w, t_1x2x2x2w);
 
@@ -554,14 +554,14 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
     carryp_fp_4x2w(t_1x2x2x2w);
 
     for(i = 0; i < SWORDS/2; i++) {
-      ret[0][0][0][i]        = ((uint64_t *)&t_1x2x2x2w[i])[0];
-      ret[0][0][0][i+SWORDS] = ((uint64_t *)&t_1x2x2x2w[i])[1];
-      ret[0][0][1][i]        = ((uint64_t *)&t_1x2x2x2w[i])[2];
-      ret[0][0][1][i+SWORDS] = ((uint64_t *)&t_1x2x2x2w[i])[3];
-      ret[1][1][0][i]        = ((uint64_t *)&t_1x2x2x2w[i])[4];
-      ret[1][1][0][i+SWORDS] = ((uint64_t *)&t_1x2x2x2w[i])[5];
-      ret[1][1][1][i]        = ((uint64_t *)&t_1x2x2x2w[i])[6];
-      ret[1][1][1][i+SWORDS] = ((uint64_t *)&t_1x2x2x2w[i])[7];
+      ret[0][0][0][i         ] = ((uint64_t *)&t_1x2x2x2w[i])[0];
+      ret[0][0][0][i+SWORDS/2] = ((uint64_t *)&t_1x2x2x2w[i])[1];
+      ret[0][0][1][i         ] = ((uint64_t *)&t_1x2x2x2w[i])[2];
+      ret[0][0][1][i+SWORDS/2] = ((uint64_t *)&t_1x2x2x2w[i])[3];
+      ret[1][1][0][i         ] = ((uint64_t *)&t_1x2x2x2w[i])[4];
+      ret[1][1][0][i+SWORDS/2] = ((uint64_t *)&t_1x2x2x2w[i])[5];
+      ret[1][1][1][i         ] = ((uint64_t *)&t_1x2x2x2w[i])[6];
+      ret[1][1][1][i+SWORDS/2] = ((uint64_t *)&t_1x2x2x2w[i])[7];
     }
 
     conv_48to64_fp_8x1w(t_2x2x2x1w, rbc_2x2x2x1w);
