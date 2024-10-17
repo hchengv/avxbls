@@ -67,6 +67,7 @@ void redc_fpx2_4x2w(__m512i *r, const __m512i *a);
 void assa_fp2_4x2x1w(__m512i *r, const __m512i *a, const __m512i *b);
 
 void as_fp2_2x2x2w(__m512i *r, const __m512i *a, const __m512i *b);
+void sqr_fp2_2x2x2w(__m512i *r, const __m512i *a);
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp2 double-length operations
@@ -131,7 +132,7 @@ static void conv_64to48_fp_8x1w(__m512i *r, const __m512i *a)
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
 
-static void mpi_conv_64to48(uint64_t *r, const uint64_t *a, int rlen, int alen)
+static void conv_64to48_mpi(uint64_t *r, const uint64_t *a, int rlen, int alen)
 {
   int i, j, shr_pos, shl_pos;
   uint64_t word, temp;
@@ -188,7 +189,7 @@ static void conv_48to64_fp_8x1w(__m512i *r, const __m512i *a)
   r[3] = r3; r[4] = r4; r[5] = r5; 
 }
 
-static void mpi_conv_48to64(uint64_t *r, const uint64_t *a, int rlen, int alen)
+static void conv_48to64_mpi(uint64_t *r, const uint64_t *a, int rlen, int alen)
 {
   int i, j, bits_in_word, bits_to_shift;
   uint64_t word;
