@@ -7,16 +7,6 @@
 #include "fields.h"
 #include "fp12_avx.h"
 
-#ifdef PROFILING
-  extern uint64_t read_tsc();
-  extern uint64_t sqr_fp12_cycles;
-  extern uint64_t mul_fp12_cycles;
-  extern uint64_t cyclotomic_sqr_fp12_cycles;
-  extern uint64_t mul_by_xy00z0_fp12_cycles;
-  extern uint64_t inverse_fp12_cycles;
-  extern uint64_t frobenius_map_fp12_cycles;
-#endif 
-
 /*
  * Fp2  = Fp[u]  / (u^2 + 1)
  * Fp6  = Fp2[v] / (v^3 - u - 1)
