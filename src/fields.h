@@ -90,10 +90,9 @@ typedef vec384fp6 vec384fp12[2];
 void sqr_fp12(vec384fp12 ret, const vec384fp12 a);
 
 // void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a);
-#define cyclotomic_sqr_fp12 cyclotomic_sqr_fp12_v1
+#define cyclotomic_sqr_fp12 cyclotomic_sqr_fp12_vector
 void cyclotomic_sqr_fp12_scalar(vec384fp12 ret, const vec384fp12 a);
-void cyclotomic_sqr_fp12_v1(vec384fp12 ret, const vec384fp12 a);
-void cyclotomic_sqr_fp12_v2(vec384fp12 ret, const vec384fp12 a);
+void cyclotomic_sqr_fp12_vector(vec384fp12 ret, const vec384fp12 a);
 
 void mul_fp12(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b);
 void mul_by_xy00z0_fp12(vec384fp12 ret, const vec384fp12 a,

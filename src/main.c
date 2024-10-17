@@ -472,6 +472,8 @@ void test_fp4()
 void test_fp12()
 {
   vec384fp12 r, a;
+  __m512i ra_1x2x2x2w[VWORDS], a_1x2x2x2w[VWORDS];
+  __m512i rbc_2x2x2x1w[NWORDS], bc_2x2x2x1w[NWORDS];
 
   uint64_t start_cycles, end_cycles, diff_cycles;
   int i;
@@ -481,17 +483,23 @@ void test_fp12()
   printf("- cyclotomic_sqr_fp12_scalar: ");
   LOAD_CACHE(cyclotomic_sqr_fp12_scalar(r, a), 1000);
   MEASURE_CYCLES(cyclotomic_sqr_fp12_scalar(r, a), 10000);
-  printf("  #cycle = %ld\n", diff_cycles);
+  printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- cyclotomic_sqr_fp12_v1: ");
-  LOAD_CACHE(cyclotomic_sqr_fp12_v1(r, a), 1000);
-  MEASURE_CYCLES(cyclotomic_sqr_fp12_v1(r, a), 10000);
-  printf("  #cycle = %ld\n", diff_cycles);
+  printf("- cyclotomic_sqr_fp12_vector: ");
+  LOAD_CACHE(cyclotomic_sqr_fp12_vector(r, a), 1000);
+  MEASURE_CYCLES(cyclotomic_sqr_fp12_vector(r, a), 10000);
+  printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- cyclotomic_sqr_fp12_v2: ");
-  LOAD_CACHE(cyclotomic_sqr_fp12_v2(r, a), 1000);
-  MEASURE_CYCLES(cyclotomic_sqr_fp12_v2(r, a), 10000);
-  printf("  #cycle = %ld\n", diff_cycles);
+  printf("- cyclotomic_sqr_fp12_vec_v1: ");
+  LOAD_CACHE(cyclotomic_sqr_fp12_vec_v1(ra_1x2x2x2w, rbc_2x2x2x1w, a_1x2x2x2w, bc_2x2x2x1w), 1000);
+  MEASURE_CYCLES(cyclotomic_sqr_fp12_vec_v1(ra_1x2x2x2w, rbc_2x2x2x1w, a_1x2x2x2w, bc_2x2x2x1w), 10000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- cyclotomic_sqr_fp12_vec_v2: ");
+  LOAD_CACHE(cyclotomic_sqr_fp12_vec_v2(ra_1x2x2x2w, rbc_2x2x2x1w, a_1x2x2x2w, bc_2x2x2x1w), 1000);
+  MEASURE_CYCLES(cyclotomic_sqr_fp12_vec_v2(ra_1x2x2x2w, rbc_2x2x2x1w, a_1x2x2x2w, bc_2x2x2x1w), 10000);
+  printf("#cycle = %ld\n", diff_cycles);
+
 }
 
 // ----------------------------------------------------------------------------
