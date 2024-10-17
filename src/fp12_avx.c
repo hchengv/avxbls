@@ -106,6 +106,24 @@ static void perm_2332(__m512i *r, const __m512i *a)
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
 
+// a = < H | G | F | E | D | C | B | A >
+// r = < 0 | 0 | H | G | 0 | 0 | D | C >
+static void perm_zz32(__m512i *r, const __m512i *a)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7;
+
+  r0 = VZPERM(0x33, a0, 0xEE); r1 = VZPERM(0x33, a1, 0xEE);
+  r2 = VZPERM(0x33, a2, 0xEE); r3 = VZPERM(0x33, a3, 0xEE);
+  r4 = VZPERM(0x33, a4, 0xEE); r5 = VZPERM(0x33, a5, 0xEE);
+  r6 = VZPERM(0x33, a6, 0xEE); r7 = VZPERM(0x33, a7, 0xEE);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+  r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
+}
+
+
 static void perm_var(__m512i *r, const __m512i *a, const __m512i mask)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
@@ -136,6 +154,26 @@ static void blend_0xC0(__m512i *r, const __m512i *a, const __m512i *b)
   r2 = VMBLEND(0xC0, a2, b2); r3 = VMBLEND(0xC0, a3, b3);
   r4 = VMBLEND(0xC0, a4, b4); r5 = VMBLEND(0xC0, a5, b5);
   r6 = VMBLEND(0xC0, a6, b6); r7 = VMBLEND(0xC0, a7, b7);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+  r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
+}
+
+// a = < H | G | F | E | D | C | B | A >
+// b = < P | O | N | M | L | K | J | I >
+// r = < P | O | F | E | D | C | B | A >
+static void blend_0x33(__m512i *r, const __m512i *a, const __m512i *b)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
+  const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+  const __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7;
+
+  r0 = VMBLEND(0x33, a0, b0); r1 = VMBLEND(0x33, a1, b1);
+  r2 = VMBLEND(0x33, a2, b2); r3 = VMBLEND(0x33, a3, b3);
+  r4 = VMBLEND(0x33, a4, b4); r5 = VMBLEND(0x33, a5, b5);
+  r6 = VMBLEND(0x33, a6, b6); r7 = VMBLEND(0x33, a7, b7);
 
   r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
@@ -1791,6 +1829,39 @@ void mul_by_u_plus_1_fp2_4x2x1w(__m512i *r, const __m512i *a)
   asx4_fp_8x1w(r, a, t0);               //  A0+A1 | A0-A1
 }
 
+// r0 = (a0+a1)*(a0-a1)
+// r1 = 2*a0*a1
+void sqr_fp2_4x2x1w(__m512i *r, const __m512i *a)
+{
+  __m512i t0[NWORDS], t1[NWORDS], t2[NWORDS], tt0[2*NWORDS];
+
+  // a = A1 | A0 at Fp layer 
+  shuf_00(t0, a);                       //      A0 |              A0
+  shuf_01(t1, a);                       //      A0 |              A1 
+  shuf_z1(t2, a);                       //       0 |              A1
+  add_fp_8x1w(t0, t0, t1);              //    2*A0 |           A0+A1
+  sub_fp_8x1w(t2, a, t2);               //      A1 |           A0-A1
+  mul_mp_8x1w(tt0, t0, t2);             // 2*A0*A1 | (A0+A1)*(A0-A1)
+  redc_fpx2_8x1w(r, tt0);               // 2*A0*A1 | (A0+A1)*(A0-A1)
+}
+
+// r0 = a0*b0-a1*b1
+// r1 = a0*b1+a1*b0
+void mul_fp2_2x4x1w(__m512i *r, const __m512i *a, const __m512i *b)
+{
+  __m512i t0[NWORDS], t1[NWORDS], tt0[2*NWORDS];
+
+  // a = A1 | A0 | ... | ... at Fp layer
+  // b = B1 | B0 | ... | ... at Fp layer
+  perm_3322(t0, a);                     //        A1 |        A1 |   A0 |   A0
+  perm_2332(t1, b);                     //        B0 |        B1 |   B1 |   B0
+  mul_mp_8x1w(tt0, t0, t1);             //      A1B0 |      A1B1 | A0B1 | A0B0
+  redc_fpx2_8x1w(t0, tt0);              //      A1B0 |      A1B1 | A0B1 | A0B0
+  perm_10zz(t1, t0);                    //      A0B1 |      A0B0 |    0 |    0 
+  asx4_fp_8x1w(r, t1, t0);              // A0B1+A1B0 | A0B0-A1B1 |  ... |  ...
+}
+
+
 static void add_fp2_2x2x2w(__m512i *r, const __m512i *a, const __m512i *b)
 {
   add_fp_4x2w(r, a, b);
@@ -1955,9 +2026,8 @@ void redc_fp2x2_4x2x1w(__m512i *r, const __m512i *a)
 
 // r0 = a0^2 + (u+1)*a1^2
 // r1 = 2*a0*a1
-// x2 version
-// TODO: is x2 version really faster than x1 version in AVX implementation?
-void sqr_fp4_2x2x2x1w(__m512i *r, const __m512i *a)
+// double-length version
+void sqr_fp4_2x2x2x1w_v1(__m512i *r, const __m512i *a)
 {
   __m512i tt0[2*NWORDS], tt1[2*NWORDS], t0[NWORDS];
 
@@ -1968,9 +2038,27 @@ void sqr_fp4_2x2x2x1w(__m512i *r, const __m512i *a)
   add_fp2x2_4x2x1w(tt0, tt0, tt1);          //         ... | A0^2+(u+1)*(A1^2)
   perm_10zz(t0, a);                         //          A0 |                 0
   mul_fp2x2_2x4x1w(tt1, a, t0);             //       A0*A1 |               ...
-  add_fp2x2_4x2x1w(tt1, tt1, tt1);          //     2*A0*A1 |               ...  
+  add_fp2x2_4x2x1w(tt1, tt1, tt1);          //     2*A0*A1 |               ...
   blend_0x33_dl(tt0, tt1, tt0);             //     2*A0*A1 | A0^2+(u+1)*(A1^2)
   redc_fp2x2_4x2x1w(r, tt0);                //     2*A0*A1 | A0^2+(u+1)*(A1^2)
+}
+
+// r0 = a0^2 + (u+1)*a1^2
+// r1 = 2*a0*a1
+// single-length version
+void sqr_fp4_2x2x2x1w_v2(__m512i *r, const __m512i *a)
+{
+  __m512i t0[NWORDS], t1[NWORDS], t2[NWORDS];
+
+  // a = A1 | A0 at Fp2 layer
+  sqr_fp2_4x2x1w(t0, a);                //        A1^2 |              A0^2
+  mul_by_u_plus_1_fp2_4x2x1w(t1, t0);   //  (u+1)*A1^2 |               ...
+  perm_zz32(t1, t1);                    //           0 |        (u+1)*A1^2
+  add_fp2_4x2x1w(t0, t0, t1);           //         ... | A0^2+(u+1)*(A1^2)
+  perm_10zz(t1, a);                     //          A0 |                 0
+  mul_fp2_2x4x1w(t2, a, t1);            //       A0*A1 |               ...
+  add_fp2_4x2x1w(t2, t2, t2);           //     2*A0*A1 |               ...
+  blend_0x33(r, t0, t2);                //     2*A0*A1 | A0^2+(u+1)*(A1^2)
 }
 
 // r0 = a0^2 + (u+1)*a1^2
@@ -1996,28 +2084,24 @@ void sqr_fp4_1x2x2x2w(__m512i *r, const __m512i *a)
 // Fp12 operations
 
 // To understand the comments, see Listing 21 in "Guide to Pairing-Based Cryptography". 
-void cyclotomic_sqr_fp12_vec_v1(vec384x ra0, vec384x ra1, __m512i *rbc, 
-                                const vec384x a0, const vec384x a1, const __m512i *bc)
+void cyclotomic_sqr_fp12_vec_v1(__m512i *ra, __m512i *rbc, const __m512i *a, const __m512i *bc)
 {
-  vec384fp4 s0;
-  __m512i ta[VWORDS], tbc[NWORDS], t0[NWORDS]; 
+  __m512i ta[VWORDS], tbc[NWORDS], t0[NWORDS];
   const __m512i m0 = VSET(3, 2, 1, 0, 5, 4, 7, 6);
 
-  // compute A in 1w
-  sqr_fp4(s0, a0, a1);                  // t0, t1
-  sub_fp2(ra0, s0[0], a0);              // t0-z0
-  add_fp2(ra0, ra0, ra0);               // 2*(t0-z0)
-  add_fp2(ra0, ra0, s0[0]);             // 3*t0-2*z0
-  add_fp2(ra1, s0[1], a1);              // t1+z1
-  add_fp2(ra1, ra1, ra1);               // 2*(t1+z1)
-  add_fp2(ra1, ra1, s0[1]);             // 3*t1+2*z1
+  // compute A in 1x2x2x2w (some limbs are not fully shortened)
+  // a = z1 | z0 at Fp2 layer
+  sqr_fp4_1x2x2x2w(ta, a);              //        t1 |        t0
+  as_fp2_2x2x2w(ra, ta, a);             //     t1+z1 |     t0-z0
+  add_fp2_2x2x2w(ra, ra, ra);           // 2*(t1+z1) | 2*(t0-z0)
+  add_fp2_2x2x2w(ra, ra, ta);           // 3*t1+2*z1 | 3*t0-2*z0
 
   // compute B and C in 2x2x2x1w
   // bc = z5 | z4 | z3 | z2 at Fp2 layer
-  sqr_fp4_2x2x2x1w(tbc, bc);            //              t3 |        t2 |        t1 |              t0 
+  sqr_fp4_2x2x2x1w_v1(tbc, bc);         //              t3 |        t2 |        t1 |              t0
   mul_by_u_plus_1_fp2_4x2x1w(t0, tbc);  //        t3*(u+1) |       ... |       ... |             ...
   blend_0xC0(tbc, tbc, t0);             //        t3*(u+1) |        t2 |        t1 |              t0
-  perm_var(tbc, tbc, m0);               //              t1 |        t0 |        t2 |        t3*(u+1)        
+  perm_var(tbc, tbc, m0);               //              t1 |        t0 |        t2 |        t3*(u+1)
   assa_fp2_4x2x1w(rbc, tbc, bc);        //           t1+z5 |     t0-z4 |     t2-z3 |     t3*(u+1)+z2
   add_fp2_4x2x1w(rbc, rbc, rbc);        //       2*(t1+z5) | 2*(t0-z4) | 2*(t2-z3) | 2*(t3*(u+1)+z2)
   add_fp2_4x2x1w(rbc, rbc, tbc);        //       3*t1+2*z5 | 3*t0-2*z4 | 3*t2-2*z3 | 3*t3*(u+1)+2*z2
@@ -2026,22 +2110,22 @@ void cyclotomic_sqr_fp12_vec_v1(vec384x ra0, vec384x ra1, __m512i *rbc,
 // To understand the comments, see Listing 21 in "Guide to Pairing-Based Cryptography". 
 void cyclotomic_sqr_fp12_vec_v2(__m512i *ra, __m512i *rbc, const __m512i *a, const __m512i *bc)
 {
-  __m512i ta[VWORDS], tbc[NWORDS], t0[NWORDS]; 
+  __m512i ta[VWORDS], tbc[NWORDS], t0[NWORDS];
   const __m512i m0 = VSET(3, 2, 1, 0, 5, 4, 7, 6);
 
   // compute A in 1x2x2x2w (some limbs are not fully shortened)
   // a = z1 | z0 at Fp2 layer
-  sqr_fp4_1x2x2x2w(ta, a);              //        t1 |        t0      
-  as_fp2_2x2x2w(ra, ta, a);             //     t1+z1 |     t0-z0     
-  add_fp2_2x2x2w(ra, ra, ra);           // 2*(t1+z1) | 2*(t0-z0) 
+  sqr_fp4_1x2x2x2w(ta, a);              //        t1 |        t0
+  as_fp2_2x2x2w(ra, ta, a);             //     t1+z1 |     t0-z0
+  add_fp2_2x2x2w(ra, ra, ra);           // 2*(t1+z1) | 2*(t0-z0)
   add_fp2_2x2x2w(ra, ra, ta);           // 3*t1+2*z1 | 3*t0-2*z0
 
   // compute B and C in 2x2x2x1w
   // bc = z5 | z4 | z3 | z2 at Fp2 layer
-  sqr_fp4_2x2x2x1w(tbc, bc);            //              t3 |        t2 |        t1 |              t0 
+  sqr_fp4_2x2x2x1w_v2(tbc, bc);         //              t3 |        t2 |        t1 |              t0
   mul_by_u_plus_1_fp2_4x2x1w(t0, tbc);  //        t3*(u+1) |       ... |       ... |             ...
   blend_0xC0(tbc, tbc, t0);             //        t3*(u+1) |        t2 |        t1 |              t0
-  perm_var(tbc, tbc, m0);               //              t1 |        t0 |        t2 |        t3*(u+1)        
+  perm_var(tbc, tbc, m0);               //              t1 |        t0 |        t2 |        t3*(u+1)
   assa_fp2_4x2x1w(rbc, tbc, bc);        //           t1+z5 |     t0-z4 |     t2-z3 |     t3*(u+1)+z2
   add_fp2_4x2x1w(rbc, rbc, rbc);        //       2*(t1+z5) | 2*(t0-z4) | 2*(t2-z3) | 2*(t3*(u+1)+z2)
   add_fp2_4x2x1w(rbc, rbc, tbc);        //       3*t1+2*z5 | 3*t0-2*z4 | 3*t2-2*z3 | 3*t3*(u+1)+2*z2

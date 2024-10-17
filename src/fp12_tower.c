@@ -487,40 +487,9 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
     add_fp2(ret[1][2], t1[1],     a[1][2]);
     add_fp2(ret[1][2], ret[1][2], ret[1][2]);
     add_fp2(ret[1][2], ret[1][2], t1[1]);
-    
-#elif 0
-    // vector implementation v1
-
-    __m512i rbc_2x2x2x1w[NWORDS], bc_2x2x2x1w[NWORDS], t_2x2x2x1w[SWORDS];
-    uint64_t r48[NWORDS];
-    int i;
-
-    // form < a12 | a01 | a02 | a10 >
-    for (i = 0; i < SWORDS; i++) {
-      t_2x2x2x1w[i] = VSET( a[1][2][1][i], a[1][2][0][i], 
-                            a[0][1][1][i], a[0][1][0][i], 
-                            a[0][2][1][i], a[0][2][0][i], 
-                            a[1][0][1][i], a[1][0][0][i] );
-    }
-    conv_64to48_fp_8x1w(bc_2x2x2x1w, t_2x2x2x1w);
-
-    cyclotomic_sqr_fp12_vec_v1(ret[0][0], ret[1][1], rbc_2x2x2x1w, 
-                                 a[0][0],   a[1][1],  bc_2x2x2x1w);
-
-    conv_48to64_fp_8x1w(t_2x2x2x1w, rbc_2x2x2x1w);
-    for (i = 0; i < SWORDS; i++) {
-      ret[1][0][0][i] = ((uint64_t *)&t_2x2x2x1w[i])[0];
-      ret[1][0][1][i] = ((uint64_t *)&t_2x2x2x1w[i])[1];
-      ret[0][2][0][i] = ((uint64_t *)&t_2x2x2x1w[i])[2];
-      ret[0][2][1][i] = ((uint64_t *)&t_2x2x2x1w[i])[3];
-      ret[0][1][0][i] = ((uint64_t *)&t_2x2x2x1w[i])[4];
-      ret[0][1][1][i] = ((uint64_t *)&t_2x2x2x1w[i])[5];
-      ret[1][2][0][i] = ((uint64_t *)&t_2x2x2x1w[i])[6];
-      ret[1][2][1][i] = ((uint64_t *)&t_2x2x2x1w[i])[7];
-    }
 
 #else
-  // vector implementation v2
+  // vector implementation v1
 
     __m512i ra_1x2x2x2w[VWORDS], a_1x2x2x2w[VWORDS], t_1x2x2x2w[SWORDS/2];
     __m512i rbc_2x2x2x1w[NWORDS], bc_2x2x2x1w[NWORDS], t_2x2x2x1w[SWORDS];
@@ -545,6 +514,8 @@ void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
     }
     conv_64to48_fp_8x1w(bc_2x2x2x1w, t_2x2x2x1w);
 
+    // cyclotomic_sqr_fp12_vec_v1(ra_1x2x2x2w, rbc_2x2x2x1w, 
+    //                             a_1x2x2x2w,  bc_2x2x2x1w);
     cyclotomic_sqr_fp12_vec_v2(ra_1x2x2x2w, rbc_2x2x2x1w, 
                                 a_1x2x2x2w,  bc_2x2x2x1w);
 

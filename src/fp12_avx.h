@@ -81,14 +81,14 @@ void mul_fp2x2_2x4x1w(__m512i *r, const __m512i *a, const __m512i *b);
 // ----------------------------------------------------------------------------
 // prototypes: Fp4 operations
 
-void sqr_fp4_2x2x2x1w(__m512i *r, const __m512i *a);
+void sqr_fp4_2x2x2x1w_v1(__m512i *r, const __m512i *a);
+void sqr_fp4_2x2x2x1w_v2(__m512i *r, const __m512i *a);
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp12 operations
 
-void cyclotomic_sqr_fp12_vec_v1(vec384x ra0, vec384x ra1, __m512i *rbc, 
-                                const vec384x a0, const vec384x a1, 
-                                const __m512i *bc);
+void cyclotomic_sqr_fp12_vec_v1(__m512i *ra, __m512i *rbc, 
+                                const __m512i *a, const __m512i *bc);
 void cyclotomic_sqr_fp12_vec_v2(__m512i *ra, __m512i *rbc, 
                                 const __m512i *a, const __m512i *bc);
 
