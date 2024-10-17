@@ -311,14 +311,14 @@ void test_fp()
 
   add_fp_4x2w(r_4x2w, a_4x2w, b_4x2w);
   get_channel_4x2w(r48, r_4x2w, 0);
-  mpi48_carryp(r48);
+  carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* add_fp_4x2w r0 = 0x", r64, SWORDS);
 
   mul_mp_4x2w(z_4x2w, a_4x2w, b_4x2w);
   redc_fpx2_4x2w(r_4x2w, z_4x2w);
   get_channel_4x2w(r48, r_4x2w, 0);
-  mpi48_carryp(r48);
+  carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* mul_fp_4x2w r0 = 0x", r64, SWORDS);
 }
@@ -361,11 +361,11 @@ void test_fp2()
 
   as_fp2_2x2x2w(r_2x2x2w, a_2x2x2w, b_2x2x2w);
   get_channel_4x2w(r48, r_2x2x2w, 0);
-  mpi48_carryp(r48);
+  carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* as_fp2_2x2x2w r0 = 0x", r64, SWORDS);
   get_channel_4x2w(r48, r_2x2x2w, 4);
-  mpi48_carryp(r48);
+  carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* as_fp2_2x2x2w r4 = 0x", r64, SWORDS);
 
@@ -383,11 +383,11 @@ void test_fp2()
     a_2x2x2w[i] = VSET(0, 0, 0, 0, b48[i+VWORDS], b48[i], a48[i+VWORDS], a48[i]);
   sqr_fp2_2x2x2w(r_2x2x2w, a_2x2x2w);
   get_channel_4x2w(r48, r_2x2x2w, 0);
-  mpi48_carryp(r48);
+  carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* sqr_fp2_2x2x2w r0 = 0x", r64, SWORDS);
   get_channel_4x2w(r48, r_2x2x2w, 2);
-  mpi48_carryp(r48);
+  carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* sqr_fp2_2x2x2w r2 = 0x", r64, SWORDS);
 
@@ -401,11 +401,11 @@ void test_fp2()
 
   mul_by_u_plus_1_fp2_2x2x2w(r_2x2x2w, r_2x2x2w);
   get_channel_4x2w(r48, r_2x2x2w, 0);
-  mpi48_carryp(r48);
+  carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* mul_by_u_plus_1_fp2_2x2x2w r0 = 0x", r64, SWORDS);
   get_channel_4x2w(r48, r_2x2x2w, 2);
-  mpi48_carryp(r48);
+  carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* mul_by_u_plus_1_fp2_2x2x2w r2 = 0x", r64, SWORDS);
 
