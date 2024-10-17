@@ -438,19 +438,33 @@ void test_fp4()
 
   puts("\nFP4 TEST\n");
 
-  sqr_fp4_2x2x2x1w(r_2x2x2x1w, a_2x2x2x1w);
+  sqr_fp4_2x2x2x1w_v1(r_2x2x2x1w, a_2x2x2x1w);
   get_channel_8x1w(r48, r_2x2x2x1w, 0);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp4_2x2x2x1w r00 = 0x", r64, SWORDS);
+  mpi_print("* sqr_fp4_2x2x2x1w_v1 r00 = 0x", r64, SWORDS);
   get_channel_8x1w(r48, r_2x2x2x1w, 1);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp4_2x2x2x1w r01 = 0x", r64, SWORDS);
+  mpi_print("* sqr_fp4_2x2x2x1w_v1 r01 = 0x", r64, SWORDS);
   get_channel_8x1w(r48, r_2x2x2x1w, 2);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp4_2x2x2x1w r10 = 0x", r64, SWORDS);
+  mpi_print("* sqr_fp4_2x2x2x1w_v1 r10 = 0x", r64, SWORDS);
   get_channel_8x1w(r48, r_2x2x2x1w, 3);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp4_2x2x2x1w r11 = 0x", r64, SWORDS);
+  mpi_print("* sqr_fp4_2x2x2x1w_v1 r11 = 0x", r64, SWORDS);
+
+  sqr_fp4_2x2x2x1w_v2(r_2x2x2x1w, a_2x2x2x1w);
+  get_channel_8x1w(r48, r_2x2x2x1w, 0);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* sqr_fp4_2x2x2x1w_v2 r00 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r_2x2x2x1w, 1);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* sqr_fp4_2x2x2x1w_v2 r01 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r_2x2x2x1w, 2);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* sqr_fp4_2x2x2x1w_v2 r10 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r_2x2x2x1w, 3);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* sqr_fp4_2x2x2x1w_v2 r11 = 0x", r64, SWORDS);
 }
 
 // ----------------------------------------------------------------------------
@@ -464,9 +478,19 @@ void test_fp12()
 
   puts("\nFP12 TIMING\n");
 
-  printf("- cyclotomic_sqr_fp12: ");
-  LOAD_CACHE(cyclotomic_sqr_fp12(r, a), 100);
-  MEASURE_CYCLES(cyclotomic_sqr_fp12(r, a), 1000);
+  printf("- cyclotomic_sqr_fp12_scalar: ");
+  LOAD_CACHE(cyclotomic_sqr_fp12_scalar(r, a), 1000);
+  MEASURE_CYCLES(cyclotomic_sqr_fp12_scalar(r, a), 10000);
+  printf("  #cycle = %ld\n", diff_cycles);
+
+  printf("- cyclotomic_sqr_fp12_v1: ");
+  LOAD_CACHE(cyclotomic_sqr_fp12_v1(r, a), 1000);
+  MEASURE_CYCLES(cyclotomic_sqr_fp12_v1(r, a), 10000);
+  printf("  #cycle = %ld\n", diff_cycles);
+
+  printf("- cyclotomic_sqr_fp12_v2: ");
+  LOAD_CACHE(cyclotomic_sqr_fp12_v2(r, a), 1000);
+  MEASURE_CYCLES(cyclotomic_sqr_fp12_v2(r, a), 10000);
   printf("  #cycle = %ld\n", diff_cycles);
 }
 

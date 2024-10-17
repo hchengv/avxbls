@@ -2058,7 +2058,7 @@ void sqr_fp4_2x2x2x1w_v2(__m512i *r, const __m512i *a)
   perm_10zz(t1, a);                     //          A0 |                 0
   mul_fp2_2x4x1w(t2, a, t1);            //       A0*A1 |               ...
   add_fp2_4x2x1w(t2, t2, t2);           //     2*A0*A1 |               ...
-  blend_0x33(r, t0, t2);                //     2*A0*A1 | A0^2+(u+1)*(A1^2)
+  blend_0x33(r, t2, t0);                //     2*A0*A1 | A0^2+(u+1)*(A1^2)
 }
 
 // r0 = a0^2 + (u+1)*a1^2
