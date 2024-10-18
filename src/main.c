@@ -499,7 +499,6 @@ void test_fp12()
   LOAD_CACHE(cyclotomic_sqr_fp12_vec_v2(ra_1x2x2x2w, rbc_2x2x2x1w, a_1x2x2x2w, bc_2x2x2x1w), 1000);
   MEASURE_CYCLES(cyclotomic_sqr_fp12_vec_v2(ra_1x2x2x2w, rbc_2x2x2x1w, a_1x2x2x2w, bc_2x2x2x1w), 10000);
   printf("#cycle = %ld\n", diff_cycles);
-
 }
 
 // ----------------------------------------------------------------------------

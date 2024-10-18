@@ -2098,13 +2098,13 @@ void cyclotomic_sqr_fp12_vec_v1(__m512i *ra, __m512i *rbc, const __m512i *a, con
 
   // compute B and C in 2x2x2x1w
   // bc = z5 | z4 | z3 | z2 at Fp2 layer
-  sqr_fp4_2x2x2x1w_v1(tbc, bc);         //              t3 |        t2 |        t1 |              t0
-  mul_by_u_plus_1_fp2_4x2x1w(t0, tbc);  //        t3*(u+1) |       ... |       ... |             ...
-  blend_0xC0(tbc, tbc, t0);             //        t3*(u+1) |        t2 |        t1 |              t0
-  perm_var(tbc, tbc, m0);               //              t1 |        t0 |        t2 |        t3*(u+1)
-  assa_fp2_4x2x1w(rbc, tbc, bc);        //           t1+z5 |     t0-z4 |     t2-z3 |     t3*(u+1)+z2
-  add_fp2_4x2x1w(rbc, rbc, rbc);        //       2*(t1+z5) | 2*(t0-z4) | 2*(t2-z3) | 2*(t3*(u+1)+z2)
-  add_fp2_4x2x1w(rbc, rbc, tbc);        //       3*t1+2*z5 | 3*t0-2*z4 | 3*t2-2*z3 | 3*t3*(u+1)+2*z2
+  sqr_fp4_2x2x2x1w_v1(tbc, bc);         //   t3 |        t2 |        t1 |              t0
+  mul_by_u_plus_1_fp2_4x2x1w(t0, tbc);  //  t3*(u+1) |       ... |       ... |             ...
+  blend_0xC0(tbc, tbc, t0);             //  t3*(u+1) |        t2 |        t1 |              t0
+  perm_var(tbc, tbc, m0);               //        t1 |        t0 |        t2 |        t3*(u+1)
+  assa_fp2_4x2x1w(rbc, tbc, bc);        //     t1+z5 |     t0-z4 |     t2-z3 |     t3*(u+1)+z2
+  add_fp2_4x2x1w(rbc, rbc, rbc);        // 2*(t1+z5) | 2*(t0-z4) | 2*(t2-z3) | 2*(t3*(u+1)+z2)
+  add_fp2_4x2x1w(rbc, rbc, tbc);        // 3*t1+2*z5 | 3*t0-2*z4 | 3*t2-2*z3 | 3*t3*(u+1)+2*z2
 }
 
 // To understand the comments, see Listing 21 in "Guide to Pairing-Based Cryptography". 
@@ -2122,13 +2122,13 @@ void cyclotomic_sqr_fp12_vec_v2(__m512i *ra, __m512i *rbc, const __m512i *a, con
 
   // compute B and C in 2x2x2x1w
   // bc = z5 | z4 | z3 | z2 at Fp2 layer
-  sqr_fp4_2x2x2x1w_v2(tbc, bc);         //              t3 |        t2 |        t1 |              t0
-  mul_by_u_plus_1_fp2_4x2x1w(t0, tbc);  //        t3*(u+1) |       ... |       ... |             ...
-  blend_0xC0(tbc, tbc, t0);             //        t3*(u+1) |        t2 |        t1 |              t0
-  perm_var(tbc, tbc, m0);               //              t1 |        t0 |        t2 |        t3*(u+1)
-  assa_fp2_4x2x1w(rbc, tbc, bc);        //           t1+z5 |     t0-z4 |     t2-z3 |     t3*(u+1)+z2
-  add_fp2_4x2x1w(rbc, rbc, rbc);        //       2*(t1+z5) | 2*(t0-z4) | 2*(t2-z3) | 2*(t3*(u+1)+z2)
-  add_fp2_4x2x1w(rbc, rbc, tbc);        //       3*t1+2*z5 | 3*t0-2*z4 | 3*t2-2*z3 | 3*t3*(u+1)+2*z2
+  sqr_fp4_2x2x2x1w_v2(tbc, bc);         //        t3 |        t2 |        t1 |              t0
+  mul_by_u_plus_1_fp2_4x2x1w(t0, tbc);  //  t3*(u+1) |       ... |       ... |             ...
+  blend_0xC0(tbc, tbc, t0);             //  t3*(u+1) |        t2 |        t1 |              t0
+  perm_var(tbc, tbc, m0);               //        t1 |        t0 |        t2 |        t3*(u+1)
+  assa_fp2_4x2x1w(rbc, tbc, bc);        //     t1+z5 |     t0-z4 |     t2-z3 |     t3*(u+1)+z2
+  add_fp2_4x2x1w(rbc, rbc, rbc);        // 2*(t1+z5) | 2*(t0-z4) | 2*(t2-z3) | 2*(t3*(u+1)+z2)
+  add_fp2_4x2x1w(rbc, rbc, tbc);        // 3*t1+2*z5 | 3*t0-2*z4 | 3*t2-2*z3 | 3*t3*(u+1)+2*z2
 }
 
 // ----------------------------------------------------------------------------
