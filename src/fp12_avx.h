@@ -54,54 +54,22 @@ static uint64_t P48[NWORDS] = {
 // prototypes: mp operations
 
 #define mul_mp_8x1w mul_mp_8x1w_v2
-
-void mul_mp_8x1w_v1(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b);
-void mul_mp_8x1w_v2(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b);
-void mul_mp_8x1w_v3(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b);
-void mul_mp_8x1w_v4(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b);
-
 #define mul_mp_4x2w mul_mp_4x2w_v1
-
-void mul_mp_4x2w_v1(fpx2_4x2w r, const fpx2_4x2w a, const fpx2_4x2w b);
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp single-length operations
 
-void add_fp_8x1w(fp_8x1w r, const fp_8x1w a, const fp_8x1w b);
-void sub_fp_8x1w(fp_8x1w r, const fp_8x1w a, const fp_8x1w b);
-
-void add_fp_4x2w(fp_4x2w r, const fp_4x2w a, const fp_4x2w b);
-void asx2_fp_4x2w(fp_4x2w r, const fp_4x2w a, const fp_4x2w b);
-
 // ----------------------------------------------------------------------------
 // prototypes: Fp double-length operations
-
-void redc_fpx2_8x1w(fp_8x1w r, const fpx2_8x1w a);
-
-void redc_fpx2_4x2w(fp_4x2w r, const fpx2_4x2w a);
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp2 single-length operations
 
-void assa_fp2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a, const fp2_4x2x1w b);
-
-void as_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b);
-void sqr_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a);
-void mul_by_u_plus_1_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a);
-
 // ----------------------------------------------------------------------------
 // prototypes: Fp2 double-length operations
 
-void sqr_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2_4x2x1w a);
-void mul_by_u_plus_1_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2x2_4x2x1w a);
-
-void mul_fp2x2_2x4x1w(fp2x2_2x4x1w r, const fp2_2x4x1w a, const fp2_2x4x1w b);
-
 // ----------------------------------------------------------------------------
 // prototypes: Fp4 operations
-
-void sqr_fp4_2x2x2x1w_v1(fp4_2x2x2x1w r, const fp4_2x2x2x1w a);
-void sqr_fp4_2x2x2x1w_v2(fp4_2x2x2x1w r, const fp4_2x2x2x1w a);
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp12 operations
