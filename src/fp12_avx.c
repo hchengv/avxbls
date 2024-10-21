@@ -45,6 +45,23 @@ static void shuf_01_fp2_8x1x1w(fp2_8x1x1w r, const fp2_8x1x1w a)
 }
 
 // a = < H | G | F | E | D | C | B | A >
+// r = < H | H | F | F | D | D | B | B >
+static void shuf_11(__m512i *r, const __m512i *a)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7;
+
+  r0 = VSHUF(a0, 0xEE); r1 = VSHUF(a1, 0xEE);
+  r2 = VSHUF(a2, 0xEE); r3 = VSHUF(a3, 0xEE);
+  r4 = VSHUF(a4, 0xEE); r5 = VSHUF(a5, 0xEE);
+  r6 = VSHUF(a6, 0xEE); r7 = VSHUF(a7, 0xEE);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+  r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
+}
+
+// a = < H | G | F | E | D | C | B | A >
 // r = < 0 | H | 0 | F | 0 | D | 0 | B >
 static void shuf_z1(__m512i *r, const __m512i *a)
 {
@@ -194,6 +211,38 @@ static void blend_0x33_fp2_8x1x1w(fp2_8x1x1w r, const fp2_8x1x1w a, const fp2_8x
 // vector double-length transform 
 
 // a = < H | G | F | E | D | C | B | A >
+// r = < G | G | E | E | C | C | A | A >
+static void shuf_00_dl(__m512i *r, const __m512i *a)
+{
+  const __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
+  const __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
+  const __m512i a8  = a[8 ], a9  = a[9 ], a10 = a[10], a11 = a[11];
+  const __m512i a12 = a[12], a13 = a[13], a14 = a[14], a15 = a[15];
+  __m512i r0, r1, r2 , r3 , r4 , r5 , r6 , r7 ;
+  __m512i r8, r9, r10, r11, r12, r13, r14, r15;
+
+  r0  = VSHUF(a0 , 0x44); r1  = VSHUF(a1 , 0x44);
+  r2  = VSHUF(a2 , 0x44); r3  = VSHUF(a3 , 0x44);
+  r4  = VSHUF(a4 , 0x44); r5  = VSHUF(a5 , 0x44);
+  r6  = VSHUF(a6 , 0x44); r7  = VSHUF(a7 , 0x44);
+  r8  = VSHUF(a8 , 0x44); r9  = VSHUF(a9 , 0x44);
+  r10 = VSHUF(a10, 0x44); r11 = VSHUF(a11, 0x44);
+  r12 = VSHUF(a12, 0x44); r13 = VSHUF(a13, 0x44);
+  r14 = VSHUF(a14, 0x44); r15 = VSHUF(a15, 0x44);
+
+  r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
+  r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
+  r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
+  r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
+}
+
+static void shuf_00_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a)
+{
+  shuf_00_dl(r[0], a[0]);
+  shuf_00_dl(r[1], a[1]);
+}
+
+// a = < H | G | F | E | D | C | B | A >
 // r = < G | H | E | F | C | D | A | B >
 static void shuf_01_dl(__m512i *r, const __m512i *a)
 {
@@ -217,6 +266,44 @@ static void shuf_01_dl(__m512i *r, const __m512i *a)
   r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
   r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
   r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
+}
+
+static void shuf_01_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a)
+{
+  shuf_01_dl(r[0], a[0]);
+  shuf_01_dl(r[1], a[1]);
+}
+
+// a = < H | G | F | E | D | C | B | A >
+// r = < H | H | F | F | D | D | B | B >
+static void shuf_11_dl(__m512i *r, const __m512i *a)
+{
+  const __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
+  const __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
+  const __m512i a8  = a[8 ], a9  = a[9 ], a10 = a[10], a11 = a[11];
+  const __m512i a12 = a[12], a13 = a[13], a14 = a[14], a15 = a[15];
+  __m512i r0, r1, r2 , r3 , r4 , r5 , r6 , r7 ;
+  __m512i r8, r9, r10, r11, r12, r13, r14, r15;
+
+  r0  = VSHUF(a0 , 0xEE); r1  = VSHUF(a1 , 0xEE);
+  r2  = VSHUF(a2 , 0xEE); r3  = VSHUF(a3 , 0xEE);
+  r4  = VSHUF(a4 , 0xEE); r5  = VSHUF(a5 , 0xEE);
+  r6  = VSHUF(a6 , 0xEE); r7  = VSHUF(a7 , 0xEE);
+  r8  = VSHUF(a8 , 0xEE); r9  = VSHUF(a9 , 0xEE);
+  r10 = VSHUF(a10, 0xEE); r11 = VSHUF(a11, 0xEE);
+  r12 = VSHUF(a12, 0xEE); r13 = VSHUF(a13, 0xEE);
+  r14 = VSHUF(a14, 0xEE); r15 = VSHUF(a15, 0xEE);
+
+  r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
+  r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
+  r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
+  r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
+}
+
+static void shuf_11_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a)
+{
+  shuf_11_dl(r[0], a[0]);
+  shuf_11_dl(r[1], a[1]);  
 }
 
 // a = < H | G | F | E | D | C | B | A >
@@ -300,6 +387,12 @@ static void blend_0x33_dl(__m512i *r, const __m512i *a, const __m512i *b)
   r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
   r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
   r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
+}
+
+static void blend_0x33_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a, const fp2x2_8x1x1w b)
+{
+  blend_0x33_dl(r[0], a[0], b[0]);
+  blend_0x33_dl(r[1], a[1], b[1]);
 }
 
 // ----------------------------------------------------------------------------
@@ -712,6 +805,74 @@ static void add_fpx2_8x1w(fpx2_8x1w r, const fpx2_8x1w a, const fpx2_8x1w b)
   r10 = VSUB(r10, p2); r11 = VSUB(r11, p3);
   r12 = VSUB(r12, p4); r13 = VSUB(r13, p5);
   r14 = VSUB(r14, p6); r15 = VSUB(r15, p7);
+
+  // get sign mask
+  r1 = VADD(r1 , VSRA(r0, BRADIX)); r0 = VAND(r0, bmask);
+  r2 = VADD(r2 , VSRA(r1, BRADIX)); r1 = VAND(r1, bmask);
+  r3 = VADD(r3 , VSRA(r2, BRADIX)); r2 = VAND(r2, bmask);
+  r4 = VADD(r4 , VSRA(r3, BRADIX)); r3 = VAND(r3, bmask);
+  r5 = VADD(r5 , VSRA(r4, BRADIX)); r4 = VAND(r4, bmask);
+  r6 = VADD(r6 , VSRA(r5, BRADIX)); r5 = VAND(r5, bmask);
+  r7 = VADD(r7 , VSRA(r6, BRADIX)); r6 = VAND(r6, bmask);
+  r8 = VADD(r8 , VSRA(r7, BRADIX)); r7 = VAND(r7, bmask);
+  t0 = VADD(r9 , VSRA(r8, BRADIX));
+  t0 = VADD(r10, VSRA(t0, BRADIX));
+  t0 = VADD(r11, VSRA(t0, BRADIX));
+  t0 = VADD(r12, VSRA(t0, BRADIX));
+  t0 = VADD(r13, VSRA(t0, BRADIX));
+  t0 = VADD(r14, VSRA(t0, BRADIX));
+  t0 = VADD(r15, VSRA(t0, BRADIX));
+
+  // if r is non-negative, smask = all-0 
+  // if r is     negative, smask = all-1
+  smask = VSRA(t0, 63);
+  // r = r + (p & smask)*2^384
+  r8  = VADD(r8 , VAND(p0, smask)); r9  = VADD(r9 , VAND(p1, smask));
+  r10 = VADD(r10, VAND(p2, smask)); r11 = VADD(r11, VAND(p3, smask));
+  r12 = VADD(r12, VAND(p4, smask)); r13 = VADD(r13, VAND(p5, smask));
+  r14 = VADD(r14, VAND(p6, smask)); r15 = VADD(r15, VAND(p7, smask));
+
+  // carry propagation 
+  r9  = VADD(r9 , VSRA(r8 , BRADIX)); r8  = VAND(r8 , bmask);
+  r10 = VADD(r10, VSRA(r9 , BRADIX)); r9  = VAND(r9 , bmask);
+  r11 = VADD(r11, VSRA(r10, BRADIX)); r10 = VAND(r10, bmask);
+  r12 = VADD(r12, VSRA(r11, BRADIX)); r11 = VAND(r11, bmask);
+  r13 = VADD(r13, VSRA(r12, BRADIX)); r12 = VAND(r12, bmask);
+  r14 = VADD(r14, VSRA(r13, BRADIX)); r13 = VAND(r13, bmask);
+  r15 = VADD(r15, VSRA(r14, BRADIX)); r14 = VAND(r14, bmask);
+
+  r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
+  r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
+  r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
+  r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
+}
+
+static void sub_fpx2_8x1w(fpx2_8x1w r, const fpx2_8x1w a, const fpx2_8x1w b)
+{
+  const __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
+  const __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
+  const __m512i a8  = a[8 ], a9  = a[9 ], a10 = a[10], a11 = a[11];
+  const __m512i a12 = a[12], a13 = a[13], a14 = a[14], a15 = a[15];
+  const __m512i b0  = b[0 ], b1  = b[1 ], b2  = b[2 ], b3  = b[3 ];
+  const __m512i b4  = b[4 ], b5  = b[5 ], b6  = b[6 ], b7  = b[7 ];
+  const __m512i b8  = b[8 ], b9  = b[9 ], b10 = b[10], b11 = b[11];
+  const __m512i b12 = b[12], b13 = b[13], b14 = b[14], b15 = b[15];
+  const __m512i p0 = VSET1(P48[0]), p1 = VSET1(P48[1]), p2 = VSET1(P48[2]);
+  const __m512i p3 = VSET1(P48[3]), p4 = VSET1(P48[4]), p5 = VSET1(P48[5]);
+  const __m512i p6 = VSET1(P48[6]), p7 = VSET1(P48[7]);
+  const __m512i bmask = VSET1(BMASK);
+  __m512i r0, r1, r2 , r3 , r4 , r5 , r6 , r7 ;
+  __m512i r8, r9, r10, r11, r12, r13, r14, r15, smask, t0;
+
+  // r = a - b
+  r0  = VSUB(a0 , b0 ); r1  = VSUB(a1 , b1 );
+  r2  = VSUB(a2 , b2 ); r3  = VSUB(a3 , b3 );
+  r4  = VSUB(a4 , b4 ); r5  = VSUB(a5 , b5 );
+  r6  = VSUB(a6 , b6 ); r7  = VSUB(a7 , b7 );
+  r8  = VSUB(a8 , b8 ); r9  = VSUB(a9 , b9 );
+  r10 = VSUB(a10, b10); r11 = VSUB(a11, b11);
+  r12 = VSUB(a12, b12); r13 = VSUB(a13, b13);
+  r14 = VSUB(a14, b14); r15 = VSUB(a15, b15);
 
   // get sign mask
   r1 = VADD(r1 , VSRA(r0, BRADIX)); r0 = VAND(r0, bmask);
@@ -1756,7 +1917,7 @@ static void redc_fpx2_4x2w(fp_4x2w r, const fpx2_4x2w a)
 }
 
 // ----------------------------------------------------------------------------
-// Fp2 single length operations
+// Fp2 single-length operations
 
 static void add_fp2_8x1x1w(fp2_8x1x1w r, const fp2_8x1x1w a, const fp2_8x1x1w b)
 {
@@ -1832,8 +1993,8 @@ static void assa_fp2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a, const fp2_4x2x1w b
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
 
-// r0 = a0-a1
-// r1 = a0+a1
+// r0 = a0 - a1
+// r1 = a0 + a1
 static void mul_by_u_plus_1_fp2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a)
 {
   fp2_4x2x1w t0;
@@ -1843,7 +2004,7 @@ static void mul_by_u_plus_1_fp2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a)
   asx4_fp_8x1w(r, a, t0);               //  A0+A1 | A0-A1
 }
 
-// r0 = (a0+a1)*(a0-a1)
+// r0 = (a0 + a1)*(a0 - a1)
 // r1 = 2*a0*a1
 static void sqr_fp2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a)
 {
@@ -1856,12 +2017,12 @@ static void sqr_fp2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a)
   shuf_z1(t2, a);                       //       0 |              A1
   add_fp_8x1w(t0, t0, t1);              //    2*A0 |           A0+A1
   sub_fp_8x1w(t2, a, t2);               //      A1 |           A0-A1
-  mul_fpx2_8x1w(tt0, t0, t2);             // 2*A0*A1 | (A0+A1)*(A0-A1)
+  mul_fpx2_8x1w(tt0, t0, t2);           // 2*A0*A1 | (A0+A1)*(A0-A1)
   redc_fpx2_8x1w(r, tt0);               // 2*A0*A1 | (A0+A1)*(A0-A1)
 }
 
-// r0 = a0*b0-a1*b1
-// r1 = a0*b1+a1*b0
+// r0 = a0*b0 - a1*b1
+// r1 = a0*b1 + a1*b0
 static void mul_fp2_2x4x1w(fp2_2x4x1w r, const fp2_2x4x1w a, const fp2_2x4x1w b)
 {
   fp2_2x4x1w t0, t1;
@@ -1871,7 +2032,7 @@ static void mul_fp2_2x4x1w(fp2_2x4x1w r, const fp2_2x4x1w a, const fp2_2x4x1w b)
   // b = B1 | B0 | ... | ... at Fp layer
   perm_3322(t0, a);                     //        A1 |        A1 |   A0 |   A0
   perm_2332(t1, b);                     //        B0 |        B1 |   B1 |   B0
-  mul_fpx2_8x1w(tt0, t0, t1);             //      A1B0 |      A1B1 | A0B1 | A0B0
+  mul_fpx2_8x1w(tt0, t0, t1);           //      A1B0 |      A1B1 | A0B1 | A0B0
   redc_fpx2_8x1w(t0, tt0);              //      A1B0 |      A1B1 | A0B1 | A0B0
   perm_10zz(t1, t0);                    //      A0B1 |      A0B0 |    0 |    0 
   asx4_fp_8x1w(r, t1, t0);              // A0B1+A1B0 | A0B0-A1B1 |  ... |  ...
@@ -1936,7 +2097,7 @@ static void as_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b)
   r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3; 
 }
 
-// r0 = (a0+a1)*(a0-a1)
+// r0 = (a0 + a1)*(a0 - a1)
 // r1 = 2*a0*a1
 static void sqr_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a)
 {
@@ -1953,8 +2114,8 @@ static void sqr_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a)
   redc_fpx2_4x2w(r, t3);                // 2*A0*A1 | (A0+A1)*(A0-A1)
 }
 
-// r0 = a0-a1
-// r1 = a0+a1
+// r0 = a0 - a1
+// r1 = a0 + a1
 static void mul_by_u_plus_1_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a)
 {
   fp2_2x2x2w t0;
@@ -1964,8 +2125,8 @@ static void mul_by_u_plus_1_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a)
   asx2_fp_4x2w(r, a, t0);               //  A0+A1 | A0-A1
 }
 
-// r0 = a0*b0-a1*b1
-// r1 = a0*b1+a1*b0
+// r0 = a0*b0 - a1*b1
+// r1 = a0*b1 + a1*b0
 static void mul_fp2_1x4x2w(fp2_1x4x2w r, const fp2_1x4x2w a, const fp2_1x4x2w b)
 {
   fp2_1x4x2w t0, t1;
@@ -1985,14 +2146,51 @@ static void mul_fp2_1x4x2w(fp2_1x4x2w r, const fp2_1x4x2w a, const fp2_1x4x2w b)
 }
 
 // ----------------------------------------------------------------------------
-// Fp2 double length operations
+// Fp2 double-length operations
+
+static void add_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a, const fp2x2_8x1x1w b)
+{
+  add_fpx2_8x1w(r[0], a[0], b[0]);
+  add_fpx2_8x1w(r[1], a[1], b[1]);
+}
+
+static void sub_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a, const fp2x2_8x1x1w b)
+{
+  sub_fpx2_8x1w(r[0], a[0], b[0]);
+  sub_fpx2_8x1w(r[1], a[1], b[1]);
+}
+
+// r0 = a0 - a1
+// r1 = a0 + a1
+static void mul_by_u_plus_1_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a)
+{
+  sub_fpx2_8x1w(r[0], a[0], a[1]);      // a0-a1
+  add_fpx2_8x1w(r[1], a[0], a[1]);      // a0+a1
+}
+
+// r0 = a0*b0 - a1*b1
+// r1 = (a0 + b0)*(a1 + b1) - a0*b0 - a1*b1 = a0*b1 + a1*b0
+static void mul_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2_8x1x1w a, const fp2_8x1x1w b)
+{
+  fp_8x1w t0, t1;
+  fpx2_8x1w tt0, tt1, tt2;
+
+  mul_fpx2_8x1w(tt0, a[0], b[0]);       // a0*b0
+  mul_fpx2_8x1w(tt1, a[1], b[1]);       // a1*b1
+  add_fp_8x1w(t0, a[0], b[0]);          // a0+b0
+  add_fp_8x1w(t1, a[1], b[1]);          // a1+b1
+  mul_fpx2_8x1w(tt2, t0, t1);           // (a0+b0)*(a1+b1)
+  sub_fpx2_8x1w(r[0], tt0, tt1);        // a0*b0-a1*b1
+  sub_fpx2_8x1w(tt2, tt2, tt0);         // (a0+b0)*(a1+b1)-a0*b0
+  sub_fpx2_8x1w(r[1], tt2, tt1);        // (a0+b0)*(a1+b1)-a0*b0-a1*b1
+}
 
 static void add_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2x2_4x2x1w a, const fp2x2_4x2x1w b)
 {
   add_fpx2_8x1w(r, a, b);
 }
 
-// r0 = (a0+a1)*(a0-a1)
+// r0 = (a0 + a1)*(a0 - a1)
 // r1 = 2*a0*a1
 static void sqr_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2_4x2x1w a)
 {
@@ -2004,11 +2202,11 @@ static void sqr_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2_4x2x1w a)
   shuf_z1(t2, a);                       //       0 |              A1
   add_fp_8x1w(t0, t0, t1);              //    2*A0 |           A0+A1
   sub_fp_8x1w(t2, a, t2);               //      A1 |           A0-A1
-  mul_fpx2_8x1w(r, t0, t2);               // 2*A0*A1 | (A0+A1)*(A0-A1) 
+  mul_fpx2_8x1w(r, t0, t2);             // 2*A0*A1 | (A0+A1)*(A0-A1) 
 }
 
-// r0 = a0-a1
-// r1 = a0+a1
+// r0 = a0 - a1
+// r1 = a0 + a1
 static void mul_by_u_plus_1_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2x2_4x2x1w a)
 {
   fp2x2_4x2x1w tt0;
@@ -2018,8 +2216,8 @@ static void mul_by_u_plus_1_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2x2_4x2x1w a)
   asx4_fpx2_8x1w(r, a, tt0);            //  A0+A1 | A0-A1
 }
 
-// r0 = a0*b0-a1*b1
-// r1 = a0*b1+a1*b0
+// r0 = a0*b0 - a1*b1
+// r1 = a0*b1 + a1*b0
 static void mul_fp2x2_2x4x1w(fp2x2_2x4x1w r, const fp2_2x4x1w a, const fp2_2x4x1w b)
 {
   fp2_2x4x1w t0, t1;
@@ -2029,7 +2227,7 @@ static void mul_fp2x2_2x4x1w(fp2x2_2x4x1w r, const fp2_2x4x1w a, const fp2_2x4x1
   // b = B1 | B0 | ... | ... at Fp layer
   perm_3322(t0, a);                     //        A1 |        A1 |   A0 |   A0
   perm_2332(t1, b);                     //        B0 |        B1 |   B1 |   B0
-  mul_fpx2_8x1w(tt0, t0, t1);             //      A1B0 |      A1B1 | A0B1 | A0B0
+  mul_fpx2_8x1w(tt0, t0, t1);           //      A1B0 |      A1B1 | A0B1 | A0B0
   perm_10zz_dl(tt1, tt0);               //      A0B1 |      A0B0 |    0 |    0 
   asx4_fpx2_8x1w(r, tt1, tt0);          // A0B1+A1B0 | A0B0-A1B1 |  ... |  ...
 }
@@ -2106,43 +2304,49 @@ static void sqr_fp4_1x2x2x2w(fp4_1x2x2x2w r, const fp4_1x2x2x2w a)
 // r1 = (a0 + a1)*(b0 + b1) - a0*b0 - a1*b1 + a2*b2*(u+1) = a0*b1 + a1*b0 + a2*b2*(u+1)
 // r2 = (a0 + a2)*(b0 + b2) - a0*b0 - a2*b2 + a1*b1 = a0*b2 + a2*b0 + a1*b1
 // Karatsuba 
-static void mul_fp6x2_4x2x1x1w(fp2x2_8x1x1w r01, fp2x2_8x1x1w r2, const fp2_8x1x1w ab0, const fp2_8x1x1w ab1, const fp2_8x1x1w ab2)
+void mul_fp6x2_4x2x1x1w(fp2x2_8x1x1w r01, fp2x2_8x1x1w r2, const fp2_8x1x1w ab0, const fp2_8x1x1w ab1, const fp2_8x1x1w ab2)
 {
   fp2_8x1x1w t0, t1, t2, t3, t4;
-  fp2x2_8x1x1w tt0;
+  fp2x2_8x1x1w tt0, tt1, tt2, tt3, tt4, tt5;
 
   // ab0 = b0 | a0 at Fp2 layer
   // ab1 = b1 | a1 at Fp2 layer 
   // ab2 = b2 | a2 at Fp2 layer
-  add_fp2_8x1x1w(t0, ab1, ab2);         //                                   b1+b2 |                                     a1+a2
-  add_fp2_8x1x1w(t1, ab0, ab1);         //                                   b0+b1 |                                     a0+a1                
-  add_fp2_8x1x1w(t2, ab0, ab2);         //                                   b0+b2 |                                     a0+a2 
-  shuf_01_fp2_8x1x1w(t3, ab1);          //                                      a1 |                                        b1         
-  blend_0x33_fp2_8x1x1w(t3, t3, ab0);   //                                      a1 |                                        a0
-  shuf_01_fp2_8x1x1w(t4, ab0);          //                                      a0 |                                        b0          
-  blend_0x33_fp2_8x1x1w(t4, ab1, t4);   //                                      b1 |                                        b0
-  mul_fp2x2_8x1x1w(tt0, t3, t4);        //                                   a1*b1 |                                     a0*b0
-                                        //                                      a2 |                                     a1+a2
-                                        //                                      b2 |                                     b1+b2
-                                        //                                   a2*b2 |                           (a1+a2)*(b1+b2)
-                                        //                                   a0+a1 |                                     a0+a2
-                                        //                                   b0+b1 |                                     b0+b2
-                                        //                         (a0+a1)*(b0+b1) |                           (a0+a2)*(b0+b2)
-                                        //                         (a0+a1)*(b0+b1) |                           (a1+a2)*(b1+b2)
-                                        //                                   a1*b1 |                                     a1*b1
-                                        //                   (a0+a1)*(b0+b1)-a1*b1 |                     (a1+a2)*(b1+b2)-a1*b1
-                                        //                         (a0+a2)*(b0+b2) |                     (a1+a2)*(b1+b2)-a1*b1
-                                        //                                   a2*b2 |                                     a2*b2
-                                        //                   (a0+a2)*(b0+b2)-a2*b2 |               (a1+a2)*(b1+b2)-a1*b1-a2*b2
-                                        //                   (a0+a1)*(b0+b1)-a1*b1 |                     (a0+a2)*(b0+b2)-a2*b2
-                                        //             (a0+a1)*(b0+b1)-a1*b1-a0*b0 |               (a0+a2)*(b0+b2)-a2*b2-a0*b0
-                                        //                                   a2*b2 |               (a1+a2)*(b1+b2)-a1*b1-a2*b2
-                                        //                             a2*b2*(u+1) |       ((a1+a2)*(b1+b2)-a1*b1-a2*b2)*(u+1)
-                                        //             (a0+a1)*(b0+b1)-a1*b1-a0*b0 |                                     a0*b0
-                                        // (a0+a1)*(b0+b1)-a1*b1-a0*b0+a2*b2*(u+1) | ((a1+a2)*(b1+b2)-a1*b1-a2*b2)*(u+1)+a0*b0
-                                        //                                     ... |               (a0+a2)*(b0+b2)-a2*b2-a0*b0
-                                        //                                     ... |         (a0+a2)*(b0+b2)-a2*b2-a0*b0+a1*b1
-} 
+  add_fp2_8x1x1w(t0, ab1, ab2);             //                                   b1+b2 |                                     a1+a2
+  add_fp2_8x1x1w(t1, ab0, ab1);             //                                   b0+b1 |                                     a0+a1            
+  add_fp2_8x1x1w(t2, ab0, ab2);             //                                   b0+b2 |                                     a0+a2
+  shuf_01_fp2_8x1x1w(t3, ab1);              //                                      a1 |                                        b1         
+  blend_0x33_fp2_8x1x1w(t3, t3, ab0);       //                                      a1 |                                        a0
+  shuf_01_fp2_8x1x1w(t4, ab0);              //                                      a0 |                                        b0          
+  blend_0x33_fp2_8x1x1w(t4, ab1, t4);       //                                      b1 |                                        b0
+  mul_fp2x2_8x1x1w(tt0, t3, t4);            //                                   a1*b1 |                                     a0*b0
+  shuf_01_fp2_8x1x1w(t3, ab2);              //                                      a2 |                                        b2
+  blend_0x33_fp2_8x1x1w(t3, t3, t0);        //                                      a2 |                                     a1+a2
+  shuf_01_fp2_8x1x1w(t4, t0);               //                                   a1+a2 |                                     b1+b2
+  blend_0x33_fp2_8x1x1w(t4, ab2, t4);       //                                      b2 |                                     b1+b2
+  mul_fp2x2_8x1x1w(tt1, t3, t4);            //                                   a2*b2 |                           (a1+a2)*(b1+b2)
+  shuf_01_fp2_8x1x1w(t3, t1);               //                                   a0+a1 |                                     b0+b1
+  blend_0x33_fp2_8x1x1w(t3, t3, t2);        //                                   a0+a1 |                                     a0+a2
+  shuf_01_fp2_8x1x1w(t4, t2);               //                                   a0+a2 |                                     b0+b2
+  blend_0x33_fp2_8x1x1w(t4, t1, t4);        //                                   b0+b1 |                                     b0+b2
+  mul_fp2x2_8x1x1w(tt2, t3, t4);            //                         (a0+a1)*(b0+b1) |                           (a0+a2)*(b0+b2)
+  blend_0x33_fp2x2_8x1x1w(tt3, tt2, tt1);   //                         (a0+a1)*(b0+b1) |                           (a1+a2)*(b1+b2) 
+  shuf_11_fp2x2_8x1x1w(tt4, tt0);           //                                   a1*b1 |                                     a1*b1
+  sub_fp2x2_8x1x1w(tt3, tt3, tt4);          //                   (a0+a1)*(b0+b1)-a1*b1 |                     (a1+a2)*(b1+b2)-a1*b1
+  shuf_01_fp2x2_8x1x1w(tt2, tt2);           //                         (a0+a2)*(b0+b2) |                           (a0+a1)*(b0+b1)
+  blend_0x33_fp2x2_8x1x1w(tt2, tt2, tt3);   //                         (a0+a2)*(b0+b2) |                     (a1+a2)*(b1+b2)-a1*b1
+  shuf_11_fp2x2_8x1x1w(tt1, tt1);           //                                   a2*b2 |                                     a2*b2
+  sub_fp2x2_8x1x1w(tt2, tt2, tt1);          //                   (a0+a2)*(b0+b2)-a2*b2 |               (a1+a2)*(b1+b2)-a1*b1-a2*b2
+  shuf_11_fp2x2_8x1x1w(tt5, tt2);           //                   (a0+a2)*(b0+b2)-a2*b2 |                     (a0+a2)*(b0+b2)-a2*b2 
+  blend_0x33_fp2x2_8x1x1w(tt5, tt3, tt5);   //                   (a0+a1)*(b0+b1)-a1*b1 |                     (a0+a2)*(b0+b2)-a2*b2
+  shuf_00_fp2x2_8x1x1w(tt0, tt0);           //                                   a0*b0 |                                     a0*b0
+  sub_fp2x2_8x1x1w(tt5, tt5, tt0);          //             (a0+a1)*(b0+b1)-a1*b1-a0*b0 |               (a0+a2)*(b0+b2)-a2*b2-a0*b0
+  blend_0x33_fp2x2_8x1x1w(tt2, tt1, tt2);   //                                   a2*b2 |               (a1+a2)*(b1+b2)-a1*b1-a2*b2
+  mul_by_u_plus_1_fp2x2_8x1x1w(tt2, tt2);   //                             a2*b2*(u+1) |       ((a1+a2)*(b1+b2)-a1*b1-a2*b2)*(u+1)
+  blend_0x33_fp2x2_8x1x1w(tt0, tt5, tt0);   //             (a0+a1)*(b0+b1)-a1*b1-a0*b0 |                                     a0*b0
+  add_fp2x2_8x1x1w(r01, tt0, tt2);          // (a0+a1)*(b0+b1)-a1*b1-a0*b0+a2*b2*(u+1) | ((a1+a2)*(b1+b2)-a1*b1-a2*b2)*(u+1)+a0*b0
+  add_fp2x2_8x1x1w(r2, tt5, tt4);           //                                     ... |         (a0+a2)*(b0+b2)-a2*b2-a0*b0+a1*b1 
+}
 
 // ----------------------------------------------------------------------------
 // Fp12 operations

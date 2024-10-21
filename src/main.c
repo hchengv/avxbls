@@ -473,6 +473,59 @@ void test_fp4()
 #endif
 }
 
+void test_fp6()
+{
+  uint64_t a64[SWORDS] = { TV_A }, b64[SWORDS] = { TV_B }, z64[2*SWORDS];
+  uint64_t a48[NWORDS], b48[NWORDS], r48[NWORDS], z48[2*NWORDS];
+  fp2_8x1x1w a0_8x1x1w, a1_8x1x1w, a2_8x1x1w;
+  fp2x2_8x1x1w z01_8x1x1w, z2_8x1x1w;
+  vec768fp6 r; 
+  vec384fp6 a = {{{TV_A}, {TV_A}}, {{TV_B}, {TV_B}}, {{TV_A}, {TV_B}}};
+  int i;
+
+  conv_64to48_mpi(a48, a64, NWORDS, SWORDS);
+  conv_64to48_mpi(b48, b64, NWORDS, SWORDS);
+
+  for(i = 0; i < NWORDS; i++) {
+    a0_8x1x1w[0][i] = VSET1(a48[i]);
+    a0_8x1x1w[1][i] = VSET1(a48[i]);
+    a1_8x1x1w[0][i] = VSET1(b48[i]);
+    a1_8x1x1w[1][i] = VSET1(b48[i]);
+    a2_8x1x1w[0][i] = VSET1(a48[i]);
+    a2_8x1x1w[1][i] = VSET1(b48[i]);
+  }
+
+  puts("\nFP6 TEST\n");
+
+  mul_fp6x2(r, a, a);
+  mpi_print("* mul_fp6x2 r00 = 0x", r[0][0], 2*SWORDS);
+  mpi_print("* mul_fp6x2 r01 = 0x", r[0][1], 2*SWORDS);
+  mpi_print("* mul_fp6x2 r10 = 0x", r[1][0], 2*SWORDS);
+  mpi_print("* mul_fp6x2 r11 = 0x", r[1][1], 2*SWORDS);
+  mpi_print("* mul_fp6x2 r20 = 0x", r[2][0], 2*SWORDS);
+  mpi_print("* mul_fp6x2 r21 = 0x", r[2][1], 2*SWORDS);
+
+  mul_fp6x2_4x2x1x1w(z01_8x1x1w, z2_8x1x1w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w);
+  for(i = 0; i < 2*NWORDS; i++) z48[i] = ((uint64_t *)&z01_8x1x1w[0][i])[0];
+  conv_48to64_mpi(z64, z48, 2*SWORDS, 2*NWORDS);
+  mpi_print("* mul_fp6x2_4x2x1x1w r00 = 0x", z64, 2*SWORDS);
+  for(i = 0; i < 2*NWORDS; i++) z48[i] = ((uint64_t *)&z01_8x1x1w[1][i])[0];
+  conv_48to64_mpi(z64, z48, 2*SWORDS, 2*NWORDS);
+  mpi_print("* mul_fp6x2_4x2x1x1w r01 = 0x", z64, 2*SWORDS);
+  for(i = 0; i < 2*NWORDS; i++) z48[i] = ((uint64_t *)&z01_8x1x1w[0][i])[1];
+  conv_48to64_mpi(z64, z48, 2*SWORDS, 2*NWORDS);
+  mpi_print("* mul_fp6x2_4x2x1x1w r10 = 0x", z64, 2*SWORDS);
+  for(i = 0; i < 2*NWORDS; i++) z48[i] = ((uint64_t *)&z01_8x1x1w[1][i])[1];
+  conv_48to64_mpi(z64, z48, 2*SWORDS, 2*NWORDS);
+  mpi_print("* mul_fp6x2_4x2x1x1w r11 = 0x", z64, 2*SWORDS);
+  for(i = 0; i < 2*NWORDS; i++) z48[i] = ((uint64_t *)&z2_8x1x1w[0][i])[0];
+  conv_48to64_mpi(z64, z48, 2*SWORDS, 2*NWORDS);
+  mpi_print("* mul_fp6x2_4x2x1x1w r20 = 0x", z64, 2*SWORDS);
+  for(i = 0; i < 2*NWORDS; i++) z48[i] = ((uint64_t *)&z2_8x1x1w[1][i])[0];
+  conv_48to64_mpi(z64, z48, 2*SWORDS, 2*NWORDS);
+  mpi_print("* mul_fp6x2_4x2x1x1w r21 = 0x", z64, 2*SWORDS);
+}
+
 // ----------------------------------------------------------------------------
 
 void test_fp12()
