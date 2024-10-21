@@ -29,9 +29,12 @@ typedef __m512i   fp2x2_4x2x1w[2*NWORDS];
 typedef __m512i   fp2_2x4x1w[NWORDS];
 typedef __m512i   fp2x2_2x4x1w[2*NWORDS];
 typedef __m512i   fp2_2x2x2w[VWORDS];
+typedef __m512i   fp2x2_2x2x2w[3*VWORDS];
 typedef __m512i   fp2_1x4x2w[VWORDS];
+typedef __m512i   fp2x2_1x4x2w[3*VWORDS];
 // Fp4 element
 typedef __m512i   fp4_2x2x2x1w[NWORDS];
+typedef __m512i   fp4x2_2x2x2x1w[2*NWORDS];
 typedef __m512i   fp4_1x2x2x2w[VWORDS];
 
 // ----------------------------------------------------------------------------
@@ -51,16 +54,13 @@ static uint64_t P48[NWORDS] = {
 #define MONT_W_R48 0xFFFCFFFCFFFDULL
 
 // ----------------------------------------------------------------------------
-// prototypes: mp operations
-
-#define mul_mp_8x1w mul_mp_8x1w_v2
-#define mul_mp_4x2w mul_mp_4x2w_v1
-
-// ----------------------------------------------------------------------------
 // prototypes: Fp single-length operations
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp double-length operations
+
+#define mul_fpx2_8x1w mul_fpx2_8x1w_v2
+#define mul_fpx2_4x2w mul_fpx2_4x2w_v1
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp2 single-length operations
@@ -70,6 +70,9 @@ static uint64_t P48[NWORDS] = {
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp4 operations
+
+// ----------------------------------------------------------------------------
+// prototypes: Fp6 operations
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp12 operations

@@ -539,7 +539,6 @@ void cyclotomic_sqr_fp12_vector(vec384fp12 ret, const vec384fp12 a)
     ret[1][2][1][i] = ((uint64_t *)&t_2x2x2x1w[i])[7];
   }
 
-
   #ifdef PROFILING
     uint64_t end_cycles = read_tsc();
     cyclotomic_sqr_fp12_cycles += end_cycles - start_cycles;

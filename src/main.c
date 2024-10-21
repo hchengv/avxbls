@@ -295,15 +295,15 @@ void test_fp()
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* sub_fp_8x1w r0 = 0x", r64, SWORDS);
 
-  mul_mp_8x1w_v1(z_8x1w, a_8x1w, b_8x1w);
+  mul_fpx2_8x1w_v1(z_8x1w, a_8x1w, b_8x1w);
   for(i = 0; i < 2*NWORDS; i++) z48[i] = ((uint64_t *)&z_8x1w[i])[0];
   conv_48to64_mpi(z64, z48, 2*SWORDS, 2*NWORDS);
-  mpi_print("* mul_mp_8x1w_v1 r0 = 0x", z64, 2*SWORDS);
+  mpi_print("* mul_fpx2_8x1w_v1 r0 = 0x", z64, 2*SWORDS);
 
-  mul_mp_8x1w_v3(z_8x1w, a_8x1w, b_8x1w);
+  mul_fpx2_8x1w_v3(z_8x1w, a_8x1w, b_8x1w);
   for(i = 0; i < 2*NWORDS; i++) z48[i] = ((uint64_t *)&z_8x1w[i])[0];
   conv_48to64_mpi(z64, z48, 2*SWORDS, 2*NWORDS);
-  mpi_print("* mul_mp_8x1w_v3 r0 = 0x", z64, 2*SWORDS);
+  mpi_print("* mul_fpx2_8x1w_v3 r0 = 0x", z64, 2*SWORDS);
 
   redc_fpx2_8x1w(r_8x1w, z_8x1w);
   get_channel_8x1w(r48, r_8x1w, 0);
@@ -316,7 +316,7 @@ void test_fp()
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* add_fp_4x2w r0 = 0x", r64, SWORDS);
 
-  mul_mp_4x2w(z_4x2w, a_4x2w, b_4x2w);
+  mul_fpx2_4x2w(z_4x2w, a_4x2w, b_4x2w);
   redc_fpx2_4x2w(r_4x2w, z_4x2w);
   get_channel_4x2w(r48, r_4x2w, 0);
   carryp_mpi48(r48);
