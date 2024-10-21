@@ -70,6 +70,7 @@ void mul_mp_4x2w_v1(fpx2_4x2w r, const fpx2_4x2w a, const fpx2_4x2w b);
 void add_fp_8x1w(fp_8x1w r, const fp_8x1w a, const fp_8x1w b);
 void sub_fp_8x1w(fp_8x1w r, const fp_8x1w a, const fp_8x1w b);
 
+void add_fp_4x2w(fp_4x2w r, const fp_4x2w a, const fp_4x2w b);
 void asx2_fp_4x2w(fp_4x2w r, const fp_4x2w a, const fp_4x2w b);
 
 // ----------------------------------------------------------------------------
