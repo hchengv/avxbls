@@ -16,6 +16,24 @@
 #define BMASK   0xFFFFFFFFFFFFULL
 #define BALIGN  4 // 52 (AVX-512IFMA) - 48 (BRADIX) = 4 
 
+// Fp element
+typedef __m512i   fp_8x1w[NWORDS];
+typedef __m512i   fpx2_8x1w[2*NWORDS];
+typedef __m512i   fp_4x2w[VWORDS];
+typedef __m512i   fpx2_4x2w[3*VWORDS];
+// Fp2 element
+typedef fp_8x1w   fp2_8x1x1w[2];
+typedef fpx2_8x1w fp2x2_8x1x1w[2];
+typedef __m512i   fp2_4x2x1w[NWORDS];
+typedef __m512i   fp2x2_4x2x1w[2*NWORDS];
+typedef __m512i   fp2_2x4x1w[NWORDS];
+typedef __m512i   fp2x2_2x4x1w[2*NWORDS];
+typedef __m512i   fp2_2x2x2w[VWORDS];
+typedef __m512i   fp2_1x4x2w[VWORDS];
+// Fp4 element
+typedef __m512i   fp4_2x2x2x1w[NWORDS];
+typedef __m512i   fp4_1x2x2x2w[VWORDS];
+
 // ----------------------------------------------------------------------------
 // p := 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab;
 
@@ -37,60 +55,60 @@ static uint64_t P48[NWORDS] = {
 
 #define mul_mp_8x1w mul_mp_8x1w_v2
 
-void mul_mp_8x1w_v1(__m512i *r, const __m512i *a, const __m512i *b);
-void mul_mp_8x1w_v2(__m512i *r, const __m512i *a, const __m512i *b);
-void mul_mp_8x1w_v3(__m512i *r, const __m512i *a, const __m512i *b);
-void mul_mp_8x1w_v4(__m512i *r, const __m512i *a, const __m512i *b);
+void mul_mp_8x1w_v1(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b);
+void mul_mp_8x1w_v2(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b);
+void mul_mp_8x1w_v3(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b);
+void mul_mp_8x1w_v4(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b);
 
 #define mul_mp_4x2w mul_mp_4x2w_v1
 
-void mul_mp_4x2w_v1(__m512i *r, const __m512i *a, const __m512i *b);
+void mul_mp_4x2w_v1(fpx2_4x2w r, const fpx2_4x2w a, const fpx2_4x2w b);
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp single-length operations
 
-void add_fp_8x1w(__m512i *r, const __m512i *a, const __m512i *b);
-void sub_fp_8x1w(__m512i *r, const __m512i *a, const __m512i *b);
+void add_fp_8x1w(fp_8x1w r, const fp_8x1w a, const fp_8x1w b);
+void sub_fp_8x1w(fp_8x1w r, const fp_8x1w a, const fp_8x1w b);
 
-void add_fp_4x2w(__m512i *r, const __m512i *a, const __m512i *b);
+void asx2_fp_4x2w(fp_4x2w r, const fp_4x2w a, const fp_4x2w b);
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp double-length operations
 
-void redc_fpx2_8x1w(__m512i *r, const __m512i *a);
+void redc_fpx2_8x1w(fp_8x1w r, const fpx2_8x1w a);
 
-void redc_fpx2_4x2w(__m512i *r, const __m512i *a);
+void redc_fpx2_4x2w(fp_4x2w r, const fpx2_4x2w a);
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp2 single-length operations
 
-void assa_fp2_4x2x1w(__m512i *r, const __m512i *a, const __m512i *b);
+void assa_fp2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a, const fp2_4x2x1w b);
 
-void as_fp2_2x2x2w(__m512i *r, const __m512i *a, const __m512i *b);
-void sqr_fp2_2x2x2w(__m512i *r, const __m512i *a);
-void mul_by_u_plus_1_fp2_2x2x2w(__m512i *r, const __m512i *a);
+void as_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b);
+void sqr_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a);
+void mul_by_u_plus_1_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a);
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp2 double-length operations
 
-void sqr_fp2x2_4x2x1w(__m512i *r, const __m512i *a);
-void mul_by_u_plus_1_fp2x2_4x2x1w(__m512i *r, const __m512i *a);
+void sqr_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2_4x2x1w a);
+void mul_by_u_plus_1_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2x2_4x2x1w a);
 
-void mul_fp2x2_2x4x1w(__m512i *r, const __m512i *a, const __m512i *b);
+void mul_fp2x2_2x4x1w(fp2x2_2x4x1w r, const fp2_2x4x1w a, const fp2_2x4x1w b);
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp4 operations
 
-void sqr_fp4_2x2x2x1w_v1(__m512i *r, const __m512i *a);
-void sqr_fp4_2x2x2x1w_v2(__m512i *r, const __m512i *a);
+void sqr_fp4_2x2x2x1w_v1(fp4_2x2x2x1w r, const fp4_2x2x2x1w a);
+void sqr_fp4_2x2x2x1w_v2(fp4_2x2x2x1w r, const fp4_2x2x2x1w a);
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp12 operations
 
-void cyclotomic_sqr_fp12_vec_v1(__m512i *ra, __m512i *rbc, 
-                                const __m512i *a, const __m512i *bc);
-void cyclotomic_sqr_fp12_vec_v2(__m512i *ra, __m512i *rbc, 
-                                const __m512i *a, const __m512i *bc);
+void cyclotomic_sqr_fp12_vec_v1(fp4_1x2x2x2w ra, fp4_2x2x2x1w rbc, 
+                                const fp4_1x2x2x2w a, const fp4_2x2x2x1w bc);
+void cyclotomic_sqr_fp12_vec_v2(fp4_1x2x2x2w ra, fp4_2x2x2x1w rbc, 
+                                const fp4_1x2x2x2w a, const fp4_2x2x2x1w bc);
 
 // ----------------------------------------------------------------------------
 // utils 

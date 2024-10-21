@@ -487,8 +487,9 @@ void cyclotomic_sqr_fp12_vector(vec384fp12 ret, const vec384fp12 a)
     uint64_t start_cycles = read_tsc();
   #endif
 
-  __m512i ra_1x2x2x2w[VWORDS], a_1x2x2x2w[VWORDS], t_1x2x2x2w[SWORDS/2];
-  __m512i rbc_2x2x2x1w[NWORDS], bc_2x2x2x1w[NWORDS], t_2x2x2x1w[SWORDS];
+  fp4_1x2x2x2w ra_1x2x2x2w, a_1x2x2x2w;
+  fp4_2x2x2x1w rbc_2x2x2x1w, bc_2x2x2x1w;
+  __m512i t_1x2x2x2w[SWORDS/2], t_2x2x2x1w[SWORDS];
   uint64_t r48[NWORDS];
   int i;
 

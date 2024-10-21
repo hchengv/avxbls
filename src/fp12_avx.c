@@ -363,7 +363,7 @@ static void blend_0xF0_hl(__m512i *r, const __m512i *a, const __m512i *b)
 // mp operations 
 
 // Karatsuba (incl. carry prop.)
-void mul_mp_8x1w_v1(__m512i *r, const __m512i *a, const __m512i *b)
+void mul_mp_8x1w_v1(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
   const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
@@ -538,7 +538,7 @@ void mul_mp_8x1w_v1(__m512i *r, const __m512i *a, const __m512i *b)
 }
 
 // Karatsuba (excl. carry prop.)
-void mul_mp_8x1w_v2(__m512i *r, const __m512i *a, const __m512i *b)
+void mul_mp_8x1w_v2(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
   const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
@@ -696,7 +696,7 @@ void mul_mp_8x1w_v2(__m512i *r, const __m512i *a, const __m512i *b)
 }
 
 // product-scanning (incl. carry prop.)
-void mul_mp_8x1w_v3(__m512i *r, const __m512i *a, const __m512i *b)
+void mul_mp_8x1w_v3(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
   const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
@@ -828,7 +828,7 @@ void mul_mp_8x1w_v3(__m512i *r, const __m512i *a, const __m512i *b)
 }
 
 // product-scanning (excl. carry prop.)
-void mul_mp_8x1w_v4(__m512i *r, const __m512i *a, const __m512i *b)
+void mul_mp_8x1w_v4(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
   const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
@@ -960,7 +960,7 @@ void mul_mp_8x1w_v4(__m512i *r, const __m512i *a, const __m512i *b)
 }
 
 // operand-scanning (excl. carry prop.)
-void mul_mp_4x2w_v1(__m512i *r, const __m512i *a, const __m512i *b)
+void mul_mp_4x2w_v1(fpx2_4x2w r, const fp_4x2w a, const fp_4x2w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
   const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
@@ -1039,7 +1039,7 @@ void mul_mp_4x2w_v1(__m512i *r, const __m512i *a, const __m512i *b)
 // ----------------------------------------------------------------------------
 // Fp single-length operations
 
-void add_fp_8x1w(__m512i *r, const __m512i *a, const __m512i *b)
+void add_fp_8x1w(fp_8x1w r, const fp_8x1w a, const fp_8x1w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
   const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
@@ -1090,7 +1090,7 @@ void add_fp_8x1w(__m512i *r, const __m512i *a, const __m512i *b)
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
 
-void sub_fp_8x1w(__m512i *r, const __m512i *a, const __m512i *b)
+void sub_fp_8x1w(fp_8x1w r, const fp_8x1w a, const fp_8x1w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
   const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
@@ -1140,7 +1140,7 @@ void sub_fp_8x1w(__m512i *r, const __m512i *a, const __m512i *b)
 // a = < H | G | F | E | D | C | B | A >
 // b = < P | O | N | M | L | K | J | I >
 // r = < H+P | G-O | F+N | E-M | D+L | C-K | B+J | A-I >
-static void asx4_fp_8x1w(__m512i *r, const __m512i *a, const __m512i *b)
+static void asx4_fp_8x1w(fp_8x1w r, const fp_8x1w a, const fp_8x1w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
   const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
@@ -1202,7 +1202,7 @@ static void asx4_fp_8x1w(__m512i *r, const __m512i *a, const __m512i *b)
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
 
-void add_fp_4x2w(__m512i *r, const __m512i *a, const __m512i *b)
+void add_fp_4x2w(fp_4x2w r, const fp_4x2w a, const fp_4x2w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
   const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
@@ -1247,7 +1247,7 @@ void add_fp_4x2w(__m512i *r, const __m512i *a, const __m512i *b)
   r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3; 
 }
 
-void sub_fp_4x2w(__m512i *r, const __m512i *a, const __m512i *b)
+void sub_fp_4x2w(fp_4x2w r, const fp_4x2w a, const fp_4x2w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
   const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
@@ -1292,7 +1292,7 @@ void sub_fp_4x2w(__m512i *r, const __m512i *a, const __m512i *b)
 // a = < D' | D | C' | C | B' | B | A' | A >
 // b = < H' | H | G' | G | F' | F | E' | E >
 // r = < D'+H' | D+H | C'-G' | C+G | B'+F' | B+F | A'-E' | A-E >
-void asx2_fp_4x2w(__m512i *r, const __m512i *a, const __m512i *b)
+void asx2_fp_4x2w(fp_4x2w r, const fp_4x2w a, const fp_4x2w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
   const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
@@ -1346,7 +1346,7 @@ void asx2_fp_4x2w(__m512i *r, const __m512i *a, const __m512i *b)
 // ----------------------------------------------------------------------------
 // Fp double-length operations
 
-void add_fpx2_8x1w(__m512i *r, const __m512i *a, const __m512i *b)
+void add_fpx2_8x1w(fpx2_8x1w r, const fpx2_8x1w a, const fpx2_8x1w b)
 {
   const __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
   const __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
@@ -1423,7 +1423,7 @@ void add_fpx2_8x1w(__m512i *r, const __m512i *a, const __m512i *b)
 // a = < H | G | F | E | D | C | B | A >
 // b = < P | O | N | M | L | K | J | I >
 // r = < H+P | G-O | F+N | E-M | D+L | C-K | B+J | A-I >
-static void asx4_fpx2_8x1w(__m512i *r, const __m512i *a, const __m512i *b)
+static void asx4_fpx2_8x1w(fpx2_8x1w r, const fpx2_8x1w a, const fpx2_8x1w b)
 {
   const __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
   const __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
@@ -1510,7 +1510,7 @@ static void asx4_fpx2_8x1w(__m512i *r, const __m512i *a, const __m512i *b)
 }
 
 // Montgomery reduction
-void redc_fpx2_8x1w(__m512i *r, const __m512i *a)
+void redc_fpx2_8x1w(fp_8x1w r, const fpx2_8x1w a)
 {
   __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
   __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
@@ -1645,7 +1645,7 @@ void redc_fpx2_8x1w(__m512i *r, const __m512i *a)
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
 
-void redc_fpx2_4x2w(__m512i *r, const __m512i *a)
+void redc_fpx2_4x2w(fp_4x2w r, const fpx2_4x2w a)
 {
   __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
   __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
@@ -1750,7 +1750,13 @@ void redc_fpx2_4x2w(__m512i *r, const __m512i *a)
 // ----------------------------------------------------------------------------
 // Fp2 single length operations
 
-static void add_fp2_4x2x1w(__m512i *r, const __m512i *a, const __m512i *b)
+static void add_fp2_8x1x1w(fp2_8x1x1w r, const fp2_8x1x1w a, const fp2_8x1x1w b)
+{
+  add_fp_8x1w(r[0], a[0], b[0]);
+  add_fp_8x1w(r[1], a[1], b[1]);
+}
+
+static void add_fp2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a, const fp2_4x2x1w b)
 {
   add_fp_8x1w(r, a, b);
 }
@@ -1758,7 +1764,7 @@ static void add_fp2_4x2x1w(__m512i *r, const __m512i *a, const __m512i *b)
 // a = < D1 | D0 | C1 | C0 | B1 | B0 | A1 | A0 >  
 // b = < H1 | H0 | G1 | G0 | F1 | F0 | E1 | E0 >
 // r = < D1+H1 | D0+H0 | C1-G1 | C0-G0 | B1-F1 | B0-F0 | A1+E1 | A0+E0 >
-void assa_fp2_4x2x1w(__m512i *r, const __m512i *a, const __m512i *b)
+void assa_fp2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a, const fp2_4x2x1w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
   const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
@@ -1820,7 +1826,7 @@ void assa_fp2_4x2x1w(__m512i *r, const __m512i *a, const __m512i *b)
 
 // r0 = a0-a1
 // r1 = a0+a1
-void mul_by_u_plus_1_fp2_4x2x1w(__m512i *r, const __m512i *a)
+void mul_by_u_plus_1_fp2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a)
 {
   __m512i t0[NWORDS];
 
@@ -1831,7 +1837,7 @@ void mul_by_u_plus_1_fp2_4x2x1w(__m512i *r, const __m512i *a)
 
 // r0 = (a0+a1)*(a0-a1)
 // r1 = 2*a0*a1
-void sqr_fp2_4x2x1w(__m512i *r, const __m512i *a)
+void sqr_fp2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a)
 {
   __m512i t0[NWORDS], t1[NWORDS], t2[NWORDS], tt0[2*NWORDS];
 
@@ -1847,7 +1853,7 @@ void sqr_fp2_4x2x1w(__m512i *r, const __m512i *a)
 
 // r0 = a0*b0-a1*b1
 // r1 = a0*b1+a1*b0
-void mul_fp2_2x4x1w(__m512i *r, const __m512i *a, const __m512i *b)
+void mul_fp2_2x4x1w(fp2_2x4x1w r, const fp2_2x4x1w a, const fp2_2x4x1w b)
 {
   __m512i t0[NWORDS], t1[NWORDS], tt0[2*NWORDS];
 
@@ -1861,8 +1867,7 @@ void mul_fp2_2x4x1w(__m512i *r, const __m512i *a, const __m512i *b)
   asx4_fp_8x1w(r, t1, t0);              // A0B1+A1B0 | A0B0-A1B1 |  ... |  ...
 }
 
-
-static void add_fp2_2x2x2w(__m512i *r, const __m512i *a, const __m512i *b)
+static void add_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b)
 {
   add_fp_4x2w(r, a, b);
 }
@@ -1870,7 +1875,7 @@ static void add_fp2_2x2x2w(__m512i *r, const __m512i *a, const __m512i *b)
 // a = < B1' | B1 | B0' | B0 | A1' | A1 | A0' | A0 >
 // b = < D1' | D1 | D0' | D0 | C1' | C1 | C0' | C0 >
 // r = < B1'+D1' | B1+D1 | B0'+D0' | B0+D0 | A1'-C1' | A1-C1 | A0'-C0' | A0-C0 >
-void as_fp2_2x2x2w(__m512i *r, const __m512i *a, const __m512i *b)
+void as_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
   const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
@@ -1923,7 +1928,7 @@ void as_fp2_2x2x2w(__m512i *r, const __m512i *a, const __m512i *b)
 
 // r0 = (a0+a1)*(a0-a1)
 // r1 = 2*a0*a1
-void sqr_fp2_2x2x2w(__m512i *r, const __m512i *a)
+void sqr_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a)
 {
   __m512i t0[VWORDS], t1[VWORDS], t2[VWORDS], t3[3*VWORDS];
 
@@ -1939,7 +1944,7 @@ void sqr_fp2_2x2x2w(__m512i *r, const __m512i *a)
 
 // r0 = a0-a1
 // r1 = a0+a1
-void mul_by_u_plus_1_fp2_2x2x2w(__m512i *r, const __m512i *a)
+void mul_by_u_plus_1_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a)
 {
   __m512i t0[VWORDS];
 
@@ -1950,7 +1955,7 @@ void mul_by_u_plus_1_fp2_2x2x2w(__m512i *r, const __m512i *a)
 
 // r0 = a0*b0-a1*b1
 // r1 = a0*b1+a1*b0
-void mul_fp2_1x4x2w(__m512i *r, const __m512i *a, const __m512i *b)
+void mul_fp2_1x4x2w(fp2_1x4x2w r, const fp2_1x4x2w a, const fp2_1x4x2w b)
 {
   __m512i t0[VWORDS], t1[VWORDS], tt0[3*VWORDS];
   const __m512i m0 = VSET(7, 6, 7, 6, 5, 4, 5, 4);
@@ -1970,14 +1975,14 @@ void mul_fp2_1x4x2w(__m512i *r, const __m512i *a, const __m512i *b)
 // ----------------------------------------------------------------------------
 // Fp2 double length operations
 
-static void add_fp2x2_4x2x1w(__m512i *r, const __m512i *a, const __m512i *b)
+static void add_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2x2_4x2x1w a, const fp2x2_4x2x1w b)
 {
   add_fpx2_8x1w(r, a, b);
 }
 
 // r0 = (a0+a1)*(a0-a1)
 // r1 = 2*a0*a1
-void sqr_fp2x2_4x2x1w(__m512i *r, const __m512i *a)
+void sqr_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2_4x2x1w a)
 {
   __m512i t0[NWORDS], t1[NWORDS], t2[NWORDS];
 
@@ -1992,7 +1997,7 @@ void sqr_fp2x2_4x2x1w(__m512i *r, const __m512i *a)
 
 // r0 = a0-a1
 // r1 = a0+a1
-void mul_by_u_plus_1_fp2x2_4x2x1w(__m512i *r, const __m512i *a)
+void mul_by_u_plus_1_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2x2_4x2x1w a)
 {
   __m512i tt0[2*NWORDS];
 
@@ -2003,7 +2008,7 @@ void mul_by_u_plus_1_fp2x2_4x2x1w(__m512i *r, const __m512i *a)
 
 // r0 = a0*b0-a1*b1
 // r1 = a0*b1+a1*b0
-void mul_fp2x2_2x4x1w(__m512i *r, const __m512i *a, const __m512i *b)
+void mul_fp2x2_2x4x1w(fp2x2_2x4x1w r, const fp2_2x4x1w a, const fp2_2x4x1w b)
 {
   __m512i t0[NWORDS], t1[NWORDS], tt0[2*NWORDS], tt1[2*NWORDS];
 
@@ -2016,7 +2021,7 @@ void mul_fp2x2_2x4x1w(__m512i *r, const __m512i *a, const __m512i *b)
   asx4_fpx2_8x1w(r, tt1, tt0);          // A0B1+A1B0 | A0B0-A1B1 |  ... |  ...
 }
 
-void redc_fp2x2_4x2x1w(__m512i *r, const __m512i *a)
+void redc_fp2x2_4x2x1w(fp2_4x2x1w r, const fp2x2_4x2x1w a)
 {
   redc_fpx2_8x1w(r, a);
 }
@@ -2027,7 +2032,7 @@ void redc_fp2x2_4x2x1w(__m512i *r, const __m512i *a)
 // r0 = a0^2 + (u+1)*a1^2
 // r1 = 2*a0*a1
 // double-length version
-void sqr_fp4_2x2x2x1w_v1(__m512i *r, const __m512i *a)
+void sqr_fp4_2x2x2x1w_v1(fp4_2x2x2x1w r, const fp4_2x2x2x1w a)
 {
   __m512i tt0[2*NWORDS], tt1[2*NWORDS], t0[NWORDS];
 
@@ -2046,7 +2051,7 @@ void sqr_fp4_2x2x2x1w_v1(__m512i *r, const __m512i *a)
 // r0 = a0^2 + (u+1)*a1^2
 // r1 = 2*a0*a1
 // single-length version
-void sqr_fp4_2x2x2x1w_v2(__m512i *r, const __m512i *a)
+void sqr_fp4_2x2x2x1w_v2(fp4_2x2x2x1w r, const fp4_2x2x2x1w a)
 {
   __m512i t0[NWORDS], t1[NWORDS], t2[NWORDS];
 
@@ -2063,8 +2068,8 @@ void sqr_fp4_2x2x2x1w_v2(__m512i *r, const __m512i *a)
 
 // r0 = a0^2 + (u+1)*a1^2
 // r1 = 2*a0*a1
-// x1 version
-void sqr_fp4_1x2x2x2w(__m512i *r, const __m512i *a)
+// single-length version
+void sqr_fp4_1x2x2x2w(fp4_1x2x2x2w r, const fp4_1x2x2x2w a)
 {
   __m512i t0[VWORDS], t1[VWORDS], t2[VWORDS];
   const __m512i m0 = VSET(3, 2, 1, 0, 7, 6, 5, 4);
@@ -2081,10 +2086,52 @@ void sqr_fp4_1x2x2x2w(__m512i *r, const __m512i *a)
 }
 
 // ----------------------------------------------------------------------------
+// Fp6 operations
+
+// r0 = ((a1 + a2)*(b1 + b2) - a1*b1 - a2*b2)*(u+1) + a0*b0 = (a1*b2 + a2*b1)*(u+1) + a0*b0 
+// r1 = (a0 + a1)*(b0 + b1) - a0*b0 - a1*b1 + a2*b2*(u+1) = a0*b1 + a1*b0 + a2*b2*(u+1)
+// r2 = (a0 + a2)*(b0 + b2) - a0*b0 - a2*b2 + a1*b1 = a0*b2 + a2*b0 + a1*b1
+// Karatsuba 
+void mul_fp6x2_4x2x1x1w(fp2x2_8x1x1w r01, fp2x2_8x1x1w r2, const fp2_8x1x1w ab0, const fp2_8x1x1w ab1, const fp2_8x1x1w ab2)
+{
+  __m512i t0[2][NWORDS], t1[2][NWORDS], t2[2][NWORDS];
+
+  // ab0 = b0 | a0 at Fp2 layer
+  // ab1 = b1 | a1 at Fp2 layer 
+  // ab2 = b2 | a2 at Fp2 layer
+  add_fp2_8x1x1w(t0, ab1, ab2);         //                                   b1+b2 |                                     a1+a2
+  add_fp2_8x1x1w(t1, ab0, ab1);         //                                   b0+b1 |                                     a0+a1
+  add_fp2_8x1x1w(t2, ab0, ab2);         //                                   b0+b2 |                                     a0+a2
+                                        //                                      a1 |                                        a0
+                                        //                                      b1 |                                        b0
+                                        //                                   a1*b1 |                                     a0*b0
+                                        //                                      a2 |                                     a1+a2
+                                        //                                      b2 |                                     b1+b2
+                                        //                                   a2*b2 |                           (a1+a2)*(b1+b2)
+                                        //                                   a0+a1 |                                     a0+a2
+                                        //                                   b0+b1 |                                     b0+b2
+                                        //                         (a0+a1)*(b0+b1) |                           (a0+a2)*(b0+b2)
+                                        //                         (a0+a1)*(b0+b1) |                           (a1+a2)*(b1+b2)
+                                        //                                   a1*b1 |                                     a1*b1
+                                        //                   (a0+a1)*(b0+b1)-a1*b1 |                     (a1+a2)*(b1+b2)-a1*b1
+                                        //                         (a0+a2)*(b0+b2) |                     (a1+a2)*(b1+b2)-a1*b1
+                                        //                                   a2*b2 |                                     a2*b2
+                                        //                   (a0+a2)*(b0+b2)-a2*b2 |               (a1+a2)*(b1+b2)-a1*b1-a2*b2
+                                        //                   (a0+a1)*(b0+b1)-a1*b1 |                     (a0+a2)*(b0+b2)-a2*b2
+                                        //             (a0+a1)*(b0+b1)-a1*b1-a0*b0 |               (a0+a2)*(b0+b2)-a2*b2-a0*b0
+                                        //                                   a2*b2 |               (a1+a2)*(b1+b2)-a1*b1-a2*b2
+                                        //                             a2*b2*(u+1) |       ((a1+a2)*(b1+b2)-a1*b1-a2*b2)*(u+1)
+                                        //             (a0+a1)*(b0+b1)-a1*b1-a0*b0 |                                     a0*b0
+                                        // (a0+a1)*(b0+b1)-a1*b1-a0*b0+a2*b2*(u+1) | ((a1+a2)*(b1+b2)-a1*b1-a2*b2)*(u+1)+a0*b0
+                                        //                                     ... |               (a0+a2)*(b0+b2)-a2*b2-a0*b0
+                                        //                                     ... |         (a0+a2)*(b0+b2)-a2*b2-a0*b0+a1*b1
+} 
+
+// ----------------------------------------------------------------------------
 // Fp12 operations
 
 // To understand the comments, see Listing 21 in "Guide to Pairing-Based Cryptography". 
-void cyclotomic_sqr_fp12_vec_v1(__m512i *ra, __m512i *rbc, const __m512i *a, const __m512i *bc)
+void cyclotomic_sqr_fp12_vec_v1(fp4_1x2x2x2w ra, fp4_2x2x2x1w rbc, const fp4_1x2x2x2w a, const fp4_2x2x2x1w bc)
 {
   __m512i ta[VWORDS], tbc[NWORDS], t0[NWORDS];
   const __m512i m0 = VSET(3, 2, 1, 0, 5, 4, 7, 6);
@@ -2098,7 +2145,7 @@ void cyclotomic_sqr_fp12_vec_v1(__m512i *ra, __m512i *rbc, const __m512i *a, con
 
   // compute B and C in 2x2x2x1w
   // bc = z5 | z4 | z3 | z2 at Fp2 layer
-  sqr_fp4_2x2x2x1w_v1(tbc, bc);         //   t3 |        t2 |        t1 |              t0
+  sqr_fp4_2x2x2x1w_v1(tbc, bc);         //        t3 |        t2 |        t1 |              t0
   mul_by_u_plus_1_fp2_4x2x1w(t0, tbc);  //  t3*(u+1) |       ... |       ... |             ...
   blend_0xC0(tbc, tbc, t0);             //  t3*(u+1) |        t2 |        t1 |              t0
   perm_var(tbc, tbc, m0);               //        t1 |        t0 |        t2 |        t3*(u+1)
@@ -2108,7 +2155,7 @@ void cyclotomic_sqr_fp12_vec_v1(__m512i *ra, __m512i *rbc, const __m512i *a, con
 }
 
 // To understand the comments, see Listing 21 in "Guide to Pairing-Based Cryptography". 
-void cyclotomic_sqr_fp12_vec_v2(__m512i *ra, __m512i *rbc, const __m512i *a, const __m512i *bc)
+void cyclotomic_sqr_fp12_vec_v2(fp4_1x2x2x2w ra, fp4_2x2x2x1w rbc, const fp4_1x2x2x2w a, const fp4_2x2x2x1w bc)
 {
   __m512i ta[VWORDS], tbc[NWORDS], t0[NWORDS];
   const __m512i m0 = VSET(3, 2, 1, 0, 5, 4, 7, 6);
@@ -2129,6 +2176,15 @@ void cyclotomic_sqr_fp12_vec_v2(__m512i *ra, __m512i *rbc, const __m512i *a, con
   assa_fp2_4x2x1w(rbc, tbc, bc);        //     t1+z5 |     t0-z4 |     t2-z3 |     t3*(u+1)+z2
   add_fp2_4x2x1w(rbc, rbc, rbc);        // 2*(t1+z5) | 2*(t0-z4) | 2*(t2-z3) | 2*(t3*(u+1)+z2)
   add_fp2_4x2x1w(rbc, rbc, tbc);        // 3*t1+2*z5 | 3*t0-2*z4 | 3*t2-2*z3 | 3*t3*(u+1)+2*z2
+}
+
+// schoolbook
+void mul_fp12_vec_v1(__m512i *r0, __m512i *r1, const __m512i *a0, const __m512i *a1, const __m512i *b0, const __m512i *b1)
+{
+  mul_fp6x2_4x2x1x1w();                 // a1*b1, a0*b1, a1*b0, a0*b0
+  mul_by_u_plus_1_fp2x2_4x2x1x1w();     // a1*b1*v 
+  add_fp6x2_2xnxnx1w();                 // a0*b0+a1*b1*v, a0*b1+a1*b0
+  redc_fp6x2_2xnxnx1w();                // a0*b0+a1*b1*v, a0*b1+a1*b0
 }
 
 // ----------------------------------------------------------------------------
