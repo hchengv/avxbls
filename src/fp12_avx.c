@@ -389,20 +389,45 @@ static void perm_1032_dl(__m512i *r, const __m512i *a)
   __m512i r0, r1, r2 , r3 , r4 , r5 , r6 , r7 ;
   __m512i r8, r9, r10, r11, r12, r13, r14, r15;
 
-  r0  = VPERM(a0, 0x4E); r1  = VPERM(a1, 0x4E);
-  r2  = VPERM(a2, 0x4E); r3  = VPERM(a3, 0x4E);
-  r4  = VPERM(a4, 0x4E); r5  = VPERM(a5, 0x4E);
-  r6  = VPERM(a6, 0x4E); r7  = VPERM(a7, 0x4E);
-  r8  = VPERM(a0, 0x4E); r9  = VPERM(a1, 0x4E);
-  r10 = VPERM(a0, 0x4E); r11 = VPERM(a1, 0x4E);
-  r12 = VPERM(a0, 0x4E); r13 = VPERM(a1, 0x4E);
-  r14 = VPERM(a0, 0x4E); r15 = VPERM(a1, 0x4E);
+  r0  = VPERM(a0 , 0x4E); r1  = VPERM(a1 , 0x4E);
+  r2  = VPERM(a2 , 0x4E); r3  = VPERM(a3 , 0x4E);
+  r4  = VPERM(a4 , 0x4E); r5  = VPERM(a5 , 0x4E);
+  r6  = VPERM(a6 , 0x4E); r7  = VPERM(a7 , 0x4E);
+  r8  = VPERM(a8 , 0x4E); r9  = VPERM(a9 , 0x4E);
+  r10 = VPERM(a10, 0x4E); r11 = VPERM(a11, 0x4E);
+  r12 = VPERM(a12, 0x4E); r13 = VPERM(a13, 0x4E);
+  r14 = VPERM(a14, 0x4E); r15 = VPERM(a15, 0x4E);
 
   r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
   r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
   r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
   r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
 }
+
+static void perm_var_dl(__m512i *r, const __m512i *a, const __m512i mask)
+{
+  const __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
+  const __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
+  const __m512i a8  = a[8 ], a9  = a[9 ], a10 = a[10], a11 = a[11];
+  const __m512i a12 = a[12], a13 = a[13], a14 = a[14], a15 = a[15];
+  __m512i r0, r1, r2 , r3 , r4 , r5 , r6 , r7 ;
+  __m512i r8, r9, r10, r11, r12, r13, r14, r15;
+
+  r0  = VPERMV(mask, a0 ); r1  = VPERMV(mask, a1 );
+  r2  = VPERMV(mask, a2 ); r3  = VPERMV(mask, a3 );
+  r4  = VPERMV(mask, a4 ); r5  = VPERMV(mask, a5 );
+  r6  = VPERMV(mask, a6 ); r7  = VPERMV(mask, a7 );
+  r8  = VPERMV(mask, a8 ); r9  = VPERMV(mask, a9 );
+  r10 = VPERMV(mask, a10); r11 = VPERMV(mask, a11);
+  r12 = VPERMV(mask, a12); r13 = VPERMV(mask, a13);
+  r14 = VPERMV(mask, a14); r15 = VPERMV(mask, a15);
+
+  r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
+  r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
+  r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
+  r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
+}
+
 
 // a = < H | G | F | E | D | C | B | A >
 // b = < P | O | N | M | L | K | J | I >
@@ -2499,15 +2524,15 @@ void mul_fp12_vec_v1(fp2_4x2x1w r01, fp2_4x2x1w r2, const fp2_8x1x1w ab0, const 
   // tt3[1]  = a1*b1[0][1] | a1*b1[1][1] | a1*b0[0][1] | a1*b0[1][1] | a0*b1[0][1] | a0*b1[1][1] | a0*b0[0][1] | a0*b0[1][1] at Fp layer
   shuf_01_fp2x2_8x1x1w(tt3, tt01);
   //    ss0  = a1*b1[0] | a1*b0[0] | a0*b1[0] | a0*b0[0] at Fp2 layer
-  //    ss1  = a1*b1[1] | a1*b0[1] | a0*b1[1] | a0*b0[1] at Fp2 layer
   blend_0x55_dl(ss0, tt3[1], tt01[0]);
+  //    ss1  = a1*b1[1] | a1*b0[1] | a0*b1[1] | a0*b0[1] at Fp2 layer
   blend_0x55_dl(ss1, tt01[1], tt3[0]);
   //    ss2  = a1*b0[0] | a1*b1[0] | a0*b0[0] | a0*b1[0] at Fp2 layer
   perm_1032_dl(ss2, ss0);
   //    ss2  = a1*b1[1] | a1*b1[0] | a0*b1[1] | a0*b1[0] at Fp2 layer
   blend_0x33_dl(ss2, ss1, ss2);
   //    ss2  = a0*b1[1] | a0*b1[0] | a1*b1[1] | a1*b1[0] at Fp2 layer
-  perm_var(ss2, ss2, m0);
+  perm_var_dl(ss2, ss2, m0);
   //    ss3  = a1*b0[1] | a1*b1[1] | a0*b0[1] | a0*b1[1] at Fp2 layer
   perm_1032_dl(ss3, ss1);
   //    ss3  = a1*b0[1] | a1*b0[0] | a0*b0[1] | a0*b0[0] at Fp2 layer
