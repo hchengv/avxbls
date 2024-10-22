@@ -93,6 +93,41 @@ void mul_fp12_vec_v1(fp2_4x2x1w r01, fp2_4x2x1w r2,
 // ----------------------------------------------------------------------------
 // utils 
 
+// a = < H | G | F | E | D | C | B | A >
+// b = < P | O | N | M | L | K | J | I >
+// r = < H | G | F | E | D | C | J | I >
+static void blend_0x03(__m512i *r, const __m512i *a, const __m512i *b)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
+  const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+  const __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7;
+
+  r0 = VMBLEND(0x33, a0, b0); r1 = VMBLEND(0x33, a1, b1);
+  r2 = VMBLEND(0x33, a2, b2); r3 = VMBLEND(0x33, a3, b3);
+  r4 = VMBLEND(0x33, a4, b4); r5 = VMBLEND(0x33, a5, b5);
+  r6 = VMBLEND(0x33, a6, b6); r7 = VMBLEND(0x33, a7, b7);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+  r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
+}
+
+static void perm_var(__m512i *r, const __m512i *a, const __m512i mask)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7;
+
+  r0 = VPERMV(mask, a0); r1 = VPERMV(mask, a1);
+  r2 = VPERMV(mask, a2); r3 = VPERMV(mask, a3);
+  r4 = VPERMV(mask, a4); r5 = VPERMV(mask, a5);
+  r6 = VPERMV(mask, a6); r7 = VPERMV(mask, a7);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+  r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
+}
+
 static void mpi_print(const char *c, const uint64_t *a, int len)
 {
   int i;

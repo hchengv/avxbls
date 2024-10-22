@@ -146,21 +146,6 @@ static void perm_zz32(__m512i *r, const __m512i *a)
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
 
-static void perm_var(__m512i *r, const __m512i *a, const __m512i mask)
-{
-  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
-  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
-  __m512i r0, r1, r2, r3, r4, r5, r6, r7;
-
-  r0 = VPERMV(mask, a0); r1 = VPERMV(mask, a1);
-  r2 = VPERMV(mask, a2); r3 = VPERMV(mask, a3);
-  r4 = VPERMV(mask, a4); r5 = VPERMV(mask, a5);
-  r6 = VPERMV(mask, a6); r7 = VPERMV(mask, a7);
-
-  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
-  r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
-}
-
 // a = < H | G | F | E | D | C | B | A >
 // b = < P | O | N | M | L | K | J | I >
 // r = < P | O | F | E | D | C | B | A >
@@ -183,7 +168,7 @@ static void blend_0xC0(__m512i *r, const __m512i *a, const __m512i *b)
 
 // a = < H | G | F | E | D | C | B | A >
 // b = < P | O | N | M | L | K | J | I >
-// r = < P | O | N | M | L | K | B | A >
+// r = < H | G | N | M | D | C | J | I >
 static void blend_0x33(__m512i *r, const __m512i *a, const __m512i *b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
