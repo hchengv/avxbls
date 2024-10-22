@@ -326,7 +326,7 @@ static void mul_n_sqr_vec(vec384fp12 ret, const vec384fp12 a, size_t n)
   fp4_1x2x2x2w  a_1x2x2x2w;
   fp4_2x2x2x1w bc_2x2x2x1w;
   __m512i t_1x2x2x2w[SWORDS/2], t_2x2x2x1w[SWORDS];
-  const __m512i m0 = VSET(4, 5, 2, 3, 0, 1, 3, 2);
+  const __m512i m0 = VSET(3, 2, 1, 0, 3, 2, 5, 4);
 
   // form < a11 | a00 >
   // for (i = 0; i < SWORDS/2; i++) {
@@ -350,7 +350,7 @@ static void mul_n_sqr_vec(vec384fp12 ret, const vec384fp12 a, size_t n)
   // form < a12 | a01 | a02 | a10 >
   perm_var(r01, r01, m0);
   perm_var(r2, r2, m0);
-  blend_0x03(bc_2x2x2x1w, r01, r2);
+  blend_0xC0(bc_2x2x2x1w, r01, r2);
 
   // for (i = 0; i < NWORDS; i++) {
   //   bc_2x2x2x1w[i] = VSET(((uint64_t *) &r2[i])[3],

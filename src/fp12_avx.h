@@ -95,8 +95,8 @@ void mul_fp12_vec_v1(fp2_4x2x1w r01, fp2_4x2x1w r2,
 
 // a = < H | G | F | E | D | C | B | A >
 // b = < P | O | N | M | L | K | J | I >
-// r = < H | G | F | E | D | C | J | I >
-static void blend_0x03(__m512i *r, const __m512i *a, const __m512i *b)
+// r = < P | O | F | E | D | C | B | A >
+static void blend_0xC0(__m512i *r, const __m512i *a, const __m512i *b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
   const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
@@ -104,14 +104,15 @@ static void blend_0x03(__m512i *r, const __m512i *a, const __m512i *b)
   const __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
   __m512i r0, r1, r2, r3, r4, r5, r6, r7;
 
-  r0 = VMBLEND(0x03, a0, b0); r1 = VMBLEND(0x03, a1, b1);
-  r2 = VMBLEND(0x03, a2, b2); r3 = VMBLEND(0x03, a3, b3);
-  r4 = VMBLEND(0x03, a4, b4); r5 = VMBLEND(0x03, a5, b5);
-  r6 = VMBLEND(0x03, a6, b6); r7 = VMBLEND(0x03, a7, b7);
+  r0 = VMBLEND(0xC0, a0, b0); r1 = VMBLEND(0xC0, a1, b1);
+  r2 = VMBLEND(0xC0, a2, b2); r3 = VMBLEND(0xC0, a3, b3);
+  r4 = VMBLEND(0xC0, a4, b4); r5 = VMBLEND(0xC0, a5, b5);
+  r6 = VMBLEND(0xC0, a6, b6); r7 = VMBLEND(0xC0, a7, b7);
 
   r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
+
 
 static void perm_var(__m512i *r, const __m512i *a, const __m512i mask)
 {
