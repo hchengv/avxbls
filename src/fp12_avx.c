@@ -428,6 +428,79 @@ static void perm_var_dl(__m512i *r, const __m512i *a, const __m512i mask)
   r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
 }
 
+// a = < H | G | F | E | D | C | B | A >
+// b = < P | O | N | M | L | K | J | I >
+// r = < H | G | F | E | D | C | B | I >
+static void blend_0x01_dl(__m512i *r, const __m512i *a, const __m512i *b)
+{
+  const __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
+  const __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
+  const __m512i a8  = a[8 ], a9  = a[9 ], a10 = a[10], a11 = a[11];
+  const __m512i a12 = a[12], a13 = a[13], a14 = a[14], a15 = a[15];
+  const __m512i b0  = b[0 ], b1  = b[1 ], b2  = b[2 ], b3  = b[3 ];
+  const __m512i b4  = b[4 ], b5  = b[5 ], b6  = b[6 ], b7  = b[7 ];
+  const __m512i b8  = b[8 ], b9  = b[9 ], b10 = b[10], b11 = b[11];
+  const __m512i b12 = b[12], b13 = b[13], b14 = b[14], b15 = b[15];
+  __m512i r0, r1, r2 , r3 , r4 , r5 , r6 , r7 ;
+  __m512i r8, r9, r10, r11, r12, r13, r14, r15;
+
+  r0  = VMBLEND(0x01, a0 , b0 ); r1  = VMBLEND(0x01, a1 , b1 );
+  r2  = VMBLEND(0x01, a2 , b2 ); r3  = VMBLEND(0x01, a3 , b3 );
+  r4  = VMBLEND(0x01, a4 , b4 ); r5  = VMBLEND(0x01, a5 , b5 );
+  r6  = VMBLEND(0x01, a6 , b6 ); r7  = VMBLEND(0x01, a7 , b7 );
+  r8  = VMBLEND(0x01, a8 , b8 ); r9  = VMBLEND(0x01, a9 , b9 );
+  r10 = VMBLEND(0x01, a10, b10); r11 = VMBLEND(0x01, a11, b11);
+  r12 = VMBLEND(0x01, a12, b12); r13 = VMBLEND(0x01, a13, b13);
+  r14 = VMBLEND(0x01, a14, b14); r15 = VMBLEND(0x01, a15, b15);
+
+  r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
+  r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
+  r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
+  r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
+}
+
+static void blend_0x01_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a, const fp2x2_8x1x1w b)
+{
+  blend_0x01_dl(r[0], a[0], b[0]);
+  blend_0x01_dl(r[1], a[1], b[1]);
+}
+
+// a = < H | G | F | E | D | C | B | A >
+// b = < P | O | N | M | L | K | J | I >
+// r = < H | G | F | E | D | C | J | I >
+static void blend_0x03_dl(__m512i *r, const __m512i *a, const __m512i *b)
+{
+  const __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
+  const __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
+  const __m512i a8  = a[8 ], a9  = a[9 ], a10 = a[10], a11 = a[11];
+  const __m512i a12 = a[12], a13 = a[13], a14 = a[14], a15 = a[15];
+  const __m512i b0  = b[0 ], b1  = b[1 ], b2  = b[2 ], b3  = b[3 ];
+  const __m512i b4  = b[4 ], b5  = b[5 ], b6  = b[6 ], b7  = b[7 ];
+  const __m512i b8  = b[8 ], b9  = b[9 ], b10 = b[10], b11 = b[11];
+  const __m512i b12 = b[12], b13 = b[13], b14 = b[14], b15 = b[15];
+  __m512i r0, r1, r2 , r3 , r4 , r5 , r6 , r7 ;
+  __m512i r8, r9, r10, r11, r12, r13, r14, r15;
+
+  r0  = VMBLEND(0x03, a0 , b0 ); r1  = VMBLEND(0x03, a1 , b1 );
+  r2  = VMBLEND(0x03, a2 , b2 ); r3  = VMBLEND(0x03, a3 , b3 );
+  r4  = VMBLEND(0x03, a4 , b4 ); r5  = VMBLEND(0x03, a5 , b5 );
+  r6  = VMBLEND(0x03, a6 , b6 ); r7  = VMBLEND(0x03, a7 , b7 );
+  r8  = VMBLEND(0x03, a8 , b8 ); r9  = VMBLEND(0x03, a9 , b9 );
+  r10 = VMBLEND(0x03, a10, b10); r11 = VMBLEND(0x03, a11, b11);
+  r12 = VMBLEND(0x03, a12, b12); r13 = VMBLEND(0x03, a13, b13);
+  r14 = VMBLEND(0x03, a14, b14); r15 = VMBLEND(0x03, a15, b15);
+
+  r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
+  r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
+  r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
+  r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
+}
+
+static void blend_0x03_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a, const fp2x2_8x1x1w b)
+{
+  blend_0x03_dl(r[0], a[0], b[0]);
+  blend_0x03_dl(r[1], a[1], b[1]);
+}
 
 // a = < H | G | F | E | D | C | B | A >
 // b = < P | O | N | M | L | K | J | I >
@@ -2506,7 +2579,7 @@ void cyclotomic_sqr_fp12_vec_v2(fp4_1x2x2x2w ra, fp4_2x2x2x1w rbc, const fp4_1x2
 // schoolbook
 void mul_fp12_vec_v1(fp2_4x2x1w r01, fp2_4x2x1w r2, const fp2_8x1x1w ab0, const fp2_8x1x1w ab1, const fp2_8x1x1w ab2)
 {
-  fp2x2_8x1x1w tt01, tt2, tt3;
+  fp2x2_8x1x1w tt01, tt2, tt3, tt4;
   fp2x2_4x2x1w ss0, ss1, ss2, ss3;
   fp2_4x2x1w s0, s1;
   const __m512i m0 = VSET(3, 2, 1, 0, 7, 6, 5, 4);
@@ -2519,7 +2592,16 @@ void mul_fp12_vec_v1(fp2_4x2x1w r01, fp2_4x2x1w r2, const fp2_8x1x1w ab0, const 
   // tt01 = a1*b1[1] | a1*b1[0] | a1*b0[1] | a1*b0[0] | a0*b1[1] | a0*b1[0] | a0*b0[1] | a0*b0[0] at Fp2 layer
   // tt2  =      ... | a1*b1[2] |      ... | a1*b0[2] |      ... | a0*b1[2] |      ... | a0*b0[2] at Fp2 layer
   mul_fp6x2_4x2x1x1w(tt01, tt2, ab0, ab1, ab2);
-  
+  // tt3  = a1*b1[0] | a1*b1[1] | a1*b0[0] | a1*b0[1] | a0*b1[0] | a0*b1[1] | a0*b0[0] | a0*b0[1] at Fp2 layer
+  shuf_01_fp2x2_8x1x1w(tt3, tt01);
+  // tt4  = a1*b1[2] |      ... | a1*b0[2] |      ... | a0*b1[2] |      ... | a0*b0[2] |      ... at Fp2 layer
+  shuf_01_fp2x2_8x1x1w(tt4, tt2);
+  // tt4  = a1*b1[2] |      ... |      ... |      ... |      ... |      ... | a0*b0[2] | a0*b0[1] at Fp2 layer
+  blend_0x01_fp2x2_8x1x1w(tt4, tt4, tt3);
+  // tt2  =      ... | a1*b1[2] |      ... | a1*b0[2] |      ... | a0*b1[2] |      ... | a0*b0[0] at Fp2 layer
+  blend_0x01_fp2x2_8x1x1w(tt2, tt2, tt01);  
+  // tt01 = a1*b1[1] | a1*b1[0] | a1*b0[1] | a1*b0[0] | a0*b1[1] | a0*b1[0] | a0*b0[2] | a0*b0[1] at Fp2 layer
+  blend_0x03_fp2x2_8x1x1w(tt01, tt01, tt4);
   // tt3[0]  = a1*b1[0][0] | a1*b1[1][0] | a1*b0[0][0] | a1*b0[1][0] | a0*b1[0][0] | a0*b1[1][0] | a0*b0[0][0] | a0*b0[1][0] at Fp layer
   // tt3[1]  = a1*b1[0][1] | a1*b1[1][1] | a1*b0[0][1] | a1*b0[1][1] | a0*b1[0][1] | a0*b1[1][1] | a0*b0[0][1] | a0*b0[1][1] at Fp layer
   shuf_01_fp2x2_8x1x1w(tt3, tt01);
@@ -2539,7 +2621,7 @@ void mul_fp12_vec_v1(fp2_4x2x1w r01, fp2_4x2x1w r2, const fp2_8x1x1w ab0, const 
   blend_0x33_dl(ss3, ss3, ss0);
   //    ss2 =  a0*b1+a1*b0[1] | a0*b1+a1*b0[0] | a0*b0+a1*b1[1] | a0*b0+a1*b1[0] at Fp2 layer
   add_fp2x2_4x2x1w(ss2, ss2, ss3);
-  //    r01 =  r1[1] | r1[0] | r0[1] | r0[0] at Fp2 layer
+  //    r01 =  r1[1] | r1[0] | r0[2] | r0[1] at Fp2 layer
   redc_fp2x2_4x2x1w(r01, ss2);
 
   // double-length sub-routines
@@ -2555,7 +2637,7 @@ void mul_fp12_vec_v1(fp2_4x2x1w r01, fp2_4x2x1w r2, const fp2_8x1x1w ab0, const 
   blend_0xC0(s1, s0, s1);
   //     s0 =            ... |      ... | a1*b0[2] | a1*b1[2]*(u+1) at Fp2 layer
   perm_var(s0, s1, m1);
-  //     r2 = ... | ... | r2[1] | r2[0] at Fp2 layer
+  //     r2 = ... | ... | r1[2] | r0[0] at Fp2 layer
   add_fp2_4x2x1w(r2, s0, s1);
 }
 
