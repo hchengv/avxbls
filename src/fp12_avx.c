@@ -183,7 +183,7 @@ static void blend_0xC0(__m512i *r, const __m512i *a, const __m512i *b)
 
 // a = < H | G | F | E | D | C | B | A >
 // b = < P | O | N | M | L | K | J | I >
-// r = < H | O | F | M | D | K | B | I >
+// r = < P | O | N | M | L | K | B | A >
 static void blend_0x33(__m512i *r, const __m512i *a, const __m512i *b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
@@ -201,10 +201,30 @@ static void blend_0x33(__m512i *r, const __m512i *a, const __m512i *b)
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
 
-static void blend_0x33_fp2_8x1x1w(fp2_8x1x1w r, const fp2_8x1x1w a, const fp2_8x1x1w b)
+// a = < H | G | F | E | D | C | B | A >
+// b = < P | O | N | M | L | K | J | I >
+// r = < H | O | F | M | D | K | B | I >
+static void blend_0x55(__m512i *r, const __m512i *a, const __m512i *b)
 {
-  blend_0x33(r[0], a[0], b[0]);
-  blend_0x33(r[1], a[1], b[1]);
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
+  const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+  const __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7;
+
+  r0 = VMBLEND(0x55, a0, b0); r1 = VMBLEND(0x55, a1, b1);
+  r2 = VMBLEND(0x55, a2, b2); r3 = VMBLEND(0x55, a3, b3);
+  r4 = VMBLEND(0x55, a4, b4); r5 = VMBLEND(0x55, a5, b5);
+  r6 = VMBLEND(0x55, a6, b6); r7 = VMBLEND(0x55, a7, b7);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+  r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
+}
+
+static void blend_0x55_fp2_8x1x1w(fp2_8x1x1w r, const fp2_8x1x1w a, const fp2_8x1x1w b)
+{
+  blend_0x55(r[0], a[0], b[0]);
+  blend_0x55(r[1], a[1], b[1]);
 }
 
 // ----------------------------------------------------------------------------
@@ -389,10 +409,41 @@ static void blend_0x33_dl(__m512i *r, const __m512i *a, const __m512i *b)
   r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
 }
 
-static void blend_0x33_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a, const fp2x2_8x1x1w b)
+// a = < H | G | F | E | D | C | B | A >
+// b = < P | O | N | M | L | K | J | I >
+// r = < H | O | F | M | D | K | B | I >
+static void blend_0x55_dl(__m512i *r, const __m512i *a, const __m512i *b)
 {
-  blend_0x33_dl(r[0], a[0], b[0]);
-  blend_0x33_dl(r[1], a[1], b[1]);
+  const __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
+  const __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
+  const __m512i a8  = a[8 ], a9  = a[9 ], a10 = a[10], a11 = a[11];
+  const __m512i a12 = a[12], a13 = a[13], a14 = a[14], a15 = a[15];
+  const __m512i b0  = b[0 ], b1  = b[1 ], b2  = b[2 ], b3  = b[3 ];
+  const __m512i b4  = b[4 ], b5  = b[5 ], b6  = b[6 ], b7  = b[7 ];
+  const __m512i b8  = b[8 ], b9  = b[9 ], b10 = b[10], b11 = b[11];
+  const __m512i b12 = b[12], b13 = b[13], b14 = b[14], b15 = b[15];
+  __m512i r0, r1, r2 , r3 , r4 , r5 , r6 , r7 ;
+  __m512i r8, r9, r10, r11, r12, r13, r14, r15;
+
+  r0  = VMBLEND(0x55, a0 , b0 ); r1  = VMBLEND(0x55, a1 , b1 );
+  r2  = VMBLEND(0x55, a2 , b2 ); r3  = VMBLEND(0x55, a3 , b3 );
+  r4  = VMBLEND(0x55, a4 , b4 ); r5  = VMBLEND(0x55, a5 , b5 );
+  r6  = VMBLEND(0x55, a6 , b6 ); r7  = VMBLEND(0x55, a7 , b7 );
+  r8  = VMBLEND(0x55, a8 , b8 ); r9  = VMBLEND(0x55, a9 , b9 );
+  r10 = VMBLEND(0x55, a10, b10); r11 = VMBLEND(0x55, a11, b11);
+  r12 = VMBLEND(0x55, a12, b12); r13 = VMBLEND(0x55, a13, b13);
+  r14 = VMBLEND(0x55, a14, b14); r15 = VMBLEND(0x55, a15, b15);
+
+  r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
+  r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
+  r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
+  r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
+}
+
+static void blend_0x55_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a, const fp2x2_8x1x1w b)
+{
+  blend_0x55_dl(r[0], a[0], b[0]);
+  blend_0x55_dl(r[1], a[1], b[1]);
 }
 
 // ----------------------------------------------------------------------------
@@ -2316,34 +2367,34 @@ void mul_fp6x2_4x2x1x1w(fp2x2_8x1x1w r01, fp2x2_8x1x1w r2, const fp2_8x1x1w ab0,
   add_fp2_8x1x1w(t1, ab0, ab1);             //                                   b0+b1 |                                     a0+a1            
   add_fp2_8x1x1w(t2, ab0, ab2);             //                                   b0+b2 |                                     a0+a2
   shuf_01_fp2_8x1x1w(t3, ab1);              //                                      a1 |                                        b1         
-  blend_0x33_fp2_8x1x1w(t3, t3, ab0);       //                                      a1 |                                        a0
+  blend_0x55_fp2_8x1x1w(t3, t3, ab0);       //                                      a1 |                                        a0
   shuf_01_fp2_8x1x1w(t4, ab0);              //                                      a0 |                                        b0          
-  blend_0x33_fp2_8x1x1w(t4, ab1, t4);       //                                      b1 |                                        b0
+  blend_0x55_fp2_8x1x1w(t4, ab1, t4);       //                                      b1 |                                        b0
   mul_fp2x2_8x1x1w(tt0, t3, t4);            //                                   a1*b1 |                                     a0*b0
   shuf_01_fp2_8x1x1w(t3, ab2);              //                                      a2 |                                        b2
-  blend_0x33_fp2_8x1x1w(t3, t3, t0);        //                                      a2 |                                     a1+a2
+  blend_0x55_fp2_8x1x1w(t3, t3, t0);        //                                      a2 |                                     a1+a2
   shuf_01_fp2_8x1x1w(t4, t0);               //                                   a1+a2 |                                     b1+b2
-  blend_0x33_fp2_8x1x1w(t4, ab2, t4);       //                                      b2 |                                     b1+b2
+  blend_0x55_fp2_8x1x1w(t4, ab2, t4);       //                                      b2 |                                     b1+b2
   mul_fp2x2_8x1x1w(tt1, t3, t4);            //                                   a2*b2 |                           (a1+a2)*(b1+b2)
   shuf_01_fp2_8x1x1w(t3, t1);               //                                   a0+a1 |                                     b0+b1
-  blend_0x33_fp2_8x1x1w(t3, t3, t2);        //                                   a0+a1 |                                     a0+a2
+  blend_0x55_fp2_8x1x1w(t3, t3, t2);        //                                   a0+a1 |                                     a0+a2
   shuf_01_fp2_8x1x1w(t4, t2);               //                                   a0+a2 |                                     b0+b2
-  blend_0x33_fp2_8x1x1w(t4, t1, t4);        //                                   b0+b1 |                                     b0+b2
+  blend_0x55_fp2_8x1x1w(t4, t1, t4);        //                                   b0+b1 |                                     b0+b2
   mul_fp2x2_8x1x1w(tt2, t3, t4);            //                         (a0+a1)*(b0+b1) |                           (a0+a2)*(b0+b2)
-  blend_0x33_fp2x2_8x1x1w(tt3, tt2, tt1);   //                         (a0+a1)*(b0+b1) |                           (a1+a2)*(b1+b2) 
+  blend_0x55_fp2x2_8x1x1w(tt3, tt2, tt1);   //                         (a0+a1)*(b0+b1) |                           (a1+a2)*(b1+b2) 
   shuf_11_fp2x2_8x1x1w(tt4, tt0);           //                                   a1*b1 |                                     a1*b1
   sub_fp2x2_8x1x1w(tt3, tt3, tt4);          //                   (a0+a1)*(b0+b1)-a1*b1 |                     (a1+a2)*(b1+b2)-a1*b1
   shuf_01_fp2x2_8x1x1w(tt2, tt2);           //                         (a0+a2)*(b0+b2) |                           (a0+a1)*(b0+b1)
-  blend_0x33_fp2x2_8x1x1w(tt2, tt2, tt3);   //                         (a0+a2)*(b0+b2) |                     (a1+a2)*(b1+b2)-a1*b1
+  blend_0x55_fp2x2_8x1x1w(tt2, tt2, tt3);   //                         (a0+a2)*(b0+b2) |                     (a1+a2)*(b1+b2)-a1*b1
   shuf_11_fp2x2_8x1x1w(tt1, tt1);           //                                   a2*b2 |                                     a2*b2
   sub_fp2x2_8x1x1w(tt2, tt2, tt1);          //                   (a0+a2)*(b0+b2)-a2*b2 |               (a1+a2)*(b1+b2)-a1*b1-a2*b2
   shuf_11_fp2x2_8x1x1w(tt5, tt2);           //                   (a0+a2)*(b0+b2)-a2*b2 |                     (a0+a2)*(b0+b2)-a2*b2 
-  blend_0x33_fp2x2_8x1x1w(tt5, tt3, tt5);   //                   (a0+a1)*(b0+b1)-a1*b1 |                     (a0+a2)*(b0+b2)-a2*b2
+  blend_0x55_fp2x2_8x1x1w(tt5, tt3, tt5);   //                   (a0+a1)*(b0+b1)-a1*b1 |                     (a0+a2)*(b0+b2)-a2*b2
   shuf_00_fp2x2_8x1x1w(tt0, tt0);           //                                   a0*b0 |                                     a0*b0
   sub_fp2x2_8x1x1w(tt5, tt5, tt0);          //             (a0+a1)*(b0+b1)-a1*b1-a0*b0 |               (a0+a2)*(b0+b2)-a2*b2-a0*b0
-  blend_0x33_fp2x2_8x1x1w(tt2, tt1, tt2);   //                                   a2*b2 |               (a1+a2)*(b1+b2)-a1*b1-a2*b2
+  blend_0x55_fp2x2_8x1x1w(tt2, tt1, tt2);   //                                   a2*b2 |               (a1+a2)*(b1+b2)-a1*b1-a2*b2
   mul_by_u_plus_1_fp2x2_8x1x1w(tt2, tt2);   //                             a2*b2*(u+1) |       ((a1+a2)*(b1+b2)-a1*b1-a2*b2)*(u+1)
-  blend_0x33_fp2x2_8x1x1w(tt0, tt5, tt0);   //             (a0+a1)*(b0+b1)-a1*b1-a0*b0 |                                     a0*b0
+  blend_0x55_fp2x2_8x1x1w(tt0, tt5, tt0);   //             (a0+a1)*(b0+b1)-a1*b1-a0*b0 |                                     a0*b0
   add_fp2x2_8x1x1w(r01, tt0, tt2);          // (a0+a1)*(b0+b1)-a1*b1-a0*b0+a2*b2*(u+1) | ((a1+a2)*(b1+b2)-a1*b1-a2*b2)*(u+1)+a0*b0
   add_fp2x2_8x1x1w(r2, tt5, tt4);           //                                     ... |         (a0+a2)*(b0+b2)-a2*b2-a0*b0+a1*b1 
 }
