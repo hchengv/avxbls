@@ -320,7 +320,7 @@ static void mul_n_sqr_vec(vec384fp12 ret, const vec384fp12 a, size_t n)
   #endif
 
   #ifdef PROFILING
-    uint64_t start_cycles = read_tsc();
+    start_cycles = read_tsc();
   #endif
 
   fp4_1x2x2x2w  a_1x2x2x2w;
@@ -375,7 +375,7 @@ static void mul_n_sqr_vec(vec384fp12 ret, const vec384fp12 a, size_t n)
   } 
 
   #ifdef PROFILING
-    uint64_t end_cycles = read_tsc();
+    end_cycles = read_tsc();
     cyclotomic_sqr_fp12_cycles += end_cycles - start_cycles;
   #endif
 }
