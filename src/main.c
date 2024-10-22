@@ -549,6 +549,7 @@ void test_fp12()
 
   uint64_t start_cycles, end_cycles, diff_cycles;
 
+#if 0
   puts("\nFP12 TEST\n");
 
   a0_8x1x1w[0][0] = VSET(7 , 7 , 1, 7 , 7 , 1, 1, 1);
@@ -619,6 +620,8 @@ void test_fp12()
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* mul_fp12_vec_v1 r121 = 0x", r64, SWORDS);
 
+#endif 
+
   puts("\nFP12 TIMING\n");
 
   printf("- cyclotomic_sqr_fp12_scalar: ");
@@ -640,6 +643,16 @@ void test_fp12()
   LOAD_CACHE(cyclotomic_sqr_fp12_vec_v2(ra_1x2x2x2w, rbc_2x2x2x1w, a_1x2x2x2w, bc_2x2x2x1w), 1000);
   MEASURE_CYCLES(cyclotomic_sqr_fp12_vec_v2(ra_1x2x2x2w, rbc_2x2x2x1w, a_1x2x2x2w, bc_2x2x2x1w), 10000);
   printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- mul_fp12_scalar: ");
+  LOAD_CACHE(mul_fp12(r, a, a), 1000);
+  MEASURE_CYCLES(mul_fp12(r, a, a), 10000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- mul_fp12_vec_v1: ");
+  LOAD_CACHE(mul_fp12_vec_v1(r01_4x2x1w, r2_4x2x1w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 1000);
+  MEASURE_CYCLES(mul_fp12_vec_v1(r01_4x2x1w, r2_4x2x1w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 10000);
+  printf("#cycle = %ld\n", diff_cycles);  
 }
 
 // ----------------------------------------------------------------------------
@@ -652,8 +665,8 @@ int main()
   // test_fp();
   // test_fp2();
   // test_fp4();
-  test_fp6();
-  // test_fp12();
+  // test_fp6();
+  test_fp12();
 
   return 0;
 }
