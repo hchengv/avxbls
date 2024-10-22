@@ -2220,7 +2220,7 @@ static void mul_by_u_plus_1_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a)
 }
 
 // r0 = a0*b0 - a1*b1
-// r1 = (a0 + b0)*(a1 + b1) - a0*b0 - a1*b1 = a0*b1 + a1*b0
+// r1 = (a0 + a1)*(b0 + b1) - a0*b0 - a1*b1 = a0*b1 + a1*b0
 static void mul_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2_8x1x1w a, const fp2_8x1x1w b)
 {
   fp_8x1w t0, t1;
@@ -2228,12 +2228,12 @@ static void mul_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2_8x1x1w a, const fp2_8x1x1
 
   mul_fpx2_8x1w(tt0, a[0], b[0]);       // a0*b0
   mul_fpx2_8x1w(tt1, a[1], b[1]);       // a1*b1
-  add_fp_8x1w(t0, a[0], b[0]);          // a0+b0
-  add_fp_8x1w(t1, a[1], b[1]);          // a1+b1
-  mul_fpx2_8x1w(tt2, t0, t1);           // (a0+b0)*(a1+b1)
+  add_fp_8x1w(t0, a[0], a[1]);          // a0+a1
+  add_fp_8x1w(t1, b[0], b[1]);          // b0+b1
+  mul_fpx2_8x1w(tt2, t0, t1);           // (a0+a1)*(b0+b1)
   sub_fpx2_8x1w(r[0], tt0, tt1);        // a0*b0-a1*b1
-  sub_fpx2_8x1w(tt2, tt2, tt0);         // (a0+b0)*(a1+b1)-a0*b0
-  sub_fpx2_8x1w(r[1], tt2, tt1);        // (a0+b0)*(a1+b1)-a0*b0-a1*b1
+  sub_fpx2_8x1w(tt2, tt2, tt0);         // (a0+a1)*(b0+b1)-a0*b0
+  sub_fpx2_8x1w(r[1], tt2, tt1);        // (a0+a1)*(b0+b1)-a0*b0-a1*b1
 }
 
 static void add_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2x2_4x2x1w a, const fp2x2_4x2x1w b)
@@ -2364,11 +2364,11 @@ void mul_fp6x2_4x2x1x1w(fp2x2_8x1x1w r01, fp2x2_8x1x1w r2, const fp2_8x1x1w ab0,
   // ab1 = b1 | a1 at Fp2 layer 
   // ab2 = b2 | a2 at Fp2 layer
   add_fp2_8x1x1w(t0, ab1, ab2);             //                                   b1+b2 |                                     a1+a2
-  add_fp2_8x1x1w(t1, ab0, ab1);             //                                   b0+b1 |                                     a0+a1            
+  add_fp2_8x1x1w(t1, ab0, ab1);             //                                   b0+b1 |                                     a0+a1
   add_fp2_8x1x1w(t2, ab0, ab2);             //                                   b0+b2 |                                     a0+a2
-  shuf_01_fp2_8x1x1w(t3, ab1);              //                                      a1 |                                        b1         
+  shuf_01_fp2_8x1x1w(t3, ab1);              //                                      a1 |                                        b1
   blend_0x55_fp2_8x1x1w(t3, t3, ab0);       //                                      a1 |                                        a0
-  shuf_01_fp2_8x1x1w(t4, ab0);              //                                      a0 |                                        b0          
+  shuf_01_fp2_8x1x1w(t4, ab0);              //                                      a0 |                                        b0
   blend_0x55_fp2_8x1x1w(t4, ab1, t4);       //                                      b1 |                                        b0
   mul_fp2x2_8x1x1w(tt0, t3, t4);            //                                   a1*b1 |                                     a0*b0
   shuf_01_fp2_8x1x1w(t3, ab2);              //                                      a2 |                                        b2
@@ -2381,22 +2381,22 @@ void mul_fp6x2_4x2x1x1w(fp2x2_8x1x1w r01, fp2x2_8x1x1w r2, const fp2_8x1x1w ab0,
   shuf_01_fp2_8x1x1w(t4, t2);               //                                   a0+a2 |                                     b0+b2
   blend_0x55_fp2_8x1x1w(t4, t1, t4);        //                                   b0+b1 |                                     b0+b2
   mul_fp2x2_8x1x1w(tt2, t3, t4);            //                         (a0+a1)*(b0+b1) |                           (a0+a2)*(b0+b2)
-  blend_0x55_fp2x2_8x1x1w(tt3, tt2, tt1);   //                         (a0+a1)*(b0+b1) |                           (a1+a2)*(b1+b2) 
+  blend_0x55_fp2x2_8x1x1w(tt3, tt2, tt1);   //                         (a0+a1)*(b0+b1) |                           (a1+a2)*(b1+b2)
   shuf_11_fp2x2_8x1x1w(tt4, tt0);           //                                   a1*b1 |                                     a1*b1
   sub_fp2x2_8x1x1w(tt3, tt3, tt4);          //                   (a0+a1)*(b0+b1)-a1*b1 |                     (a1+a2)*(b1+b2)-a1*b1
   shuf_01_fp2x2_8x1x1w(tt2, tt2);           //                         (a0+a2)*(b0+b2) |                           (a0+a1)*(b0+b1)
   blend_0x55_fp2x2_8x1x1w(tt2, tt2, tt3);   //                         (a0+a2)*(b0+b2) |                     (a1+a2)*(b1+b2)-a1*b1
   shuf_11_fp2x2_8x1x1w(tt1, tt1);           //                                   a2*b2 |                                     a2*b2
   sub_fp2x2_8x1x1w(tt2, tt2, tt1);          //                   (a0+a2)*(b0+b2)-a2*b2 |               (a1+a2)*(b1+b2)-a1*b1-a2*b2
-  shuf_11_fp2x2_8x1x1w(tt5, tt2);           //                   (a0+a2)*(b0+b2)-a2*b2 |                     (a0+a2)*(b0+b2)-a2*b2 
+  shuf_11_fp2x2_8x1x1w(tt5, tt2);           //                   (a0+a2)*(b0+b2)-a2*b2 |                     (a0+a2)*(b0+b2)-a2*b2
   blend_0x55_fp2x2_8x1x1w(tt5, tt3, tt5);   //                   (a0+a1)*(b0+b1)-a1*b1 |                     (a0+a2)*(b0+b2)-a2*b2
   shuf_00_fp2x2_8x1x1w(tt0, tt0);           //                                   a0*b0 |                                     a0*b0
   sub_fp2x2_8x1x1w(tt5, tt5, tt0);          //             (a0+a1)*(b0+b1)-a1*b1-a0*b0 |               (a0+a2)*(b0+b2)-a2*b2-a0*b0
   blend_0x55_fp2x2_8x1x1w(tt2, tt1, tt2);   //                                   a2*b2 |               (a1+a2)*(b1+b2)-a1*b1-a2*b2
-  mul_by_u_plus_1_fp2x2_8x1x1w(tt2, tt2);   //                             a2*b2*(u+1) |       ((a1+a2)*(b1+b2)-a1*b1-a2*b2)*(u+1)
+  mul_by_u_plus_1_fp2x2_8x1x1w(tt1, tt2);   //                             a2*b2*(u+1) |       ((a1+a2)*(b1+b2)-a1*b1-a2*b2)*(u+1)
   blend_0x55_fp2x2_8x1x1w(tt0, tt5, tt0);   //             (a0+a1)*(b0+b1)-a1*b1-a0*b0 |                                     a0*b0
-  add_fp2x2_8x1x1w(r01, tt0, tt2);          // (a0+a1)*(b0+b1)-a1*b1-a0*b0+a2*b2*(u+1) | ((a1+a2)*(b1+b2)-a1*b1-a2*b2)*(u+1)+a0*b0
-  add_fp2x2_8x1x1w(r2, tt5, tt4);           //                                     ... |         (a0+a2)*(b0+b2)-a2*b2-a0*b0+a1*b1 
+  add_fp2x2_8x1x1w(r01, tt0, tt1);          // (a0+a1)*(b0+b1)-a1*b1-a0*b0+a2*b2*(u+1) | ((a1+a2)*(b1+b2)-a1*b1-a2*b2)*(u+1)+a0*b0
+  add_fp2x2_8x1x1w(r2, tt5, tt4);           //                                     ... |         (a0+a2)*(b0+b2)-a2*b2-a0*b0+a1*b1
 }
 
 // ----------------------------------------------------------------------------

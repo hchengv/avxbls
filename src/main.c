@@ -475,24 +475,28 @@ void test_fp4()
 
 void test_fp6()
 {
-  uint64_t a64[SWORDS] = { TV_A }, b64[SWORDS] = { TV_B }, z64[2*SWORDS];
-  uint64_t a48[NWORDS], b48[NWORDS], r48[NWORDS], z48[2*NWORDS];
+  uint64_t r64[NWORDS], z64[2*SWORDS];
+  uint64_t r48[NWORDS], z48[2*NWORDS];
   fp2_8x1x1w a0_8x1x1w, a1_8x1x1w, a2_8x1x1w;
   fp2x2_8x1x1w z01_8x1x1w, z2_8x1x1w;
   vec768fp6 r; 
-  vec384fp6 a = {{{TV_A}, {TV_A}}, {{TV_B}, {TV_B}}, {{TV_A}, {TV_B}}};
+  vec384fp6 a = {{{1}, {2}}, {{3}, {4}}, {{5}, {6}}};
   int i;
 
-  conv_64to48_mpi(a48, a64, NWORDS, SWORDS);
-  conv_64to48_mpi(b48, b64, NWORDS, SWORDS);
+  a0_8x1x1w[0][0] = VSET1(1);
+  a0_8x1x1w[1][0] = VSET1(2);
+  a1_8x1x1w[0][0] = VSET1(3);
+  a1_8x1x1w[1][0] = VSET1(4);
+  a2_8x1x1w[0][0] = VSET1(5);
+  a2_8x1x1w[1][0] = VSET1(6);
 
-  for(i = 0; i < NWORDS; i++) {
-    a0_8x1x1w[0][i] = VSET1(a48[i]);
-    a0_8x1x1w[1][i] = VSET1(a48[i]);
-    a1_8x1x1w[0][i] = VSET1(b48[i]);
-    a1_8x1x1w[1][i] = VSET1(b48[i]);
-    a2_8x1x1w[0][i] = VSET1(a48[i]);
-    a2_8x1x1w[1][i] = VSET1(b48[i]);
+  for(i = 1; i < NWORDS; i++) {
+    a0_8x1x1w[0][i] = VSET1(0);
+    a0_8x1x1w[1][i] = VSET1(0);
+    a1_8x1x1w[0][i] = VSET1(0);
+    a1_8x1x1w[1][i] = VSET1(0);
+    a2_8x1x1w[0][i] = VSET1(0);
+    a2_8x1x1w[1][i] = VSET1(0);
   }
 
   puts("\nFP6 TEST\n");
