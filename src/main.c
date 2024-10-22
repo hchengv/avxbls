@@ -534,12 +534,90 @@ void test_fp6()
 
 void test_fp12()
 {
-  vec384fp12 r, a;
+  vec384fp12 r;
+  vec384fp12 a = {
+    {{{1}, {2}}, {{3}, {4 }}, {{5 }, {6 }}},
+    {{{7}, {8}}, {{9}, {10}}, {{11}, {12}}}};
   __m512i ra_1x2x2x2w[VWORDS], a_1x2x2x2w[VWORDS];
   __m512i rbc_2x2x2x1w[NWORDS], bc_2x2x2x1w[NWORDS];
 
-  uint64_t start_cycles, end_cycles, diff_cycles;
+  uint64_t r64[NWORDS], z64[2*SWORDS];
+  uint64_t r48[NWORDS], z48[2*NWORDS];
+  fp2_8x1x1w a0_8x1x1w, a1_8x1x1w, a2_8x1x1w;
+  fp2_4x2x1w r01_4x2x1w, r2_4x2x1w;
   int i;
+
+  uint64_t start_cycles, end_cycles, diff_cycles;
+
+  puts("\nFP12 TEST\n");
+
+  a0_8x1x1w[0][0] = VSET(7 , 7 , 1, 7 , 7 , 1, 1, 1);
+  a0_8x1x1w[1][0] = VSET(8 , 8 , 2, 8 , 8 , 2, 2, 2);
+  a1_8x1x1w[0][0] = VSET(9 , 9 , 3, 9 , 9 , 3, 3, 3);
+  a1_8x1x1w[1][0] = VSET(10, 10, 4, 10, 10, 4, 4, 4);
+  a2_8x1x1w[0][0] = VSET(11, 11, 5, 11, 11, 5, 5, 5);
+  a2_8x1x1w[1][0] = VSET(12, 12, 6, 12, 12, 6, 6, 6);
+
+  for(i = 1; i < NWORDS; i++) {
+    a0_8x1x1w[0][i] = VSET1(0);
+    a0_8x1x1w[1][i] = VSET1(0);
+    a1_8x1x1w[0][i] = VSET1(0);
+    a1_8x1x1w[1][i] = VSET1(0);
+    a2_8x1x1w[0][i] = VSET1(0);
+    a2_8x1x1w[1][i] = VSET1(0);
+  }
+
+  mul_fp12(r, a, a);
+  mpi_print("* mul_fp12 r000 = 0x", r[0][0][0], SWORDS);
+  mpi_print("* mul_fp12 r001 = 0x", r[0][0][1], SWORDS);
+  mpi_print("* mul_fp12 r010 = 0x", r[0][1][0], SWORDS);
+  mpi_print("* mul_fp12 r011 = 0x", r[0][1][1], SWORDS);
+  mpi_print("* mul_fp12 r020 = 0x", r[0][2][0], SWORDS);
+  mpi_print("* mul_fp12 r021 = 0x", r[0][2][1], SWORDS);
+  mpi_print("* mul_fp12 r100 = 0x", r[1][0][0], SWORDS);
+  mpi_print("* mul_fp12 r101 = 0x", r[1][0][1], SWORDS);
+  mpi_print("* mul_fp12 r110 = 0x", r[1][1][0], SWORDS);
+  mpi_print("* mul_fp12 r111 = 0x", r[1][1][1], SWORDS);
+  mpi_print("* mul_fp12 r120 = 0x", r[1][2][0], SWORDS);
+  mpi_print("* mul_fp12 r121 = 0x", r[1][2][1], SWORDS);
+
+  mul_fp12_vec_v1(r01_4x2x1w, r2_4x2x1w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w);
+  get_channel_8x1w(r48, r01_4x2x1w, 0);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v1 r000 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r01_4x2x1w, 1);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v1 r001 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r01_4x2x1w, 2);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v1 r010 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r01_4x2x1w, 3);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v1 r011 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r2_4x2x1w, 0);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v1 r020 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r2_4x2x1w, 1);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v1 r021 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r01_4x2x1w, 4);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v1 r100 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r01_4x2x1w, 5);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v1 r101 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r01_4x2x1w, 6);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v1 r110 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r01_4x2x1w, 7);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v1 r111 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r2_4x2x1w, 2);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v1 r120 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r2_4x2x1w, 3);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v1 r121 = 0x", r64, SWORDS);
 
   puts("\nFP12 TIMING\n");
 
