@@ -645,8 +645,8 @@ void test_fp12()
   printf("#cycle = %ld\n", diff_cycles);
 
   printf("- mul_fp12_scalar: ");
-  LOAD_CACHE(mul_fp12(r, a, a), 1000);
-  MEASURE_CYCLES(mul_fp12(r, a, a), 10000);
+  LOAD_CACHE(mul_fp12_scalar(r, a, a), 1000);
+  MEASURE_CYCLES(mul_fp12_scalar(r, a, a), 10000);
   printf("#cycle = %ld\n", diff_cycles);
 
   printf("- mul_fp12_vec_v1: ");

@@ -2624,7 +2624,7 @@ void mul_fp12_vec_v1(fp2_4x2x1w r01, fp2_4x2x1w r2, const fp2_8x1x1w ab0, const 
   //    r01 =  r1[1] | r1[0] | r0[2] | r0[1] at Fp2 layer
   redc_fp2x2_4x2x1w(r01, ss2);
 
-  // double-length sub-routines
+  // single-length sub-routines
   // tt3[0] = a1*b1[2][1] | ... | a1*b0[2][1] | ... | a0*b1[2][1] | ... | a0*b0[2][1] | ... at Fp layer
   shuf_01_dl(tt3[0], tt2[1]);
   //    ss0 =       a1*b1[2] | a1*b0[2] | a0*b1[2] | a0*b0[2] at Fp2 layer

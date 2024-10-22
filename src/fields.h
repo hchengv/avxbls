@@ -94,7 +94,11 @@ void sqr_fp12(vec384fp12 ret, const vec384fp12 a);
 void cyclotomic_sqr_fp12_scalar(vec384fp12 ret, const vec384fp12 a);
 void cyclotomic_sqr_fp12_vector(vec384fp12 ret, const vec384fp12 a);
 
-void mul_fp12(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b);
+// void mul_fp12(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b);
+#define mul_fp12 mul_fp12_vector
+void mul_fp12_scalar(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b);
+void mul_fp12_vector(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b);
+
 void mul_by_xy00z0_fp12(vec384fp12 ret, const vec384fp12 a,
                                         const vec384fp6 xy00z0);
 void conjugate_fp12(vec384fp12 a);
