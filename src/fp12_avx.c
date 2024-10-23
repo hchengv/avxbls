@@ -2250,7 +2250,7 @@ static void sqr_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a)
   perm_zz32_hl(t2, a);                  //       0 |              A1
   add_fp_4x2w(t0, t0, t1);              //    2*A0 |           A0+A1
   sub_fp_4x2w(t2, a, t2);               //      A1 |           A0-A1
-  mul_fpx2_4x2w(t3, t0, t2);              // 2*A0*A1 | (A0+A1)*(A0-A1)
+  mul_fpx2_4x2w(t3, t0, t2);            // 2*A0*A1 | (A0+A1)*(A0-A1)
   redc_fpx2_4x2w(r, t3);                // 2*A0*A1 | (A0+A1)*(A0-A1)
 }
 
@@ -2277,12 +2277,12 @@ static void mul_fp2_1x4x2w(fp2_1x4x2w r, const fp2_1x4x2w a, const fp2_1x4x2w b)
 
   // a = A1 | A0 | ... | ... at Fp layer
   // b = B1 | B0 | ... | ... at Fp layer
-  perm_var_hl(t0, a, m0);               //        A1 |        A1 |   A0 |   A0
-  perm_var_hl(t1, b, m1);               //        B0 |        B1 |   B1 |   B0
-  mul_fpx2_4x2w(tt0, t0, t1);             //      A1B0 |      A1B1 | A0B1 | A0B0
-  redc_fpx2_4x2w(t0, tt0);              //      A1B0 |      A1B1 | A0B1 | A0B0
-  perm_var_hl(t1, t0, m2);              //      A0B1 |      A0B0 |  ... |  ... 
-  asx2_fp_4x2w(r, t1, t0);              // A0B1+A1B0 | A0B0-A1B1 |  ... |  ...
+  perm_var_hl(t0, a, m0);               //          A1 |          A1 |    A0 |    A0
+  perm_var_hl(t1, b, m1);               //          B0 |          B1 |    B1 |    B0
+  mul_fpx2_4x2w(tt0, t0, t1);           //       A1*B0 |       A1*B1 | A0*B1 | A0*B0
+  redc_fpx2_4x2w(t0, tt0);              //       A1*B0 |       A1*B1 | A0*B1 | A0*B0
+  perm_var_hl(t1, t0, m2);              //       A0*B1 |       A0*B0 |   ... |   ... 
+  asx2_fp_4x2w(r, t1, t0);              // A0*B1+A1*B0 | A0*B0-A1*B1 |   ... |   ...
 }
 
 // ----------------------------------------------------------------------------
@@ -2365,11 +2365,11 @@ static void mul_fp2x2_2x4x1w(fp2x2_2x4x1w r, const fp2_2x4x1w a, const fp2_2x4x1
 
   // a = A1 | A0 | ... | ... at Fp layer
   // b = B1 | B0 | ... | ... at Fp layer
-  perm_3322(t0, a);                     //        A1 |        A1 |   A0 |   A0
-  perm_2332(t1, b);                     //        B0 |        B1 |   B1 |   B0
-  mul_fpx2_8x1w(tt0, t0, t1);           //      A1B0 |      A1B1 | A0B1 | A0B0
-  perm_10zz_dl(tt1, tt0);               //      A0B1 |      A0B0 |    0 |    0 
-  asx4_fpx2_8x1w(r, tt1, tt0);          // A0B1+A1B0 | A0B0-A1B1 |  ... |  ...
+  perm_3322(t0, a);                     //          A1 |          A1 |   A0 |   A0
+  perm_2332(t1, b);                     //          B0 |          B1 |   B1 |   B0
+  mul_fpx2_8x1w(tt0, t0, t1);           //        A1B0 |        A1B1 | A0B1 | A0B0
+  perm_10zz_dl(tt1, tt0);               //       A0*B1 |       A0*B0 |    0 |    0 
+  asx4_fpx2_8x1w(r, tt1, tt0);          // A0*B1+A1*B0 | A0*B0-A1*B1 |  ... |  ...
 }
 
 static void redc_fp2x2_4x2x1w(fp2_4x2x1w r, const fp2x2_4x2x1w a)
@@ -2570,39 +2570,39 @@ void mul_fp12_vec_v1(fp2_4x2x1w r01, fp2_4x2x1w r2, const fp2_8x1x1w ab0, const 
   // tt3[0]  = a1*b1[0][0] | a1*b1[1][0] | a1*b0[0][0] | a1*b0[1][0] | a0*b1[0][0] | a0*b1[1][0] | a0*b0[0][0] | a0*b0[1][0] at Fp layer
   // tt3[1]  = a1*b1[0][1] | a1*b1[1][1] | a1*b0[0][1] | a1*b0[1][1] | a0*b1[0][1] | a0*b1[1][1] | a0*b0[0][1] | a0*b0[1][1] at Fp layer
   shuf_01_fp2x2_8x1x1w(tt3, tt01);
-  //    ss0  = a1*b1[0] | a1*b0[0] | a0*b1[0] | a0*b0[0] at Fp2 layer
+  //    ss0  =       a1*b1[0] |       a1*b0[0] |       a0*b1[0] |       a0*b0[0] at Fp2 layer
   blend_0x55_dl(ss0, tt3[1], tt01[0]);
-  //    ss1  = a1*b1[1] | a1*b0[1] | a0*b1[1] | a0*b0[1] at Fp2 layer
+  //    ss1  =       a1*b1[1] |       a1*b0[1] |       a0*b1[1] |       a0*b0[1] at Fp2 layer
   blend_0x55_dl(ss1, tt01[1], tt3[0]);
-  //    ss2  = a1*b0[0] | a1*b1[0] | a0*b0[0] | a0*b1[0] at Fp2 layer
+  //    ss2  =       a1*b0[0] |       a1*b1[0] |       a0*b0[0] |       a0*b1[0] at Fp2 layer
   perm_1032_dl(ss2, ss0);
-  //    ss2  = a1*b1[1] | a1*b1[0] | a0*b1[1] | a0*b1[0] at Fp2 layer
+  //    ss2  =       a1*b1[1] |       a1*b1[0] |       a0*b1[1] |       a0*b1[0] at Fp2 layer
   blend_0x33_dl(ss2, ss1, ss2);
-  //    ss2  = a0*b1[1] | a0*b1[0] | a1*b1[1] | a1*b1[0] at Fp2 layer
+  //    ss2  =       a0*b1[1] |       a0*b1[0] |       a1*b1[1] |       a1*b1[0] at Fp2 layer
   perm_var_dl(ss2, ss2, m0);
-  //    ss3  = a1*b0[1] | a1*b1[1] | a0*b0[1] | a0*b1[1] at Fp2 layer
+  //    ss3  =       a1*b0[1] |       a1*b1[1] |       a0*b0[1] |       a0*b1[1] at Fp2 layer
   perm_1032_dl(ss3, ss1);
-  //    ss3  = a1*b0[1] | a1*b0[0] | a0*b0[1] | a0*b0[0] at Fp2 layer
+  //    ss3  =       a1*b0[1] |       a1*b0[0] |       a0*b0[1] |       a0*b0[0] at Fp2 layer
   blend_0x33_dl(ss3, ss3, ss0);
   //    ss2 =  a0*b1+a1*b0[1] | a0*b1+a1*b0[0] | a0*b0+a1*b1[1] | a0*b0+a1*b1[0] at Fp2 layer
   add_fp2x2_4x2x1w(ss2, ss2, ss3);
-  //    r01 =  r1[1] | r1[0] | r0[2] | r0[1] at Fp2 layer
+  //    r01 =           r1[1] |          r1[0] |          r0[2] |          r0[1] at Fp2 layer
   redc_fp2x2_4x2x1w(r01, ss2);
 
   // single-length sub-routines
   // tt3[0] = a1*b1[2][1] | ... | a1*b0[2][1] | ... | a0*b1[2][1] | ... | a0*b0[2][1] | ... at Fp layer
   shuf_01_dl(tt3[0], tt2[1]);
-  //    ss0 =       a1*b1[2] | a1*b0[2] | a0*b1[2] | a0*b0[2] at Fp2 layer
+  //    ss0 =       a1*b1[2] | a1*b0[2] | a0*b1[2] |       a0*b0[2] at Fp2 layer
   blend_0x55_dl(ss0, tt3[0], tt2[0]); 
-  //     s0 =       a1*b1[2] | a1*b0[2] | a0*b1[2] | a0*b0[2] at Fp2 layer
+  //     s0 =       a1*b1[2] | a1*b0[2] | a0*b1[2] |       a0*b0[2] at Fp2 layer
   redc_fp2x2_4x2x1w(s0, ss0);
-  //     s1 = a1*b1[2]*(u+1) |      ... |      ... |      ... at Fp2 layer
+  //     s1 = a1*b1[2]*(u+1) |      ... |      ... |            ... at Fp2 layer
   mul_by_u_plus_1_fp2_4x2x1w(s1, s0);
-  //     s1 = a1*b1[2]*(u+1) | a1*b0[2] | a0*b1[2] | a0*b0[2] at Fp2 layer
+  //     s1 = a1*b1[2]*(u+1) | a1*b0[2] | a0*b1[2] |       a0*b0[2] at Fp2 layer
   blend_0xC0(s1, s0, s1);
   //     s0 =            ... |      ... | a1*b0[2] | a1*b1[2]*(u+1) at Fp2 layer
   perm_var(s0, s1, m1);
-  //     r2 = ... | ... | r1[2] | r0[0] at Fp2 layer
+  //     r2 =            ... |      ... |    r1[2] |          r0[0] at Fp2 layer
   add_fp2_4x2x1w(r2, s0, s1);
 }
 
