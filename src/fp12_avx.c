@@ -1998,7 +1998,7 @@ static void redc_fpx2_4x2w(fp_4x2w r, const fpx2_4x2w a)
   const __m512i p2 = VSET(P48[6], P48[2], P48[6], P48[2], P48[6], P48[2], P48[6], P48[2]);
   const __m512i p3 = VSET(P48[7], P48[3], P48[7], P48[3], P48[7], P48[3], P48[7], P48[3]);
   const __m512i bmask = VSET1(BMASK), montw = VSET1(MONT_W_R48), zero = VZERO;
-  __m512i r0, r1, r2, r3, smask, u;
+  __m512i r0, r1, r2, r3, smask, u, t0;
 
   u  = VSHUF(VAND(VMACLO(zero, a0, montw), bmask), 0x44);
   a0 = VMACLO(a0, u, p0); a1 = VMACLO(a1, u, p1);
@@ -2076,8 +2076,31 @@ static void redc_fpx2_4x2w(fp_4x2w r, const fpx2_4x2w a)
   a10 = VADD(a10, VSHL(y9 , BALIGN));
   a11 = VADD(a11, VSHL(y10, BALIGN));
 
-  // carry propagation 
+  // final subtraction
   r0 = a8; r1 = a9; r2 = a10; r3 = a11;
+
+  // r = r - p
+  r0 = VSUB(r0, p0); r1 = VSUB(r1, p1); r2 = VSUB(r2, p2); r3 = VSUB(r3, p3);
+
+  // get sign mask
+  t0 = VMADD(r1, 0x55, r1, VSRA(r0, BRADIX));
+  t0 = VMADD(r2, 0x55, r2, VSRA(t0, BRADIX));
+  t0 = VMADD(r3, 0x55, r3, VSRA(t0, BRADIX));
+  t0 = VMADD(r0, 0xAA, r0, VZSHUF(0xCCCC, VSRA(t0, BRADIX), 0x4E));
+  t0 = VMADD(r1, 0xAA, r1, VSRA(t0, BRADIX));
+  t0 = VMADD(r2, 0xAA, r2, VSRA(t0, BRADIX));
+  t0 = VMADD(r3, 0xAA, r3, VSRA(t0, BRADIX));
+
+  // if r is non-negative, smask = all-0 
+  // if r is     negative, smask = all-1
+  smask = VSRA(t0, 63);
+  smask = VSHUF(smask, 0xEE);
+
+  // r = r + (p & smask)
+  r0 = VADD(r0, VAND(p0, smask)); r1 = VADD(r1, VAND(p1, smask)); 
+  r2 = VADD(r2, VAND(p2, smask)); r3 = VADD(r3, VAND(p3, smask)); 
+
+  // carry propagation 
   // r0 is finally 49-bit not 48-bit
   r1 = VADD(r1, VSRA(r0, BRADIX)); r0 = VAND(r0, bmask);
   r2 = VADD(r2, VSRA(r1, BRADIX)); r1 = VAND(r1, bmask);
