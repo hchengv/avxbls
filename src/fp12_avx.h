@@ -14,6 +14,7 @@
 #define VWORDS  4 // NWORDS / 2
 #define SWORDS  6
 #define BMASK   0xFFFFFFFFFFFFULL
+#define FMASK   0xFFFFFFFFFFFFFFFFULL
 #define BALIGN  4 // 52 (AVX-512IFMA) - 48 (BRADIX) = 4 
 
 // Fp element
