@@ -634,6 +634,21 @@ static void blend_0xF0_hl(__m512i *r, const __m512i *a, const __m512i *b)
   r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
 }
 
+// a = < H | G | F | E | D | C | B | A >
+// b = < P | O | N | M | L | K | J | I >
+// r = < H | G | N | M | D | C | J | I >
+static void blend_0x33_hl(__m512i *r, const __m512i *a, const __m512i *b)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+  __m512i r0, r1, r2, r3;
+
+  r0 = VMBLEND(0x33, a0, b0); r1 = VMBLEND(0x33, a1, b1);
+  r2 = VMBLEND(0x33, a2, b2); r3 = VMBLEND(0x33, a3, b3);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+}
+
 // ----------------------------------------------------------------------------
 // Fp single-length operations
 
@@ -2677,6 +2692,8 @@ void mul_fp12_vec_v2(fp2_4x2x1w r01, fp2_2x2x2w r2, const fp2_8x1x1w ab0, const 
   uint64_t vv00[NWORDS*2], vv01[NWORDS*2], vv10[NWORDS*2], vv11[NWORDS*2];
   const __m512i m0 = VSET(3, 2, 1, 0, 7, 6, 5, 4);
   const __m512i m1 = VSET(3, 2, 1, 0, 5, 4, 7, 6);
+  const __m512i m2 = VSET(3, 2, 3, 2, 1, 0, 1, 0);
+  const __m512i m3 = VSET(0, BMASK, 0, BMASK, 0, BMASK, 0, BMASK);
   int i;
 
   // ab0 =  b1[0] | a1[0] | b0[0] | a1[0] | b1[0] | a0[0] | b0[0] | a0[0] at Fp2 layer
@@ -2731,22 +2748,27 @@ void mul_fp12_vec_v2(fp2_4x2x1w r01, fp2_2x2x2w r2, const fp2_8x1x1w ab0, const 
   perm_var_dl(ss0, ss1, m1);
   //    ss0 =            ... |      ... | a0*b1[2]+a1*b0[2] | a1*b1[2]*(u+1)+a0*b0[2] at Fp2 layer
   add_fp2x2_4x2x1w(ss0, ss0, ss1);
+
   //    uu0 =                             a0*b1[2]+a1*b0[2] | a1*b1[2]*(u+1)+a0*b0[2] at Fp2 layer
-  for (i = 0; i < NWORDS*2; i++) { 
-    vv00[i] = ((uint64_t *)&ss0[i])[0];
-    vv01[i] = ((uint64_t *)&ss0[i])[1];
-    vv10[i] = ((uint64_t *)&ss0[i])[2];
-    vv11[i] = ((uint64_t *)&ss0[i])[3];
-  }
-  for (i = 0; i < VWORDS*2; i++) 
-    uu0[i] = VSET(0, vv11[i], 0, vv10[i], 0, vv01[i], 0, vv00[i]);
-  for (i = VWORDS*2; i < VWORDS*3; i++)
-    uu0[i] = VSET(vv11[i+VWORDS], vv11[i], vv10[i+VWORDS], vv10[i],
-                  vv01[i+VWORDS], vv01[i], vv00[i+VWORDS], vv00[i]);
+  // for (i = 0; i < NWORDS*2; i++) { 
+  //   vv00[i] = ((uint64_t *)&ss0[i])[0];
+  //   vv01[i] = ((uint64_t *)&ss0[i])[1];
+  //   vv10[i] = ((uint64_t *)&ss0[i])[2];
+  //   vv11[i] = ((uint64_t *)&ss0[i])[3];
+  // }
+  // for (i = 0; i < VWORDS*2; i++) 
+  //   uu0[i] = VSET(0, vv11[i], 0, vv10[i], 0, vv01[i], 0, vv00[i]);
+  // for (i = VWORDS*2; i < VWORDS*3; i++)
+  //   uu0[i] = VSET(vv11[i+VWORDS], vv11[i], vv10[i+VWORDS], vv10[i],
+  //                 vv01[i+VWORDS], vv01[i], vv00[i+VWORDS], vv00[i]);
+
+  //    uu0 =                             a0*b1[2]+a1*b0[2] | a1*b1[2]*(u+1)+a0*b0[2] at Fp2 layer
+  for (i = 0; i < VWORDS*2; i++) uu0[i] = VAND(ss0[i], m3);
+  perm_var(&ss0[VWORDS*2], &ss0[VWORDS*2], m2);
+  blend_0x33_hl(&uu0[VWORDS*2], &ss0[VWORDS*3], &ss0[VWORDS*2]);
   //     r2 =                                         r1[2] |                   r0[0] at Fp2 layer
   redc_fp2x2_2x2x2w(r2, uu0);
 }
-
 
 // ----------------------------------------------------------------------------
 
