@@ -89,6 +89,9 @@ void cyclotomic_sqr_fp12_vec_v2(fp4_1x2x2x2w ra, fp4_2x2x2x1w rbc,
 void mul_fp12_vec_v1(fp2_4x2x1w r01, fp2_4x2x1w r2, 
                     const fp2_8x1x1w ab0, const fp2_8x1x1w ab1, 
                     const fp2_8x1x1w ab2);
+void mul_fp12_vec_v2(fp2_4x2x1w r01, fp2_2x2x2w r2, 
+                    const fp2_8x1x1w ab0, const fp2_8x1x1w ab1, 
+                    const fp2_8x1x1w ab2);
 
 // ----------------------------------------------------------------------------
 // utils 

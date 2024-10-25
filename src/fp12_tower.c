@@ -250,7 +250,7 @@ void mul_fp12_vector(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b)
   #ifdef PROFILING
     uint64_t start_cycles = read_tsc();
   #endif
-  
+
   fp2_8x1x1w ab0, ab1, ab2;
   fp2_4x2x1w r01, r2;
   __m512i t[3][2][SWORDS];

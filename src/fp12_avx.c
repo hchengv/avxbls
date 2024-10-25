@@ -535,6 +535,37 @@ static void blend_0x55_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a, const 
   blend_0x55_dl(r[1], a[1], b[1]);
 }
 
+// a = < H | G | F | E | D | C | B | A >
+// b = < P | O | N | M | L | K | J | I >
+// r = < H | G | N | M | D | C | J | I >
+static void blend_0xC0_dl(__m512i *r, const __m512i *a, const __m512i *b)
+{
+  const __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
+  const __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
+  const __m512i a8  = a[8 ], a9  = a[9 ], a10 = a[10], a11 = a[11];
+  const __m512i a12 = a[12], a13 = a[13], a14 = a[14], a15 = a[15];
+  const __m512i b0  = b[0 ], b1  = b[1 ], b2  = b[2 ], b3  = b[3 ];
+  const __m512i b4  = b[4 ], b5  = b[5 ], b6  = b[6 ], b7  = b[7 ];
+  const __m512i b8  = b[8 ], b9  = b[9 ], b10 = b[10], b11 = b[11];
+  const __m512i b12 = b[12], b13 = b[13], b14 = b[14], b15 = b[15];
+  __m512i r0, r1, r2 , r3 , r4 , r5 , r6 , r7 ;
+  __m512i r8, r9, r10, r11, r12, r13, r14, r15;
+
+  r0  = VMBLEND(0xC0, a0 , b0 ); r1  = VMBLEND(0xC0, a1 , b1 );
+  r2  = VMBLEND(0xC0, a2 , b2 ); r3  = VMBLEND(0xC0, a3 , b3 );
+  r4  = VMBLEND(0xC0, a4 , b4 ); r5  = VMBLEND(0xC0, a5 , b5 );
+  r6  = VMBLEND(0xC0, a6 , b6 ); r7  = VMBLEND(0xC0, a7 , b7 );
+  r8  = VMBLEND(0xC0, a8 , b8 ); r9  = VMBLEND(0xC0, a9 , b9 );
+  r10 = VMBLEND(0xC0, a10, b10); r11 = VMBLEND(0xC0, a11, b11);
+  r12 = VMBLEND(0xC0, a12, b12); r13 = VMBLEND(0xC0, a13, b13);
+  r14 = VMBLEND(0xC0, a14, b14); r15 = VMBLEND(0xC0, a15, b15);
+
+  r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
+  r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
+  r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
+  r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
+}
+
 // ----------------------------------------------------------------------------
 // vector half-length transform 
 
@@ -2377,6 +2408,11 @@ static void redc_fp2x2_4x2x1w(fp2_4x2x1w r, const fp2x2_4x2x1w a)
   redc_fpx2_8x1w(r, a);
 }
 
+static void redc_fp2x2_2x2x2w(fp2_2x2x2w r, const fp2x2_2x2x2w a)
+{
+  redc_fpx2_4x2w(r, a);
+}
+
 // ----------------------------------------------------------------------------
 // Fp4 operations
 
@@ -2542,6 +2578,7 @@ void cyclotomic_sqr_fp12_vec_v2(fp4_1x2x2x2w ra, fp4_2x2x2x1w rbc, const fp4_1x2
 }
 
 // schoolbook
+// single-length version
 void mul_fp12_vec_v1(fp2_4x2x1w r01, fp2_4x2x1w r2, const fp2_8x1x1w ab0, const fp2_8x1x1w ab1, const fp2_8x1x1w ab2)
 {
   fp2x2_8x1x1w tt01, tt2, tt3, tt4;
@@ -2605,6 +2642,88 @@ void mul_fp12_vec_v1(fp2_4x2x1w r01, fp2_4x2x1w r2, const fp2_8x1x1w ab0, const 
   //     r2 =            ... |      ... |    r1[2] |          r0[0] at Fp2 layer
   add_fp2_4x2x1w(r2, s0, s1);
 }
+
+// schoolbook
+// double-length version
+void mul_fp12_vec_v2(fp2_4x2x1w r01, fp2_2x2x2w r2, const fp2_8x1x1w ab0, const fp2_8x1x1w ab1, const fp2_8x1x1w ab2)
+{
+  fp2x2_8x1x1w tt01, tt2, tt3, tt4;
+  fp2x2_4x2x1w ss0, ss1, ss2, ss3;
+  fp2_4x2x1w s0, s1;
+  fp2x2_2x2x2w uu0;
+  uint64_t vv00[NWORDS*2], vv01[NWORDS*2], vv10[NWORDS*2], vv11[NWORDS*2];
+  const __m512i m0 = VSET(3, 2, 1, 0, 7, 6, 5, 4);
+  const __m512i m1 = VSET(3, 2, 1, 0, 5, 4, 7, 6);
+  int i;
+
+  // ab0 =  b1[0] | a1[0] | b0[0] | a1[0] | b1[0] | a0[0] | b0[0] | a0[0] at Fp2 layer
+  // ab1 =  b1[1] | a1[1] | b0[1] | a1[1] | b1[1] | a0[1] | b0[1] | a0[1] at Fp2 layer
+  // ab2 =  b1[2] | a1[2] | b0[2] | a1[2] | b1[2] | a0[2] | b0[2] | a0[2] at Fp2 layer
+
+  // tt01 = a1*b1[1] | a1*b1[0] | a1*b0[1] | a1*b0[0] | a0*b1[1] | a0*b1[0] | a0*b0[1] | a0*b0[0] at Fp2 layer
+  // tt2  =      ... | a1*b1[2] |      ... | a1*b0[2] |      ... | a0*b1[2] |      ... | a0*b0[2] at Fp2 layer
+  mul_fp6x2_4x2x1x1w(tt01, tt2, ab0, ab1, ab2);
+  // tt3  = a1*b1[0] | a1*b1[1] | a1*b0[0] | a1*b0[1] | a0*b1[0] | a0*b1[1] | a0*b0[0] | a0*b0[1] at Fp2 layer
+  shuf_01_fp2x2_8x1x1w(tt3, tt01);
+  // tt4  = a1*b1[2] |      ... | a1*b0[2] |      ... | a0*b1[2] |      ... | a0*b0[2] |      ... at Fp2 layer
+  shuf_01_fp2x2_8x1x1w(tt4, tt2);
+  // tt4  = a1*b1[2] |      ... |      ... |      ... |      ... |      ... | a0*b0[2] | a0*b0[1] at Fp2 layer
+  blend_0x01_fp2x2_8x1x1w(tt4, tt4, tt3);
+  // tt2  =      ... | a1*b1[2] |      ... | a1*b0[2] |      ... | a0*b1[2] |      ... | a0*b0[0] at Fp2 layer
+  blend_0x01_fp2x2_8x1x1w(tt2, tt2, tt01);  
+  // tt01 = a1*b1[1] | a1*b1[0] | a1*b0[1] | a1*b0[0] | a0*b1[1] | a0*b1[0] | a0*b0[2] | a0*b0[1] at Fp2 layer
+  blend_0x03_fp2x2_8x1x1w(tt01, tt01, tt4);
+  // tt3[0]  = a1*b1[0][0] | a1*b1[1][0] | a1*b0[0][0] | a1*b0[1][0] | a0*b1[0][0] | a0*b1[1][0] | a0*b0[0][0] | a0*b0[1][0] at Fp layer
+  // tt3[1]  = a1*b1[0][1] | a1*b1[1][1] | a1*b0[0][1] | a1*b0[1][1] | a0*b1[0][1] | a0*b1[1][1] | a0*b0[0][1] | a0*b0[1][1] at Fp layer
+  shuf_01_fp2x2_8x1x1w(tt3, tt01);
+  //    ss0  =       a1*b1[0] |       a1*b0[0] |       a0*b1[0] |       a0*b0[0] at Fp2 layer
+  blend_0x55_dl(ss0, tt3[1], tt01[0]);
+  //    ss1  =       a1*b1[1] |       a1*b0[1] |       a0*b1[1] |       a0*b0[1] at Fp2 layer
+  blend_0x55_dl(ss1, tt01[1], tt3[0]);
+  //    ss2  =       a1*b0[0] |       a1*b1[0] |       a0*b0[0] |       a0*b1[0] at Fp2 layer
+  perm_1032_dl(ss2, ss0);
+  //    ss2  =       a1*b1[1] |       a1*b1[0] |       a0*b1[1] |       a0*b1[0] at Fp2 layer
+  blend_0x33_dl(ss2, ss1, ss2);
+  //    ss2  =       a0*b1[1] |       a0*b1[0] |       a1*b1[1] |       a1*b1[0] at Fp2 layer
+  perm_var_dl(ss2, ss2, m0);
+  //    ss3  =       a1*b0[1] |       a1*b1[1] |       a0*b0[1] |       a0*b1[1] at Fp2 layer
+  perm_1032_dl(ss3, ss1);
+  //    ss3  =       a1*b0[1] |       a1*b0[0] |       a0*b0[1] |       a0*b0[0] at Fp2 layer
+  blend_0x33_dl(ss3, ss3, ss0);
+  //    ss2 =  a0*b1+a1*b0[1] | a0*b1+a1*b0[0] | a0*b0+a1*b1[1] | a0*b0+a1*b1[0] at Fp2 layer
+  add_fp2x2_4x2x1w(ss2, ss2, ss3);
+  //    r01 =           r1[1] |          r1[0] |          r0[2] |          r0[1] at Fp2 layer
+  redc_fp2x2_4x2x1w(r01, ss2);
+
+  // double-length sub-routines
+  // tt3[0] = a1*b1[2][1] | ... | a1*b0[2][1] | ... | a0*b1[2][1] | ... | a0*b0[2][1] | ... at Fp layer
+  shuf_01_dl(tt3[0], tt2[1]);
+  //    ss0 =       a1*b1[2] | a1*b0[2] |          a0*b1[2] |                a0*b0[2] at Fp2 layer
+  blend_0x55_dl(ss0, tt3[0], tt2[0]); 
+  //    ss1 = a1*b1[2]*(u+1) |      ... |               ... |                     ... at Fp2 layer
+  mul_by_u_plus_1_fp2x2_4x2x1w(ss1, ss0);
+  //    ss1 = a1*b1[2]*(u+1) | a1*b0[2] |          a0*b1[2] |                a0*b0[2] at Fp2 layer
+  blend_0xC0_dl(ss1, ss0, ss1);
+  //    ss0 =            ... |      ... |          a1*b0[2] |          a1*b1[2]*(u+1) at Fp2 layer
+  perm_var_dl(ss0, ss1, m1);
+  //    ss0 =            ... |      ... | a0*b1[2]+a1*b0[2] | a1*b1[2]*(u+1)+a0*b0[2] at Fp2 layer
+  add_fp2x2_4x2x1w(ss0, ss0, ss1);
+  //    uu0 =                             a0*b1[2]+a1*b0[2] | a1*b1[2]*(u+1)+a0*b0[2] at Fp2 layer
+  for (i = 0; i < NWORDS*2; i++) { 
+    vv00[i] = ((uint64_t *)&ss0[i])[0];
+    vv01[i] = ((uint64_t *)&ss0[i])[1];
+    vv10[i] = ((uint64_t *)&ss0[i])[2];
+    vv11[i] = ((uint64_t *)&ss0[i])[3];
+  }
+  for (i = 0; i < VWORDS*2; i++) 
+    uu0[i] = VSET(0, vv11[i], 0, vv10[i], 0, vv01[i], 0, vv00[i]);
+  for (i = VWORDS*2; i < VWORDS*3; i++)
+    uu0[i] = VSET(vv11[i+VWORDS], vv11[i], vv10[i+VWORDS], vv10[i],
+                  vv01[i+VWORDS], vv01[i], vv00[i+VWORDS], vv00[i]);
+  //     r2 =                                         r1[2] |                   r0[0] at Fp2 layer
+  redc_fp2x2_2x2x2w(r2, uu0);
+}
+
 
 // ----------------------------------------------------------------------------
 

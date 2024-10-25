@@ -545,6 +545,7 @@ void test_fp12()
   uint64_t r48[NWORDS], z48[2*NWORDS];
   fp2_8x1x1w a0_8x1x1w, a1_8x1x1w, a2_8x1x1w;
   fp2_4x2x1w r01_4x2x1w, r2_4x2x1w;
+  fp2_2x2x2w r2_2x2x2w;
   int i;
 
   uint64_t start_cycles, end_cycles, diff_cycles;
@@ -652,6 +653,11 @@ void test_fp12()
   printf("- mul_fp12_vec_v1: ");
   LOAD_CACHE(mul_fp12_vec_v1(r01_4x2x1w, r2_4x2x1w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 1000);
   MEASURE_CYCLES(mul_fp12_vec_v1(r01_4x2x1w, r2_4x2x1w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 10000);
+  printf("#cycle = %ld\n", diff_cycles);  
+
+  printf("- mul_fp12_vec_v2: ");
+  LOAD_CACHE(mul_fp12_vec_v2(r01_4x2x1w, r2_2x2x2w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 1000);
+  MEASURE_CYCLES(mul_fp12_vec_v2(r01_4x2x1w, r2_2x2x2w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 10000);
   printf("#cycle = %ld\n", diff_cycles);  
 }
 
