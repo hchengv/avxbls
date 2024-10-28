@@ -37,6 +37,7 @@ typedef __m512i   fp2x2_1x4x2w[3*VWORDS];
 typedef __m512i   fp4_2x2x2x1w[NWORDS];
 typedef __m512i   fp4x2_2x2x2x1w[2*NWORDS];
 typedef __m512i   fp4_1x2x2x2w[VWORDS];
+typedef __m512i   fp4x2_1x2x2x2w[3*VWORDS];
 
 // ----------------------------------------------------------------------------
 // p := 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab;
@@ -71,6 +72,8 @@ static uint64_t P48[NWORDS] = {
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp4 operations
+
+#define sqr_fp4_1x2x2x2w sqr_fp4_1x2x2x2w_v1
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp6 operations

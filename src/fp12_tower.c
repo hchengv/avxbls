@@ -374,13 +374,13 @@ void mul_fp12_vector(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b)
   }
 
   for (i = 0; i < SWORDS/2; i++) {
-    ret[0][0][0][i] = ((uint64_t *)&t[0][1][i])[0];
+    ret[0][0][0][i         ] = ((uint64_t *)&t[0][1][i])[0];
     ret[0][0][0][i+SWORDS/2] = ((uint64_t *)&t[0][1][i])[1];
-    ret[0][0][1][i] = ((uint64_t *)&t[0][1][i])[2];
+    ret[0][0][1][i         ] = ((uint64_t *)&t[0][1][i])[2];
     ret[0][0][1][i+SWORDS/2] = ((uint64_t *)&t[0][1][i])[3];
-    ret[1][2][0][i] = ((uint64_t *)&t[0][1][i])[4];
+    ret[1][2][0][i         ] = ((uint64_t *)&t[0][1][i])[4];
     ret[1][2][0][i+SWORDS/2] = ((uint64_t *)&t[0][1][i])[5];
-    ret[1][2][1][i] = ((uint64_t *)&t[0][1][i])[6];
+    ret[1][2][1][i         ] = ((uint64_t *)&t[0][1][i])[6];
     ret[1][2][1][i+SWORDS/2] = ((uint64_t *)&t[0][1][i])[7];
   }
 
