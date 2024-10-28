@@ -334,6 +334,7 @@ void test_fp2()
   __m512i a_4x2x1w[NWORDS], b_4x2x1w[NWORDS], r_4x2x1w[NWORDS], z_4x2x1w[2*NWORDS];
   __m512i a_2x2x2w[VWORDS], b_2x2x2w[VWORDS], r_2x2x2w[VWORDS];
   __m512i a_2x4x1w[NWORDS], b_2x4x1w[NWORDS], z_2x4x1w[2*NWORDS];
+  fp2x2_2x2x2w aa_2x2x2w, rr_2x2x2w;
   int i;
 
   conv_64to48_mpi(a48, a64, NWORDS, SWORDS);
@@ -351,7 +352,26 @@ void test_fp2()
     b_2x2x2w[i] = VSET(0, 0, b48[i+VWORDS], b48[i], 0, 0, b48[i+VWORDS], b48[i]);
   }
 
+  for (i = 0; i < VWORDS*2; i++) {
+    aa_2x2x2w[i] = VSET(0, b48[i], 0, b48[i], 0, a48[i], 0, a48[i]);
+  }
+  for (i = VWORDS*2; i < VWORDS*3-1; i++) {
+    aa_2x2x2w[i] = VSET(b48[i+VWORDS], b48[i], b48[i+VWORDS], b48[i], a48[i+VWORDS], a48[i], a48[i+VWORDS], a48[i]);
+  }
+  aa_2x2x2w[VWORDS*3-1] = VSET(0, b48[i], 0, b48[i], 0, a48[i], 0, a48[i]);
+
   puts("\nFP2 TEST\n");
+
+  mul_by_u_plus_1_fp2x2_2x2x2w(rr_2x2x2w, aa_2x2x2w);
+  redc_fp2x2_2x2x2w(r_2x2x2w, rr_2x2x2w);
+  get_channel_4x2w(r48, r_2x2x2w, 0);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_by_u_plus_1_fp2x2_2x2x2w r0 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, r_2x2x2w, 2);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_by_u_plus_1_fp2x2_2x2x2w r2 = 0x", r64, SWORDS);
 
 #if 0
   assa_fp2_4x2x1w(r_4x2x1w, a_4x2x1w, b_4x2x1w);
@@ -711,10 +731,10 @@ int main()
   timing_pairing();
 
   // test_fp();
-  // test_fp2();
+  test_fp2();
   // test_fp4();
   // test_fp6();
-  test_fp12();
+  // test_fp12();
 
   return 0;
 }

@@ -254,11 +254,88 @@ static void mul_n_sqr_vec(vec384fp12 ret, const vec384fp12 a, size_t n)
     uint64_t start_cycles = read_tsc();
   #endif
 
+#if 0
+  // use mul_fp12_vec_v1
+
   fp2_8x1x1w ab0, ab1, ab2;
-  // fp2_4x2x1w r01, r2;
+  fp2_4x2x1w r01, r2;
+  fp4_1x2x2x2w  a_1x2x2x2w;
+  fp4_2x2x2x1w bc_2x2x2x1w;
+  __m512i t_1x2x2x2w[SWORDS/2], t_2x2x2x1w[SWORDS], t[3][2][SWORDS];
+  const __m512i m0 = VSET(3, 2, 1, 0, 3, 2, 5, 4);
+  uint64_t r48[NWORDS];
+  int i;
+
+    // form < b[1] | a[1] | b[0] | a[1] | b[1] | a[0] | b[0] | a[0] >
+  for (i = 0; i < SWORDS; i++) {
+    t[0][0][i] = VSET( ret[1][0][0][i], a[1][0][0][i], 
+                       ret[0][0][0][i], a[1][0][0][i], 
+                       ret[1][0][0][i], a[0][0][0][i], 
+                       ret[0][0][0][i], a[0][0][0][i]);
+    t[0][1][i] = VSET( ret[1][0][1][i], a[1][0][1][i], 
+                       ret[0][0][1][i], a[1][0][1][i], 
+                       ret[1][0][1][i], a[0][0][1][i], 
+                       ret[0][0][1][i], a[0][0][1][i]);
+    t[1][0][i] = VSET( ret[1][1][0][i], a[1][1][0][i], 
+                       ret[0][1][0][i], a[1][1][0][i], 
+                       ret[1][1][0][i], a[0][1][0][i], 
+                       ret[0][1][0][i], a[0][1][0][i]);
+    t[1][1][i] = VSET( ret[1][1][1][i], a[1][1][1][i], 
+                       ret[0][1][1][i], a[1][1][1][i], 
+                       ret[1][1][1][i], a[0][1][1][i], 
+                       ret[0][1][1][i], a[0][1][1][i]);
+    t[2][0][i] = VSET( ret[1][2][0][i], a[1][2][0][i], 
+                       ret[0][2][0][i], a[1][2][0][i], 
+                       ret[1][2][0][i], a[0][2][0][i], 
+                       ret[0][2][0][i], a[0][2][0][i]);
+    t[2][1][i] = VSET( ret[1][2][1][i], a[1][2][1][i], 
+                       ret[0][2][1][i], a[1][2][1][i], 
+                       ret[1][2][1][i], a[0][2][1][i], 
+                       ret[0][2][1][i], a[0][2][1][i]);    
+  }
+  conv_64to48_fp_8x1w(ab0[0], t[0][0]);
+  conv_64to48_fp_8x1w(ab0[1], t[0][1]);
+  conv_64to48_fp_8x1w(ab1[0], t[1][0]);
+  conv_64to48_fp_8x1w(ab1[1], t[1][1]);
+  conv_64to48_fp_8x1w(ab2[0], t[2][0]);
+  conv_64to48_fp_8x1w(ab2[1], t[2][1]);
+
+  mul_fp12_vec_v1(r01, r2, ab0, ab1, ab2);
+
+  #ifdef PROFILING
+    uint64_t end_cycles = read_tsc();
+    mul_fp12_cycles += end_cycles - start_cycles;
+
+    start_cycles = read_tsc();
+  #endif
+
+  // form < a11 | a00 >
+  for (i = 0; i < VWORDS; i++) {
+    a_1x2x2x2w[i] = VSET(((uint64_t *)&r01[i+VWORDS])[7], 
+                         ((uint64_t *)&r01[i       ])[7],
+                         ((uint64_t *)&r01[i+VWORDS])[6], 
+                         ((uint64_t *)&r01[i       ])[6],
+                         ((uint64_t *) &r2[i+VWORDS])[1], 
+                         ((uint64_t *) &r2[i       ])[1],
+                         ((uint64_t *) &r2[i+VWORDS])[0], 
+                         ((uint64_t *) &r2[i       ])[0]);
+  }
+
+  // form < a12 | a01 | a02 | a10 >
+  perm_var(r01, r01, m0);
+  perm_var(r2, r2, m0);
+  blend_0xC0(bc_2x2x2x1w, r01, r2);
+
+  #else 
+  // use mul_fp12_vec_v2
+
+  fp2_8x1x1w ab0, ab1, ab2;
   fp2_4x2x1w r01;
   fp2_2x2x2w r2;
-  __m512i t[3][2][SWORDS];
+  fp4_1x2x2x2w  a_1x2x2x2w;
+  fp4_2x2x2x1w bc_2x2x2x1w;
+  __m512i t_1x2x2x2w[SWORDS/2], t_2x2x2x1w[SWORDS], t[3][2][SWORDS];
+  const __m512i m0 = VSET(3, 2, 1, 0, 3, 2, 5, 4);
   uint64_t r48[NWORDS];
   int i;
 
@@ -296,33 +373,17 @@ static void mul_n_sqr_vec(vec384fp12 ret, const vec384fp12 a, size_t n)
   conv_64to48_fp_8x1w(ab2[0], t[2][0]);
   conv_64to48_fp_8x1w(ab2[1], t[2][1]);
 
-  // mul_fp12_vec_v1(r01, r2, ab0, ab1, ab2);
   mul_fp12_vec_v2(r01, r2, ab0, ab1, ab2);
 
   #ifdef PROFILING
     uint64_t end_cycles = read_tsc();
     mul_fp12_cycles += end_cycles - start_cycles;
-  #endif
 
-  #ifdef PROFILING
     start_cycles = read_tsc();
   #endif
 
-  fp4_1x2x2x2w  a_1x2x2x2w;
-  fp4_2x2x2x1w bc_2x2x2x1w;
-  __m512i t_1x2x2x2w[SWORDS/2], t_2x2x2x1w[SWORDS];
-  const __m512i m0 = VSET(3, 2, 1, 0, 3, 2, 5, 4);
-
   // form < a11 | a00 >
   for (i = 0; i < VWORDS; i++) {
-    // a_1x2x2x2w[i] = VSET(((uint64_t *)&r01[i+VWORDS])[7], 
-    //                      ((uint64_t *)&r01[i       ])[7],
-    //                      ((uint64_t *)&r01[i+VWORDS])[6], 
-    //                      ((uint64_t *)&r01[i       ])[6],
-    //                      ((uint64_t *) &r2[i+VWORDS])[1], 
-    //                      ((uint64_t *) &r2[i       ])[1],
-    //                      ((uint64_t *) &r2[i+VWORDS])[0], 
-    //                      ((uint64_t *) &r2[i       ])[0]);
     a_1x2x2x2w[i] = VSET(((uint64_t *)&r01[i+VWORDS])[7], 
                          ((uint64_t *)&r01[i       ])[7],
                          ((uint64_t *)&r01[i+VWORDS])[6], 
@@ -334,9 +395,6 @@ static void mul_n_sqr_vec(vec384fp12 ret, const vec384fp12 a, size_t n)
   }
 
   // form < a12 | a01 | a02 | a10 >
-  // perm_var(r01, r01, m0);
-  // perm_var(r2, r2, m0);
-  // blend_0xC0(bc_2x2x2x1w, r01, r2);
   perm_var(bc_2x2x2x1w, r01, m0);
   for (i = 0; i < VWORDS; i++) {
     uint64_t *t0 = (uint64_t *) &bc_2x2x2x1w[i];
@@ -346,6 +404,8 @@ static void mul_n_sqr_vec(vec384fp12 ret, const vec384fp12 a, size_t n)
     t1[7] = ((uint64_t *) &r2[i])[7];
     t1[6] = ((uint64_t *) &r2[i])[5];
   }
+
+  #endif
 
   while (n--)
     cyclotomic_sqr_fp12_vec_v1(a_1x2x2x2w, bc_2x2x2x1w, 
