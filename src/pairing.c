@@ -252,7 +252,7 @@ static void mul_n_sqr_vec(vec384fp12 ret, const vec384fp12 a, size_t n)
     uint64_t start_cycles = read_tsc();
   #endif
 
-#if 1
+#if 0
   // use mul_fp12_vec_v1
 
   fp2_8x1x1w ab0, ab1, ab2;
