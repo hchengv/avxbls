@@ -3011,15 +3011,15 @@ void mul_fp12_vec_v3(fp2_4x2x1w r01, fp2_2x2x2w r2, const fp2_8x1x1w ab0, const 
   // tt3[0] = a1*b1[2][1] | ... | a1*b0[2][1] | ... | a0*b1[2][1] | ... | a0*b0[0][1] | ... at Fp layer
   shuf_01_dl(tt3[0], tt2[1]);
   //    ss0 =  a1*b1[2] | a1*b0[2] | a0*b1[2] | a0*b0[0] at Fp2 layer
-  blend_0x55_dl(ss1, tt3[0], tt2[0]); 
+  blend_0x55_dl(ss0, tt3[0], tt2[0]); 
   //    hh0 =         a0*b1[2] |                a0*b0[0] at Fp2 layer
-  perm_var_dl(ss0, ss1, m1);
-  for (i = 0; i < VWORDS*2; i++) hh0[i] = VAND(ss0[i], m3);
-  blend_0x55_hl(&hh0[VWORDS*2], &ss0[VWORDS*3], &ss0[VWORDS*2]);
+  perm_var_dl(ss1, ss0, m1);
+  for (i = 0; i < VWORDS*2; i++) hh0[i] = VAND(ss1[i], m3);
+  blend_0x55_hl(&hh0[VWORDS*2], &ss1[VWORDS*3], &ss1[VWORDS*2]);
   //   hh1 =          a1*b0[2] |                a1*b1[2] at Fp2 layer
-  perm_var_dl(ss0, ss1, m2);
-  for (i = 0; i < VWORDS*2; i++) hh1[i] = VAND(ss0[i], m3);
-  blend_0x55_hl(&hh1[VWORDS*2], &ss0[VWORDS*3], &ss0[VWORDS*2]);
+  perm_var_dl(ss1, ss0, m2);
+  for (i = 0; i < VWORDS*2; i++) hh1[i] = VAND(ss1[i], m3);
+  blend_0x55_hl(&hh1[VWORDS*2], &ss1[VWORDS*3], &ss1[VWORDS*2]);
   //   hh2 =               ... |          a1*b1[2]*(u+1) at Fp2 layer
   mul_by_u_plus_1_fp2x2_2x2x2w(hh2, hh1);
   //   hh1 =          a1*b0[2] |          a1*b1[2]*(u+1) at Fp2 layer
