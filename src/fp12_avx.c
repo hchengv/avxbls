@@ -209,6 +209,27 @@ static void blend_0x55_fp2_8x1x1w(fp2_8x1x1w r, const fp2_8x1x1w a, const fp2_8x
   blend_0x55(r[1], a[1], b[1]);
 }
 
+// a = < H | G | F | E | D | C | B | A >
+// b = < P | O | N | M | L | K | J | I >
+// r = < P | O | N | M | D | C | B | A >
+static void blend_0xF0(__m512i *r, const __m512i *a, const __m512i *b)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
+  const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+  const __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7;
+
+  r0 = VMBLEND(0xF0, a0, b0); r1 = VMBLEND(0xF0, a1, b1);
+  r2 = VMBLEND(0xF0, a2, b2); r3 = VMBLEND(0xF0, a3, b3);
+  r4 = VMBLEND(0xF0, a4, b4); r5 = VMBLEND(0xF0, a5, b5);
+  r6 = VMBLEND(0xF0, a6, b6); r7 = VMBLEND(0xF0, a7, b7);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+  r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
+}
+
+
 // ----------------------------------------------------------------------------
 // vector double-length transform 
 
@@ -3023,7 +3044,8 @@ void mul_fp12_vec_v3(fp2_4x2x1w r01, fp2_2x2x2w r2, const fp2_8x1x1w ab0, const 
   //   hh2 =               ... |          a1*b1[2]*(u+1) at Fp2 layer
   mul_by_u_plus_1_fp2x2_2x2x2w(hh2, hh1);
   //   hh1 =          a1*b0[2] |          a1*b1[2]*(u+1) at Fp2 layer
-  blend_0xF0_hl(hh1, hh2, hh1);
+  blend_0xF0(hh1, hh2, hh1);
+  blend_0xF0_hl(&hh1[NWORDS], &hh2[NWORDS], &hh1[NWORDS]);
   //   hh0 = a0*b1[2]+a1*b0[2] | a1*b1[2]*(u+1)+a0*b0[0] at Fp2 layer
   add_fp2x2_2x2x2w(hh0, hh0, hh1);
   //     r2 =            r1[2] |                   r0[0] at Fp2 layer
