@@ -2166,7 +2166,6 @@ static void redc_fpx2_4x2w(fp_4x2w r, const fpx2_4x2w a)
 // a = < D' | D | C' | C | B' | B | A' | A >
 // b = < H' | H | G' | G | F' | F | E' | E >
 // r = < D'+H' | D+H | C'-G' | C+G | B'+F' | B+F | A'-E' | A-E >
-// Use L form to save the commented operations 
 static void asx2_fpx2_4x2w(fpx2_4x2w r, const fpx2_4x2w a, const fpx2_4x2w b)
 {
   __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
@@ -2207,29 +2206,21 @@ static void asx2_fpx2_4x2w(fpx2_4x2w r, const fpx2_4x2w a, const fpx2_4x2w b)
 
   // get sign mask + carry propagation
   r1  = VMADD(r1 , 0x55, r1 , VSRA(r0, BRADIX)); 
-  // r4  = VMADD(r4 , 0x55, r4 , VSHUF(r0, 0x4E)); 
-  r0 = VAND(r0, bmask0);
+  r4  = VMADD(r4 , 0x55, r4 , VSHUF(r0, 0x4E)); r0 = VAND(r0, bmask0);
   r2  = VMADD(r2 , 0x55, r2 , VSRA(r1, BRADIX)); 
-  // r5  = VMADD(r5 , 0x55, r5 , VSHUF(r1, 0x4E)); 
-  r1 = VAND(r1, bmask0);
+  r5  = VMADD(r5 , 0x55, r5 , VSHUF(r1, 0x4E)); r1 = VAND(r1, bmask0);
   r3  = VMADD(r3 , 0x55, r3 , VSRA(r2, BRADIX)); 
-  // r6  = VMADD(r6 , 0x55, r6 , VSHUF(r2, 0x4E)); 
-  r2 = VAND(r2, bmask0);
+  r6  = VMADD(r6 , 0x55, r6 , VSHUF(r2, 0x4E)); r2 = VAND(r2, bmask0);
   r4  = VMADD(r4 , 0x55, r4 , VSRA(r3, BRADIX)); 
-  // r7  = VMADD(r7 , 0x55, r7 , VSHUF(r3, 0x4E)); 
-  r3 = VAND(r3, bmask0);
+  r7  = VMADD(r7 , 0x55, r7 , VSHUF(r3, 0x4E)); r3 = VAND(r3, bmask0);
   r5  = VMADD(r5 , 0x55, r5 , VSRA(r4, BRADIX)); 
-  // r8  = VMADD(r8 , 0x55, r8 , VSHUF(r4, 0x4E)); 
-  r4 = VAND(r4, bmask0);
+  r8  = VMADD(r8 , 0x55, r8 , VSHUF(r4, 0x4E)); r4 = VAND(r4, bmask0);
   r6  = VMADD(r6 , 0x55, r6 , VSRA(r5, BRADIX)); 
-  // r9  = VMADD(r9 , 0x55, r9 , VSHUF(r5, 0x4E)); 
-  r5 = VAND(r5, bmask0);
+  r9  = VMADD(r9 , 0x55, r9 , VSHUF(r5, 0x4E)); r5 = VAND(r5, bmask0);
   r7  = VMADD(r7 , 0x55, r7 , VSRA(r6, BRADIX)); 
-  // r10 = VMADD(r10, 0x55, r10, VSHUF(r6, 0x4E)); 
-  r6 = VAND(r6, bmask0);
+  r10 = VMADD(r10, 0x55, r10, VSHUF(r6, 0x4E)); r6 = VAND(r6, bmask0);
   r8  = VMADD(r8 , 0x55, r8 , VSRA(r7, BRADIX)); 
-  // r11 = VMADD(r11, 0x55, r11, VSHUF(r7, 0x4E)); 
-  r7 = VAND(r7, bmask0);
+  r11 = VMADD(r11, 0x55, r11, VSHUF(r7, 0x4E)); r7 = VAND(r7, bmask0);
   t0  = VMADD(r9 , 0x55, r9 , VSRA(r8, BRADIX));
   t0  = VMADD(r10, 0x55, r10, VSRA(t0, BRADIX));
   t0  = VMADD(r11, 0x55, r11, VSRA(t0, BRADIX));
@@ -2260,7 +2251,6 @@ static void asx2_fpx2_4x2w(fpx2_4x2w r, const fpx2_4x2w a, const fpx2_4x2w b)
   r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
 }
 
-// Use L form to save the commented operations 
 static void add_fpx2_4x2w(fp_4x2w r, const fp_4x2w a, const fp_4x2w b)
 {
   __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
@@ -2292,29 +2282,21 @@ static void add_fpx2_4x2w(fp_4x2w r, const fp_4x2w a, const fp_4x2w b)
 
   // get sign mask + carry propagation
   r1  = VMADD(r1 , 0x55, r1 , VSRA(r0, BRADIX)); 
-  // r4  = VMADD(r4 , 0x55, r4 , VSHUF(r0, 0x4E)); 
-  r0 = VAND(r0, bmask0);
+  r4  = VMADD(r4 , 0x55, r4 , VSHUF(r0, 0x4E)); r0 = VAND(r0, bmask0);
   r2  = VMADD(r2 , 0x55, r2 , VSRA(r1, BRADIX)); 
-  // r5  = VMADD(r5 , 0x55, r5 , VSHUF(r1, 0x4E)); 
-  r1 = VAND(r1, bmask0);
+  r5  = VMADD(r5 , 0x55, r5 , VSHUF(r1, 0x4E)); r1 = VAND(r1, bmask0);
   r3  = VMADD(r3 , 0x55, r3 , VSRA(r2, BRADIX)); 
-  // r6  = VMADD(r6 , 0x55, r6 , VSHUF(r2, 0x4E)); 
-  r2 = VAND(r2, bmask0);
+  r6  = VMADD(r6 , 0x55, r6 , VSHUF(r2, 0x4E)); r2 = VAND(r2, bmask0);
   r4  = VMADD(r4 , 0x55, r4 , VSRA(r3, BRADIX)); 
-  // r7  = VMADD(r7 , 0x55, r7 , VSHUF(r3, 0x4E)); 
-  r3 = VAND(r3, bmask0);
+  r7  = VMADD(r7 , 0x55, r7 , VSHUF(r3, 0x4E)); r3 = VAND(r3, bmask0);
   r5  = VMADD(r5 , 0x55, r5 , VSRA(r4, BRADIX)); 
-  // r8  = VMADD(r8 , 0x55, r8 , VSHUF(r4, 0x4E)); 
-  r4 = VAND(r4, bmask0);
+  r8  = VMADD(r8 , 0x55, r8 , VSHUF(r4, 0x4E)); r4 = VAND(r4, bmask0);
   r6  = VMADD(r6 , 0x55, r6 , VSRA(r5, BRADIX)); 
-  // r9  = VMADD(r9 , 0x55, r9 , VSHUF(r5, 0x4E)); 
-  r5 = VAND(r5, bmask0);
+  r9  = VMADD(r9 , 0x55, r9 , VSHUF(r5, 0x4E)); r5 = VAND(r5, bmask0);
   r7  = VMADD(r7 , 0x55, r7 , VSRA(r6, BRADIX)); 
-  // r10 = VMADD(r10, 0x55, r10, VSHUF(r6, 0x4E)); 
-  r6 = VAND(r6, bmask0);
+  r10 = VMADD(r10, 0x55, r10, VSHUF(r6, 0x4E)); r6 = VAND(r6, bmask0);
   r8  = VMADD(r8 , 0x55, r8 , VSRA(r7, BRADIX)); 
-  // r11 = VMADD(r11, 0x55, r11, VSHUF(r7, 0x4E)); 
-  r7 = VAND(r7, bmask0);
+  r11 = VMADD(r11, 0x55, r11, VSHUF(r7, 0x4E)); r7 = VAND(r7, bmask0);
   t0  = VMADD(r9 , 0x55, r9 , VSRA(r8, BRADIX));
   t0  = VMADD(r10, 0x55, r10, VSRA(t0, BRADIX));
   t0  = VMADD(r11, 0x55, r11, VSRA(t0, BRADIX));
@@ -2701,7 +2683,7 @@ static void sqr_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2_2x2x2w a)
   perm_zz32_hl(t2, a);                  //       0 |              A1
   add_fp_4x2w(t0, t0, t1);              //    2*A0 |           A0+A1
   sub_fp_4x2w(t2, a, t2);               //      A1 |           A0-A1
-  mul_fpx2_4x2w(r, t0, t2);            // 2*A0*A1 | (A0+A1)*(A0-A1)
+  mul_fpx2_4x2w(r, t0, t2);             // 2*A0*A1 | (A0+A1)*(A0-A1)
 }
 
 // r0 = a0*b0 - a1*b1
@@ -2723,7 +2705,6 @@ static void mul_fp2x2_1x4x2w(fp2x2_1x4x2w r, const fp2_1x4x2w a, const fp2_1x4x2
   perm_var_hl(&tt1[NWORDS], &tt0[NWORDS], m2);  //       A0*B1 |       A0*B0 |   ... |   ... 
   asx2_fpx2_4x2w(r, tt1, tt0);                  // A0*B1+A1*B0 | A0*B0-A1*B1 |   ... |   ...
 }
-
 
 // ----------------------------------------------------------------------------
 // Fp4 operations
