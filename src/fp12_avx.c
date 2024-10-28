@@ -2715,6 +2715,7 @@ static void sqr_fp4_2x2x2x1w_v2(fp4_2x2x2x1w r, const fp4_2x2x2x1w a)
 // r0 = a0^2 + (u+1)*a1^2
 // r1 = 2*a0*a1
 // single-length version
+// TODO: double-length version
 static void sqr_fp4_1x2x2x2w(fp4_1x2x2x2w r, const fp4_1x2x2x2w a)
 {
   fp4_1x2x2x2w t0, t1, t2;

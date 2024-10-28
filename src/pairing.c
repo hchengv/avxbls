@@ -1,7 +1,5 @@
 // the original pairing.c file of blst
 
-#if 1
-
 /*
  * Copyright Supranational LLC
  * Licensed under the Apache License, Version 2.0, see LICENSE for details.
@@ -326,7 +324,7 @@ static void mul_n_sqr_vec(vec384fp12 ret, const vec384fp12 a, size_t n)
   perm_var(r2, r2, m0);
   blend_0xC0(bc_2x2x2x1w, r01, r2);
 
-  #else 
+#else 
   // use mul_fp12_vec_v2 & v3
 
   fp2_8x1x1w ab0, ab1, ab2;
@@ -406,7 +404,7 @@ static void mul_n_sqr_vec(vec384fp12 ret, const vec384fp12 a, size_t n)
     t1[6] = ((uint64_t *) &r2[i])[5];
   }
 
-  #endif
+#endif
 
   while (n--)
     cyclotomic_sqr_fp12_vec_v1(a_1x2x2x2w, bc_2x2x2x1w, 
@@ -504,5 +502,3 @@ void optimal_ate_pairing(vec384fp12 ret, POINTonE2_affine Q[],
   miller_loop_n(f, Q, P, n);
   final_exp(ret, f);
 }
-
-#endif
