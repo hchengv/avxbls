@@ -2205,7 +2205,7 @@ static void asx2_fpx2_4x2w(fpx2_4x2w r, const fpx2_4x2w a, const fpx2_4x2w b)
   t0  = VMADD(r10, 0x55, r10, VSRA(t0, BRADIX));
   t0  = VMADD(r11, 0x55, r11, VSRA(t0, BRADIX));
   t0  = VMADD(r8 , 0xAA, r8 , VZSHUF(0xCCCC, VSRA(t0, BRADIX), 0x4E));
-  t0  = VMADD(r9 , 0xAA, r9 , VSRA(r8, BRADIX));
+  t0  = VMADD(r9 , 0xAA, r9 , VSRA(t0, BRADIX));
   t0  = VMADD(r10, 0xAA, r10, VSRA(t0, BRADIX));
   t0  = VMADD(r11, 0xAA, r11, VSRA(t0, BRADIX));
 

@@ -363,15 +363,16 @@ void test_fp2()
   puts("\nFP2 TEST\n");
 
   mul_by_u_plus_1_fp2x2_2x2x2w(rr_2x2x2w, aa_2x2x2w);
-  redc_fp2x2_2x2x2w(r_2x2x2w, rr_2x2x2w);
-  get_channel_4x2w(r48, r_2x2x2w, 0);
-  carryp_mpi48(r48);
-  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* mul_by_u_plus_1_fp2x2_2x2x2w r0 = 0x", r64, SWORDS);
-  get_channel_4x2w(r48, r_2x2x2w, 2);
-  carryp_mpi48(r48);
-  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* mul_by_u_plus_1_fp2x2_2x2x2w r2 = 0x", r64, SWORDS);
+  for(i = 0; i < 2*VWORDS; i++) z48[i] = ((uint64_t *)&rr_2x2x2w[i])[0];
+  get_channel_4x2w(&z48[2*VWORDS], &rr_2x2x2w[2*VWORDS], 0);
+  carryp_mpi48(&z48[2*VWORDS]);
+  conv_48to64_mpi(z64, z48, 2*SWORDS, 2*NWORDS);
+  mpi_print("* mul_by_u_plus_1_fp2x2_2x2x2w r0 = 0x", z64, 2*SWORDS);
+  for(i = 0; i < 2*VWORDS; i++) z48[i] = ((uint64_t *)&rr_2x2x2w[i])[2];
+  get_channel_4x2w(&z48[2*VWORDS], &rr_2x2x2w[2*VWORDS], 2);
+  carryp_mpi48(&z48[2*VWORDS]);
+  conv_48to64_mpi(z64, z48, 2*SWORDS, 2*NWORDS);
+  mpi_print("* mul_by_u_plus_1_fp2x2_2x2x2w r2 = 0x", z64, 2*SWORDS);
 
 #if 0
   assa_fp2_4x2x1w(r_4x2x1w, a_4x2x1w, b_4x2x1w);
