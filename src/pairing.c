@@ -327,7 +327,7 @@ static void mul_n_sqr_vec(vec384fp12 ret, const vec384fp12 a, size_t n)
   blend_0xC0(bc_2x2x2x1w, r01, r2);
 
   #else 
-  // use mul_fp12_vec_v2
+  // use mul_fp12_vec_v2 & v3
 
   fp2_8x1x1w ab0, ab1, ab2;
   fp2_4x2x1w r01;
@@ -373,7 +373,8 @@ static void mul_n_sqr_vec(vec384fp12 ret, const vec384fp12 a, size_t n)
   conv_64to48_fp_8x1w(ab2[0], t[2][0]);
   conv_64to48_fp_8x1w(ab2[1], t[2][1]);
 
-  mul_fp12_vec_v2(r01, r2, ab0, ab1, ab2);
+  // mul_fp12_vec_v2(r01, r2, ab0, ab1, ab2);
+  mul_fp12_vec_v3(r01, r2, ab0, ab1, ab2);
 
   #ifdef PROFILING
     uint64_t end_cycles = read_tsc();

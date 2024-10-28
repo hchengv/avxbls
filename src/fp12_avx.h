@@ -69,9 +69,6 @@ static uint64_t P48[NWORDS] = {
 // ----------------------------------------------------------------------------
 // prototypes: Fp2 double-length operations
 
-void mul_by_u_plus_1_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2x2_2x2x2w a);
-void redc_fp2x2_2x2x2w(fp2_2x2x2w r, const fp2x2_2x2x2w a);
-
 // ----------------------------------------------------------------------------
 // prototypes: Fp4 operations
 
@@ -94,6 +91,9 @@ void mul_fp12_vec_v1(fp2_4x2x1w r01, fp2_4x2x1w r2,
                     const fp2_8x1x1w ab0, const fp2_8x1x1w ab1, 
                     const fp2_8x1x1w ab2);
 void mul_fp12_vec_v2(fp2_4x2x1w r01, fp2_2x2x2w r2, 
+                    const fp2_8x1x1w ab0, const fp2_8x1x1w ab1, 
+                    const fp2_8x1x1w ab2);
+void mul_fp12_vec_v3(fp2_4x2x1w r01, fp2_2x2x2w r2, 
                     const fp2_8x1x1w ab0, const fp2_8x1x1w ab1, 
                     const fp2_8x1x1w ab2);
 

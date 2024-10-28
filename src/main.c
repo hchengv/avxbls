@@ -362,6 +362,8 @@ void test_fp2()
 
   puts("\nFP2 TEST\n");
 
+#if 0
+
   mul_by_u_plus_1_fp2x2_2x2x2w(rr_2x2x2w, aa_2x2x2w);
   for(i = 0; i < 2*VWORDS; i++) z48[i] = ((uint64_t *)&rr_2x2x2w[i])[0];
   get_channel_4x2w(&z48[2*VWORDS], &rr_2x2x2w[2*VWORDS], 0);
@@ -374,7 +376,6 @@ void test_fp2()
   conv_48to64_mpi(z64, z48, 2*SWORDS, 2*NWORDS);
   mpi_print("* mul_by_u_plus_1_fp2x2_2x2x2w r2 = 0x", z64, 2*SWORDS);
 
-#if 0
   assa_fp2_4x2x1w(r_4x2x1w, a_4x2x1w, b_4x2x1w);
   get_channel_8x1w(r48, r_4x2x1w, 0);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
@@ -721,6 +722,11 @@ void test_fp12()
   printf("- mul_fp12_vec_v2: ");
   LOAD_CACHE(mul_fp12_vec_v2(r01_4x2x1w, r2_2x2x2w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 1000);
   MEASURE_CYCLES(mul_fp12_vec_v2(r01_4x2x1w, r2_2x2x2w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 10000);
+  printf("#cycle = %ld\n", diff_cycles); 
+
+  printf("- mul_fp12_vec_v3: ");
+  LOAD_CACHE(mul_fp12_vec_v3(r01_4x2x1w, r2_2x2x2w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 1000);
+  MEASURE_CYCLES(mul_fp12_vec_v3(r01_4x2x1w, r2_2x2x2w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 10000);
   printf("#cycle = %ld\n", diff_cycles);  
 }
 
@@ -732,10 +738,10 @@ int main()
   timing_pairing();
 
   // test_fp();
-  test_fp2();
+  // test_fp2();
   // test_fp4();
   // test_fp6();
-  // test_fp12();
+  test_fp12();
 
   return 0;
 }
