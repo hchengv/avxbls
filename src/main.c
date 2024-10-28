@@ -353,12 +353,12 @@ void test_fp2()
   }
 
   for (i = 0; i < VWORDS*2; i++) {
-    aa_2x2x2w[i] = VSET(0, b48[i], 0, b48[i], 0, a48[i], 0, a48[i]);
+    aa_2x2x2w[i] = VSET(0, 0, 0, 0, 0, b48[i], 0, a48[i]);
   }
   for (i = VWORDS*2; i < VWORDS*3-1; i++) {
-    aa_2x2x2w[i] = VSET(b48[i+VWORDS], b48[i], b48[i+VWORDS], b48[i], a48[i+VWORDS], a48[i], a48[i+VWORDS], a48[i]);
+    aa_2x2x2w[i] = VSET(0 ,0, 0, 0, b48[i+VWORDS], b48[i], a48[i+VWORDS], a48[i]);
   }
-  aa_2x2x2w[VWORDS*3-1] = VSET(0, b48[i], 0, b48[i], 0, a48[i], 0, a48[i]);
+  aa_2x2x2w[VWORDS*3-1] = VSET(0, 0, 0, 0, 0, b48[i], 0, a48[i]);
 
   puts("\nFP2 TEST\n");
 
