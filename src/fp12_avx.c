@@ -2850,7 +2850,7 @@ void cyclotomic_sqr_fp12_vec_v1(fp4_1x2x2x2w ra, fp4_2x2x2x1w rbc, const fp4_1x2
 
   // compute A in 1x2x2x2w (some limbs are not fully shortened)
   // a = z1 | z0 at Fp2 layer
-  sqr_fp4_1x2x2x2w(ta, a);              //        t1 |        t0
+  sqr_fp4_1x2x2x2w_v1(ta, a);           //        t1 |        t0
   as_fp2_2x2x2w(ra, ta, a);             //     t1+z1 |     t0-z0
   add_fp2_2x2x2w(ra, ra, ra);           // 2*(t1+z1) | 2*(t0-z0)
   add_fp2_2x2x2w(ra, ra, ta);           // 3*t1+2*z1 | 3*t0-2*z0
@@ -2875,7 +2875,7 @@ void cyclotomic_sqr_fp12_vec_v2(fp4_1x2x2x2w ra, fp4_2x2x2x1w rbc, const fp4_1x2
 
   // compute A in 1x2x2x2w (some limbs are not fully shortened)
   // a = z1 | z0 at Fp2 layer
-  sqr_fp4_1x2x2x2w(ta, a);              //        t1 |        t0
+  sqr_fp4_1x2x2x2w_v2(ta, a);           //        t1 |        t0
   as_fp2_2x2x2w(ra, ta, a);             //     t1+z1 |     t0-z0
   add_fp2_2x2x2w(ra, ra, ra);           // 2*(t1+z1) | 2*(t0-z0)
   add_fp2_2x2x2w(ra, ra, ta);           // 3*t1+2*z1 | 3*t0-2*z0
