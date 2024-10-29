@@ -523,6 +523,8 @@ void test_fp6()
 
   puts("\nFP6 TEST\n");
 
+#if 0
+
   mul_fp6x2(r, a, a);
   mpi_print("* mul_fp6x2 r00 = 0x", r[0][0], 2*SWORDS);
   mpi_print("* mul_fp6x2 r01 = 0x", r[0][1], 2*SWORDS);
@@ -550,6 +552,7 @@ void test_fp6()
   for(i = 0; i < 2*NWORDS; i++) z48[i] = ((uint64_t *)&z2_8x1x1w[1][i])[0];
   conv_48to64_mpi(z64, z48, 2*SWORDS, 2*NWORDS);
   mpi_print("* mul_fp6x2_4x2x1x1w r21 = 0x", z64, 2*SWORDS);
+#endif
 }
 
 // ----------------------------------------------------------------------------
