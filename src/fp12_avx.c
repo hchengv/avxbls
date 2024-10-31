@@ -211,8 +211,8 @@ static void blend_0x55_fp2_8x1x1w(fp2_8x1x1w r, const fp2_8x1x1w a, const fp2_8x
 
 // a = < H | G | F | E | D | C | B | A >
 // b = < P | O | N | M | L | K | J | I >
-// r = < P | O | N | M | D | C | B | A >
-static void blend_0xF0(__m512i *r, const __m512i *a, const __m512i *b)
+// r = < H | G | F | E | L | K | J | I >
+static void blend_0x0F(__m512i *r, const __m512i *a, const __m512i *b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
   const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
@@ -220,15 +220,14 @@ static void blend_0xF0(__m512i *r, const __m512i *a, const __m512i *b)
   const __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
   __m512i r0, r1, r2, r3, r4, r5, r6, r7;
 
-  r0 = VMBLEND(0xF0, a0, b0); r1 = VMBLEND(0xF0, a1, b1);
-  r2 = VMBLEND(0xF0, a2, b2); r3 = VMBLEND(0xF0, a3, b3);
-  r4 = VMBLEND(0xF0, a4, b4); r5 = VMBLEND(0xF0, a5, b5);
-  r6 = VMBLEND(0xF0, a6, b6); r7 = VMBLEND(0xF0, a7, b7);
+  r0 = VMBLEND(0x0F, a0, b0); r1 = VMBLEND(0x0F, a1, b1);
+  r2 = VMBLEND(0x0F, a2, b2); r3 = VMBLEND(0x0F, a3, b3);
+  r4 = VMBLEND(0x0F, a4, b4); r5 = VMBLEND(0x0F, a5, b5);
+  r6 = VMBLEND(0x0F, a6, b6); r7 = VMBLEND(0x0F, a7, b7);
 
   r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
-
 
 // ----------------------------------------------------------------------------
 // vector double-length transform 
@@ -374,6 +373,32 @@ static void perm_10zz_dl(__m512i *r, const __m512i *a)
   r10 = VZPERM(0xCC, a10, 0x44); r11 = VZPERM(0xCC, a11, 0x44);
   r12 = VZPERM(0xCC, a12, 0x44); r13 = VZPERM(0xCC, a13, 0x44);
   r14 = VZPERM(0xCC, a14, 0x44); r15 = VZPERM(0xCC, a15, 0x44);
+
+  r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
+  r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
+  r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
+  r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
+}
+
+// a = < H | G | F | E | D | C | B | A >
+// r = < F | F | E | E | B | B | A | A >
+static void perm_1100_dl(__m512i *r, const __m512i *a)
+{
+  const __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
+  const __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
+  const __m512i a8  = a[8 ], a9  = a[9 ], a10 = a[10], a11 = a[11];
+  const __m512i a12 = a[12], a13 = a[13], a14 = a[14], a15 = a[15];
+  __m512i r0, r1, r2 , r3 , r4 , r5 , r6 , r7 ;
+  __m512i r8, r9, r10, r11, r12, r13, r14, r15;
+
+  r0  = VPERM(a0 , 0x50); r1  = VPERM(a1 , 0x50);
+  r2  = VPERM(a2 , 0x50); r3  = VPERM(a3 , 0x50);
+  r4  = VPERM(a4 , 0x50); r5  = VPERM(a5 , 0x50);
+  r6  = VPERM(a6 , 0x50); r7  = VPERM(a7 , 0x50);
+  r8  = VPERM(a8 , 0x50); r9  = VPERM(a9 , 0x50);
+  r10 = VPERM(a10, 0x50); r11 = VPERM(a11, 0x50);
+  r12 = VPERM(a12, 0x50); r13 = VPERM(a13, 0x50);
+  r14 = VPERM(a14, 0x50); r15 = VPERM(a15, 0x50);
 
   r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
   r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
@@ -604,6 +629,37 @@ static void blend_0xC0_dl(__m512i *r, const __m512i *a, const __m512i *b)
   r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
 }
 
+// a = < H | G | F | E | D | C | B | A >
+// b = < P | O | N | M | L | K | J | I >
+// r = < H | G | F | E | L | K | J | I >
+static void blend_0x0F_dl(__m512i *r, const __m512i *a, const __m512i *b)
+{
+  const __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
+  const __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
+  const __m512i a8  = a[8 ], a9  = a[9 ], a10 = a[10], a11 = a[11];
+  const __m512i a12 = a[12], a13 = a[13], a14 = a[14], a15 = a[15];
+  const __m512i b0  = b[0 ], b1  = b[1 ], b2  = b[2 ], b3  = b[3 ];
+  const __m512i b4  = b[4 ], b5  = b[5 ], b6  = b[6 ], b7  = b[7 ];
+  const __m512i b8  = b[8 ], b9  = b[9 ], b10 = b[10], b11 = b[11];
+  const __m512i b12 = b[12], b13 = b[13], b14 = b[14], b15 = b[15];
+  __m512i r0, r1, r2 , r3 , r4 , r5 , r6 , r7 ;
+  __m512i r8, r9, r10, r11, r12, r13, r14, r15;
+
+  r0  = VMBLEND(0x0F, a0  , b0  ); r1  = VMBLEND(0x0F, a1  , b1  );
+  r2  = VMBLEND(0x0F, a2  , b2  ); r3  = VMBLEND(0x0F, a3  , b3  );
+  r4  = VMBLEND(0x0F, a4  , b4  ); r5  = VMBLEND(0x0F, a5  , b5  );
+  r6  = VMBLEND(0x0F, a6  , b6  ); r7  = VMBLEND(0x0F, a7  , b7  );
+  r8  = VMBLEND(0x0F, a8  , b8  ); r9  = VMBLEND(0x0F, a9  , b9  );
+  r10 = VMBLEND(0x0F, a10 , b10 ); r11 = VMBLEND(0x0F, a11 , b11 );
+  r12 = VMBLEND(0x0F, a12 , b12 ); r13 = VMBLEND(0x0F, a13 , b13 );
+  r14 = VMBLEND(0x0F, a14 , b14 ); r15 = VMBLEND(0x0F, a15 , b15 );
+
+  r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
+  r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
+  r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
+  r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
+}
+
 // ----------------------------------------------------------------------------
 // vector half-length transform 
 
@@ -634,6 +690,19 @@ static void perm_1032_hl(__m512i *r, const __m512i *a)
 }
 
 // a = < H | G | F | E | D | C | B | A >
+// r = < H | G | H | G | D | C | D | C >
+static void perm_3232_hl(__m512i *r, const __m512i *a)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  __m512i r0, r1, r2, r3;
+
+  r0 = VPERM(a0, 0xEE); r1 = VPERM(a1, 0xEE);
+  r2 = VPERM(a2, 0xEE); r3 = VPERM(a3, 0xEE);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+}
+
+// a = < H | G | F | E | D | C | B | A >
 // r = < 0 | 0 | H | G | 0 | 0 | D | C >
 static void perm_zz32_hl(__m512i *r, const __m512i *a)
 {
@@ -659,15 +728,15 @@ static void perm_var_hl(__m512i *r, const __m512i *a, const __m512i mask)
 
 // a = < H | G | F | E | D | C | B | A >
 // b = < P | O | N | M | L | K | J | I >
-// r = < P | O | N | M | D | C | B | A >
-static void blend_0xF0_hl(__m512i *r, const __m512i *a, const __m512i *b)
+// r = < H | G | F | E | L | K | J | I >
+static void blend_0x0F_hl(__m512i *r, const __m512i *a, const __m512i *b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
   const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
   __m512i r0, r1, r2, r3;
 
-  r0 = VMBLEND(0xF0, a0, b0); r1 = VMBLEND(0xF0, a1, b1);
-  r2 = VMBLEND(0xF0, a2, b2); r3 = VMBLEND(0xF0, a3, b3);
+  r0 = VMBLEND(0x0F, a0, b0); r1 = VMBLEND(0x0F, a1, b1);
+  r2 = VMBLEND(0x0F, a2, b2); r3 = VMBLEND(0x0F, a3, b3);
 
   r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
 }
@@ -685,6 +754,69 @@ static void blend_0x55_hl(__m512i *r, const __m512i *a, const __m512i *b)
   r2 = VMBLEND(0x55, a2, b2); r3 = VMBLEND(0x55, a3, b3);
 
   r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+}
+
+static void conv_sltohl(__m512i *r, const __m512i *a)
+{
+  int i;
+
+  for (i = 0; i < VWORDS; i++) blend_0x55_hl(r, &a[VWORDS], a);
+}
+
+// ----------------------------------------------------------------------------
+// vector one-and-half-length transform
+
+static void perm_var_vl(__m512i *r, const __m512i *a, const __m512i mask)
+{
+  const __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
+  const __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
+  const __m512i a8  = a[8 ], a9  = a[9 ], a10 = a[10], a11 = a[11];
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11;
+
+  r0  = VPERMV(mask, a0 ); r1  = VPERMV(mask, a1 );
+  r2  = VPERMV(mask, a2 ); r3  = VPERMV(mask, a3 );
+  r4  = VPERMV(mask, a4 ); r5  = VPERMV(mask, a5 );
+  r6  = VPERMV(mask, a6 ); r7  = VPERMV(mask, a7 );
+  r8  = VPERMV(mask, a8 ); r9  = VPERMV(mask, a9 );
+  r10 = VPERMV(mask, a10); r11 = VPERMV(mask, a11);
+
+  r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
+  r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
+  r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
+}
+
+// a = < H | G | F | E | D | C | B | A >
+// b = < P | O | N | M | L | K | J | I >
+// r = < P | O | N | M | D | C | B | A >
+static void blend_0x0F_vl(__m512i *r, const __m512i *a, const __m512i *b)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2  = a[2 ], a3  = a[3 ];
+  const __m512i a4 = a[4], a5 = a[5], a6  = a[6 ], a7  = a[7 ];
+  const __m512i a8 = a[8], a9 = a[9], a10 = a[10], a11 = a[11];
+  const __m512i b0 = b[0], b1 = b[1], b2  = b[2 ], b3  = b[3 ];
+  const __m512i b4 = b[4], b5 = b[5], b6  = b[6 ], b7  = b[7 ];
+  const __m512i b8 = b[8], b9 = b[9], b10 = b[10], b11 = b[11]; 
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11;
+
+  r0  = VMBLEND(0x0F, a0 , b0 ); r1  = VMBLEND(0x0F, a1 , b1 );
+  r2  = VMBLEND(0x0F, a2 , b2 ); r3  = VMBLEND(0x0F, a3 , b3 );
+  r4  = VMBLEND(0x0F, a4 , b4 ); r5  = VMBLEND(0x0F, a5 , b5 );
+  r6  = VMBLEND(0x0F, a6 , b6 ); r7  = VMBLEND(0x0F, a7 , b7 );
+  r8  = VMBLEND(0x0F, a8 , b8 ); r9  = VMBLEND(0x0F, a9 , b9 );
+  r10 = VMBLEND(0x0F, a10, b10); r11 = VMBLEND(0x0F, a11, b11);
+
+  r[0] = r0; r[1] = r1; r[2 ] = r2 ; r[3 ] = r3 ;
+  r[4] = r4; r[5] = r5; r[6 ] = r6 ; r[7 ] = r7 ;
+  r[8] = r8; r[9] = r9; r[10] = r10; r[11] = r11;  
+}
+
+static void conv_dltovl(__m512i *r, const __m512i *a)
+{
+  const __m512i m0 = VSET(0, FMASK, 0, FMASK, 0, FMASK, 0, FMASK);
+  int i;
+
+  for (i = 0; i < VWORDS*2; i++) r[i] = VAND(a[i], m0);
+  blend_0x55_hl(&r[VWORDS*2], &a[VWORDS*3], &a[VWORDS*2]);
 }
 
 // ----------------------------------------------------------------------------
@@ -2434,6 +2566,7 @@ static void sqr_fp2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a)
 
 // r0 = a0*b0 - a1*b1
 // r1 = a0*b1 + a1*b0
+// schoolbook
 static void mul_fp2_2x4x1w(fp2_2x4x1w r, const fp2_2x4x1w a, const fp2_2x4x1w b)
 {
   fp2_2x4x1w t0, t1;
@@ -2538,6 +2671,7 @@ static void mul_by_u_plus_1_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a)
 
 // r0 = a0*b0 - a1*b1
 // r1 = a0*b1 + a1*b0
+// schoolbook
 static void mul_fp2_1x4x2w(fp2_1x4x2w r, const fp2_1x4x2w a, const fp2_1x4x2w b)
 {
   fp2_1x4x2w t0, t1;
@@ -2581,6 +2715,7 @@ static void mul_by_u_plus_1_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a)
 
 // r0 = a0*b0 - a1*b1
 // r1 = (a0 + a1)*(b0 + b1) - a0*b0 - a1*b1 = a0*b1 + a1*b0
+// Karatsuba
 static void mul_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2_8x1x1w a, const fp2_8x1x1w b)
 {
   fp_8x1w t0, t1;
@@ -2657,6 +2792,7 @@ static void mul_by_u_plus_1_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2x2_4x2x1w a)
 
 // r0 = a0*b0 - a1*b1
 // r1 = a0*b1 + a1*b0
+// schoolbook
 static void mul_fp2x2_2x4x1w(fp2x2_2x4x1w r, const fp2_2x4x1w a, const fp2_2x4x1w b)
 {
   fp2_2x4x1w t0, t1;
@@ -2698,6 +2834,24 @@ static void add_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2x2_2x2x2w a, const fp2x2_2
   add_fpx2_4x2w(r, a, b);
 }
 
+// r0 = a0*b0 - a1*b1
+// r1 = a0*b1 + a1*b0
+// schoolbook
+static void mul_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b)
+{
+  fp2_2x2x2w t0, t1;
+  fp2x2_2x2x2w tt0, tt1;
+
+  // a = A1 | A0 at Fp layer 
+  // b = B1 | B0 at Fp layer
+  perm_1010_hl(t0, a);                  //          A0 |          A0
+  mul_fpx2_4x2w(tt0, t0, b);            //       A0*B1 |       A0*B0
+  perm_3232_hl(t0, a);                  //          A1 |          A1 
+  perm_1032_hl(t1, b);                  //          B0 |          B1
+  mul_fpx2_4x2w(tt1, t0, t1);           //       A1*B0 |       A1*B1
+  as_fp2_2x2x2w(r, tt0, tt1);           // A0*B1+A1*B0 | A0*B0-A1*B1  
+}
+
 // r0 = (a0 + a1)*(a0 - a1)
 // r1 = 2*a0*a1
 static void sqr_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2_2x2x2w a)
@@ -2716,6 +2870,7 @@ static void sqr_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2_2x2x2w a)
 
 // r0 = a0*b0 - a1*b1
 // r1 = a0*b1 + a1*b0
+// schoolbook
 static void mul_fp2x2_1x4x2w(fp2x2_1x4x2w r, const fp2_1x4x2w a, const fp2_1x4x2w b)
 {
   fp2_1x4x2w t0, t1;
@@ -2729,8 +2884,7 @@ static void mul_fp2x2_1x4x2w(fp2x2_1x4x2w r, const fp2_1x4x2w a, const fp2_1x4x2
   perm_var_hl(t0, a, m0);                       //          A1 |          A1 |    A0 |    A0
   perm_var_hl(t1, b, m1);                       //          B0 |          B1 |    B1 |    B0
   mul_fpx2_4x2w(tt0, t0, t1);                   //       A1*B0 |       A1*B1 | A0*B1 | A0*B0
-  perm_var(tt1, tt0, m2);                       //       A0*B1 |       A0*B0 |   ... |   ... 
-  perm_var_hl(&tt1[NWORDS], &tt0[NWORDS], m2);  //       A0*B1 |       A0*B0 |   ... |   ... 
+  perm_var_vl(tt1, tt0, m2);                    //       A0*B1 |       A0*B0 |   ... |   ... 
   asx2_fpx2_4x2w(r, tt1, tt0);                  // A0*B1+A1*B0 | A0*B0-A1*B1 |   ... |   ...
 }
 
@@ -2777,8 +2931,7 @@ static void sqr_fp4_2x2x2x1w_v2(fp4_2x2x2x1w r, const fp4_2x2x2x1w a)
 
 // r0 = a0^2 + (u+1)*a1^2
 // r1 = 2*a0*a1
-// single-length version
-// TODO: double-length version
+// double-length version
 static void sqr_fp4_1x2x2x2w_v1(fp4_1x2x2x2w r, const fp4_1x2x2x2w a)
 {
   fp4x2_1x2x2x2w tt0, tt1, tt2;
@@ -2788,17 +2941,18 @@ static void sqr_fp4_1x2x2x2w_v1(fp4_1x2x2x2w r, const fp4_1x2x2x2w a)
   // a = A1 | A0 at Fp2 layer
   sqr_fp2x2_2x2x2w(tt0, a);                     //        A1^2 |              A0^2
   mul_by_u_plus_1_fp2x2_2x2x2w(tt1, tt0);       //  (u+1)*A1^2 |               ...
-  perm_var(tt1, tt1, m0);                       //         ... |        (u+1)*A1^2
-  perm_var_hl(&tt1[NWORDS], &tt1[NWORDS], m0);  //         ... |        (u+1)*A1^2
+  perm_var_vl(tt1, tt1, m0);                    //         ... |        (u+1)*A1^2
   add_fp2x2_2x2x2w(tt0, tt0, tt1);              //         ... | A0^2+(u+1)*(A1^2)
   perm_var_hl(t0, a, m0);                       //          A0 |                 0
   mul_fp2x2_1x4x2w(tt2, a, t0);                 //       A0*A1 |               ...
   add_fp2x2_2x2x2w(tt2, tt2, tt2);              //     2*A0*A1 |               ...  
-  blend_0xF0(tt0, tt0, tt2);                    //     2*A0*A1 | A0^2+(u+1)*(A1^2)
-  blend_0xF0_hl(&tt0[NWORDS], &tt0[NWORDS], &tt2[NWORDS]);
+  blend_0x0F_vl(tt0, tt2, tt0);                 //     2*A0*A1 | A0^2+(u+1)*(A1^2)
   redc_fp2x2_2x2x2w(r, tt0);                    //     2*A0*A1 | A0^2+(u+1)*(A1^2)
 }
 
+// r0 = a0^2 + (u+1)*a1^2
+// r1 = 2*a0*a1
+// single-length version
 static void sqr_fp4_1x2x2x2w_v2(fp4_1x2x2x2w r, const fp4_1x2x2x2w a)
 {
   fp4_1x2x2x2w t0, t1, t2;
@@ -2812,7 +2966,7 @@ static void sqr_fp4_1x2x2x2w_v2(fp4_1x2x2x2w r, const fp4_1x2x2x2w a)
   perm_var_hl(t1, a, m0);               //          A0 |                 0
   mul_fp2_1x4x2w(t2, a, t1);            //       A0*A1 |               ...
   add_fp2_2x2x2w(t2, t2, t2);           //     2*A0*A1 |               ...  
-  blend_0xF0_hl(r, t0, t2);             //     2*A0*A1 | A0^2+(u+1)*(A1^2)
+  blend_0x0F_hl(r, t2, t0);             //     2*A0*A1 | A0^2+(u+1)*(A1^2)
 }
 
 // ----------------------------------------------------------------------------
@@ -2914,10 +3068,39 @@ static void mul_fp6x2_2x2x2x1w(fp2x2_4x2x1w r01, fp2x2_4x2x1w r2, const fp2_4x2x
   add_fp2x2_4x2x1w(r2, tt5, tt4);           //                                     ... |         (a0+a2)*(b0+b2)-a2*b2-a0*b0+a1*b1
 }
 
+// r0 = ((a1 + a2)*(b1 + b2) - a1*b1 - a2*b2)*(u+1) + a0*b0 = (a1*b2 + a2*b1)*(u+1) + a0*b0 
+// r1 = (a0 + a1)*(b0 + b1) - a0*b0 - a1*b1 + a2*b2*(u+1) = a0*b1 + a1*b0 + a2*b2*(u+1)
+// r2 = (a0 + a2)*(b0 + b2) - a0*b0 - a2*b2 + a1*b1 = a0*b2 + a2*b0 + a1*b1
+// Karatsuba 
+static void mul_fp6x2_1x2x2x2w(fp2x2_2x2x2w r01, fp2x2_2x2x2w r2, const fp2_2x2x2w ab0, const fp2_2x2x2w ab1, const fp2_2x2x2w ab2)
+{
+  fp2_2x2x2w t0, t1, t2, t3, t4;
+  fp2x2_2x2x2w tt0, tt1, tt2, tt3, tt4, tt5;
+  const __m512i m0 = VSET(3, 2, 1, 0, 7, 6, 5, 4);
+
+  // ab0 = b0 | a0 at Fp2 layer
+  // ab1 = b1 | a1 at Fp2 layer
+  // ab2 = b2 | a2 at Fp2 layer
+  add_fp2_2x2x2w(t0, ab1, ab2);             //                                   b1+b2 |                                     a1+a2
+  add_fp2_2x2x2w(t1, ab0, ab1);             //                                   b0+b1 |                                     a0+a1
+  add_fp2_2x2x2w(t2, ab0, ab2);             //                                   b0+b2 |                                     a0+a2
+  perm_var(t3, ab1, m0);                    //                                      a1 |                                        b1
+  blend_0x0F(t3, t3, ab0);                  //                                      a1 |                                        a0
+  perm_var(t4, ab0, m0);                    //                                      a0 |                                        b0
+  blend_0x0F(t4, ab1, t4);                  //                                      b1 |                                        b0
+  mul_fp2x2_2x2x2w(tt0, t3, t4);            //                                   a1*b1 |                                     a0*b0
+  perm_var(t3, ab2, m0);                    //                                      a2 |                                        b2
+  blend_0x0F(t3, t3, t0);                   //                                      a2 |                                     a1+a2
+  perm_var(t4, t0, m0);                     //                                   a1+a2 |                                     b1+b2
+  blend_0x0F(t4, t4, ab2);                  //                                      b2 |                                     b1+b2
+
+}
+
 // ----------------------------------------------------------------------------
 // Fp12 operations
 
 // To understand the comments, see Listing 21 in "Guide to Pairing-Based Cryptography". 
+// double-length version
 void cyclotomic_sqr_fp12_vec_v1(fp4_1x2x2x2w ra, fp4_2x2x2x1w rbc, const fp4_1x2x2x2w a, const fp4_2x2x2x1w bc)
 {
   fp4_1x2x2x2w ta; 
@@ -2943,6 +3126,7 @@ void cyclotomic_sqr_fp12_vec_v1(fp4_1x2x2x2w ra, fp4_2x2x2x1w rbc, const fp4_1x2
 }
 
 // To understand the comments, see Listing 21 in "Guide to Pairing-Based Cryptography". 
+// single-length version
 void cyclotomic_sqr_fp12_vec_v2(fp4_1x2x2x2w ra, fp4_2x2x2x1w rbc, const fp4_1x2x2x2w a, const fp4_2x2x2x1w bc)
 {
   fp4_1x2x2x2w ta; 
@@ -3101,8 +3285,7 @@ void mul_fp12_vec_v2(fp2_4x2x1w r01, fp2_2x2x2w r2, const fp2_8x1x1w ab0, const 
   add_fp2x2_4x2x1w(ss0, ss0, ss1);
   //    hh0 =                             a0*b1[2]+a1*b0[2] | a1*b1[2]*(u+1)+a0*b0[0] at Fp2 layer
   perm_var_dl(ss0, ss0, m2);
-  for (i = 0; i < VWORDS*2; i++) hh0[i] = VAND(ss0[i], m3);
-  blend_0x55_hl(&hh0[VWORDS*2], &ss0[VWORDS*3], &ss0[VWORDS*2]);
+  conv_dltovl(hh0, ss0);
   //     r2 =                                         r1[2] |                   r0[0] at Fp2 layer
   redc_fp2x2_2x2x2w(r2, hh0);
 }
@@ -3167,17 +3350,14 @@ void mul_fp12_vec_v3(fp2_4x2x1w r01, fp2_2x2x2w r2, const fp2_8x1x1w ab0, const 
   blend_0x55_dl(ss0, tt3[0], tt2[0]); 
   //    hh0 =         a0*b1[2] |                a0*b0[0] at Fp2 layer
   perm_var_dl(ss1, ss0, m1);
-  for (i = 0; i < VWORDS*2; i++) hh0[i] = VAND(ss1[i], m3);
-  blend_0x55_hl(&hh0[VWORDS*2], &ss1[VWORDS*3], &ss1[VWORDS*2]);
+  conv_dltovl(hh0, ss1);
   //   hh1 =          a1*b0[2] |                a1*b1[2] at Fp2 layer
   perm_var_dl(ss1, ss0, m2);
-  for (i = 0; i < VWORDS*2; i++) hh1[i] = VAND(ss1[i], m3);
-  blend_0x55_hl(&hh1[VWORDS*2], &ss1[VWORDS*3], &ss1[VWORDS*2]);
+  conv_dltovl(hh1, ss1);
   //   hh2 =               ... |          a1*b1[2]*(u+1) at Fp2 layer
   mul_by_u_plus_1_fp2x2_2x2x2w(hh2, hh1);
   //   hh1 =          a1*b0[2] |          a1*b1[2]*(u+1) at Fp2 layer
-  blend_0xF0(hh1, hh2, hh1);
-  blend_0xF0_hl(&hh1[NWORDS], &hh2[NWORDS], &hh1[NWORDS]);
+  blend_0x0F_vl(hh1, hh1, hh2);
   //   hh0 = a0*b1[2]+a1*b0[2] | a1*b1[2]*(u+1)+a0*b0[0] at Fp2 layer
   add_fp2x2_2x2x2w(hh0, hh0, hh1);
   //     r2 =            r1[2] |                   r0[0] at Fp2 layer
@@ -3188,42 +3368,90 @@ void mul_fp12_vec_v3(fp2_4x2x1w r01, fp2_2x2x2w r2, const fp2_8x1x1w ab0, const 
 // 2x2x2w sub-routines 
 void mul_fp12_vec_v4(fp2_2x2x2w r001, fp2_2x2x2w r02, fp2_2x2x2w r101, fp2_2x2x2w r12, const fp2_4x2x1w ab0, const fp2_4x2x1w ab1, const fp2_4x2x1w ab2)
 {
-  fp2x2_4x2x1w tt0, tt1;
-  fp2x2_2x2x2w ss0;
+  fp2x2_4x2x1w tt0, tt1, tt2, tt3, tt4, tt5;
+  fp2_4x2x1w t0;
+  fp2x2_2x2x2w ss0, ss1, ss2, ss3;
+  fp2_2x2x2w s0, s1, s2, s3;
+  const __m512i m0 = VSET(3, 2, 1, 0, 7, 6, 5, 4);
+  const __m512i m1 = VSET(3, 3, 2, 2, 1, 1, 0, 0);
+  const __m512i m2 = VSET(7, 7, 6, 6, 7, 7, 6, 6);
+  const __m512i m3 = VSET(7, 7, 6, 6, 5, 5, 4, 4);
 
   // ab0 =  b1[0] | a1[0] | b0[0] | a0[0] at Fp2 layer
   // ab1 =  b1[1] | a1[1] | b0[1] | a0[1] at Fp2 layer
   // ab2 =  b1[2] | a1[2] | b0[2] | a0[2] at Fp2 layer
 
-  // tt0 = a1*b1[1] | a1*b1[0] | a0*b0[1] | a0*b0[0]
-  // tt1 =      ... | a1*b1[2] |      ... | a0*b0[2]
+  // tt0 =    a1*b1[1] |    a1*b1[0] |    a0*b0[1] |    a0*b0[0] at Fp2 layer
+  // tt1 =         ... |    a1*b1[2] |         ... |    a0*b0[2] at Fp2 layer
   mul_fp6x2_2x2x2x1w(tt0, tt1, ab0, ab1, ab2);
 
   // compute r0 in 2x2x2w
-  //  ss0 = a1*b1[0] |       a1*b1[2]
-  //  ss1 =      ... | a1*b1[2]*(u+1)
-  //  ss1 = a1*b1[0] | a1*b1[2]*(u+1)
-  //  ss0 = a0*b0[1] |       a0*b0[0]
-  // r001 =    r0[1] |          r0[0]
-  //  ss1 =      ... |       a1*b1[1]
-  //  ss0 =      ... |       a0*b0[2]
-  //  r02 =      ... |          r0[2]
+  //  tt2 = a1*b1[0][1] | a1*b1[0][0] | a0*b0[0][1] | a0*b0[0][0] at Fp  layer
+  perm_1100_dl(tt2, tt0);
+  //  tt1 = a1*b1[2][1] | a1*b1[2][0] | a0*b0[2][1] | a0*b0[2][0] at Fp  layer
+  perm_1100_dl(tt1, tt1);
+  //  tt3 = a0*b0[2][1] | a0*b0[2][0] | a1*b1[2][1] | a1*b1[2][0] at Fp  layer
+  perm_var(tt3, tt1, m0);
+  //  tt4 = a1*b1[0][1] | a1*b1[0][0] | a1*b1[2][1] | a1*b1[2][0] at Fp  layer
+  blend_0x0F_dl(tt4, tt2, tt3);
+  //  tt5 = a0*b0[1][1] | a0*b0[1][0] | a0*b0[0][1] | a0*b0[0][0] at Fp  layer 
+  perm_var(tt5, tt0, m1);
+  //  ss0 =                  a1*b1[0] |                  a1*b1[2] at Fp2 layer
+  conv_dltovl(ss0, tt4);
+  //  ss1 =                       ... |            a1*b1[2]*(u+1) at Fp2 layer 
+  mul_by_u_plus_1_fp2_2x2x2w(ss1, ss0);
+  //  ss1 =                  a1*b1[0] |            a1*b1[2]*(u+1) at Fp2 layer 
+  blend_0x0F_vl(ss1, ss0, ss1);
+  //  ss0 =                  a0*b0[1] |                  a0*b0[0] at Fp2 layer
+  conv_dltovl(ss0, tt5);
+  // r001 =                     r0[1] |                     r0[0] at Fp2 layer 
+  add_fp2_2x2x2w(r001, ss0, ss1);
+  //  ss2 =                       ... |                  a0*b0[2] at Fp2 layer 
+  conv_dltovl(ss2, tt1);  
+  //  tt0 =         ... |         ... | a1*b1[1][1] | a1*b1[1][0] at Fp  layer
+  perm_var_dl(tt0, tt0, m2);
+  //  ss1 =                       ... |                  a1*b1[1] at Fp2 layer
+  conv_dltovl(ss1, tt0);
+  //  r02 =                       ... |                     r0[2] at Fp2 layer
+  add_fp2_2x2x2w(r02, ss2, ss1);
 
   // compute r1 in 2x2x2w
-  //   t0 =                       b0[0] |                       a0[0]
-  //   t1 =                       b1[0] |                       a1[0]
-  //   t0 =                 b0[0]+b1[0] |                 a0[0]+a1[0]
-  //   t1 =                       b0[1] |                       a0[1]
-  //   t2 =                       b1[1] |                       a1[1]
-  //   t1 =                 b0[1]+b1[1] |                 a0[1]+a1[1]
-  //   t2 =                       b0[2] |                       a0[2]
-  //   t3 =                       b1[2] |                       a1[2]
-  //   t2 =                 b0[2]+b1[2] |                 a0[2]+a1[2]
-  //  ss0 =          (a0+a1)*(b0+b1)[1] |          (a0+a1)*(b0+b1)[0]
-  //  ss1 =                         ... |          (a0+a1)*(b0+b1)[2]
-  //  ss2 =                    a0*b0[1] |                    a0*b0[0]
-  //  ss0 = (a0+a1)*(b0+b1)[1]-a0*b0[1] | (a0+a1)*(b0+b1)[0]-a0*b0[0]
-  //  ss2 =                    a1*b1[1] |                    a1*b1[0]
+  //   t0 =     b0[0][1] |     b0[0][0] |     a0[0][1] |     a0[0][0] at Fp  layer
+  perm_var(t0, ab0, m1);
+  //   s0 =                       b0[0] |                       a0[0] at Fp2 layer
+  conv_sltohl(s0, t0);
+  //   t0 =     b1[0][1] |     b1[0][0] |     a1[0][1] |     a1[0][0] at Fp  layer
+  perm_var(t0, ab0, m3);
+  //   s1 =                       b1[0] |                       a1[0] at Fp2 layer
+  conv_sltohl(s1, t0);
+  //   s0 =                 b0[0]+b1[0] |                 a0[0]+a1[0] at Fp2 layer
+  add_fp2_2x2x2w(s0, s0, s1);
+  //   t0 =     b0[1][1] |     b0[1][0] |     a0[1][1] |     a0[1][0] at Fp  layer
+  perm_var(t0, ab1, m1);
+  //   s1 =                       b0[1] |                       a0[1] at Fp2 layer
+  conv_sltohl(s1, t0);
+  //   t0 =     b1[1][1] |     b1[1][0] |     a1[1][1] |     a1[1][0] at Fp  layer
+  perm_var(t0, ab1, m3);
+  //   s2 =                       b1[1] |                       a1[1] at Fp2 layer
+  conv_sltohl(s2, t0);
+  //   s1 =                 b0[1]+b1[1] |                 a0[1]+a1[1] at Fp2 layer
+  add_fp2_2x2x2w(s1, s1, s2);
+  //   t0 =     b0[2][1] |     b0[2][0] |     a0[2][1] |     a0[2][0] at Fp  layer
+  perm_var(t0, ab2, m1);
+  //   s2 =                       b0[2] |                       a0[2] at Fp2 layer
+  conv_sltohl(s2, t0);
+  //   t0 =     b1[2][1] |     b1[2][0] |     a1[2][1] |     a1[2][0] at Fp  layer
+  perm_var(t0, ab2, m3);
+  //   s3 =                       b1[2] |                       a1[2] at Fp2 layer
+  conv_sltohl(s3, t0);
+  //   s2 =                 b0[2]+b1[2] |                 a0[2]+a1[2] at Fp2 layer
+  add_fp2_2x2x2w(s2, s2, s3);
+  //  ss3 =          (a0+a1)*(b0+b1)[1] |          (a0+a1)*(b0+b1)[0] at Fp2 layer
+  //  ss1 =                         ... |          (a0+a1)*(b0+b1)[2] at Fp2 layer
+  mul_fp6x2_1x2x2x2w(ss3, ss1, s0, s1, s2);
+  //  ss0 =                    a0*b0[1] |                    a0*b0[0]
+  //  ss3 = (a0+a1)*(b0+b1)[1]-a0*b0[1] | (a0+a1)*(b0+b1)[0]-a0*b0[0]
+  //  ss0 =                    a1*b1[1] |                    a1*b1[0]
   // r101 =                       r1[1] |                       r1[0]
   //  ss2 =                         ... |                    a0*b0[2]
   //  ss1 =                         ... | (a0+a1)*(b0+b1)[2]-a0*b0[2]
