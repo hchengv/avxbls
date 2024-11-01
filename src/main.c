@@ -501,7 +501,7 @@ void test_fp6()
   uint64_t r48[NWORDS], z48[2*NWORDS];
   fp2_8x1x1w a0_8x1x1w, a1_8x1x1w, a2_8x1x1w;
   fp2x2_8x1x1w z01_8x1x1w, z2_8x1x1w;
-  fp2_4x2x1w a0_4x2x1w, a1_4x2x1w, a2_4x2x1w;
+  fp2_4x2x1w a0_4x2x1w, a1_4x2x1w, a2_4x2x1w, r01_4x2x1w, r2_4x2x1w;
   fp2x2_4x2x1w z01_4x2x1w, z2_4x2x1w;
   fp2_2x2x2w a0_2x2x2w, a1_2x2x2w, a2_2x2x2w, r01_2x2x2w, r2_2x2x2w;
   fp2x2_2x2x2w z01_2x2x2w, z2_2x2x2w;
@@ -547,15 +547,15 @@ void test_fp6()
 
   puts("\nFP6 TEST\n");
 
-#if 1
+#if 0
 
-  // mul_fp6x2(r, a, a);
-  // mpi_print("* mul_fp6x2 r00 = 0x", r[0][0], 2*SWORDS);
-  // mpi_print("* mul_fp6x2 r01 = 0x", r[0][1], 2*SWORDS);
-  // mpi_print("* mul_fp6x2 r10 = 0x", r[1][0], 2*SWORDS);
-  // mpi_print("* mul_fp6x2 r11 = 0x", r[1][1], 2*SWORDS);
-  // mpi_print("* mul_fp6x2 r20 = 0x", r[2][0], 2*SWORDS);
-  // mpi_print("* mul_fp6x2 r21 = 0x", r[2][1], 2*SWORDS);
+  mul_fp6x2(r, a, a);
+  mpi_print("* mul_fp6x2 r00 = 0x", r[0][0], 2*SWORDS);
+  mpi_print("* mul_fp6x2 r01 = 0x", r[0][1], 2*SWORDS);
+  mpi_print("* mul_fp6x2 r10 = 0x", r[1][0], 2*SWORDS);
+  mpi_print("* mul_fp6x2 r11 = 0x", r[1][1], 2*SWORDS);
+  mpi_print("* mul_fp6x2 r20 = 0x", r[2][0], 2*SWORDS);
+  mpi_print("* mul_fp6x2 r21 = 0x", r[2][1], 2*SWORDS);
 
   mul_fp6x2_4x2x1x1w(z01_8x1x1w, z2_8x1x1w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w);
   for (i = 0; i < 2*NWORDS; i++) z48[i] = ((uint64_t *)&z01_8x1x1w[0][i])[0];
@@ -596,6 +596,26 @@ void test_fp6()
   for (i = 0; i < 2*NWORDS; i++) z48[i] = ((uint64_t *)&z2_4x2x1w[i])[1];
   conv_48to64_mpi(z64, z48, 2*SWORDS, 2*NWORDS);
   mpi_print("* mul_fp6x2_2x2x2x1w z21 = 0x", z64, 2*SWORDS);
+  redc_fpx2_8x1w(r01_4x2x1w, z01_4x2x1w);
+  redc_fpx2_8x1w(r2_4x2x1w, z2_4x2x1w);
+  for (i = 0; i < NWORDS; i++) r48[i] = ((uint64_t *)&r01_4x2x1w[i])[0];
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp6x2_2x2x2x1w r00 = 0x", r64, SWORDS);
+  for (i = 0; i < NWORDS; i++) r48[i] = ((uint64_t *)&r01_4x2x1w[i])[1];
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp6x2_2x2x2x1w r01 = 0x", r64, SWORDS);
+  for (i = 0; i < NWORDS; i++) r48[i] = ((uint64_t *)&r01_4x2x1w[i])[2];
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp6x2_2x2x2x1w r10 = 0x", r64, SWORDS);
+  for (i = 0; i < NWORDS; i++) r48[i] = ((uint64_t *)&r01_4x2x1w[i])[3];
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp6x2_2x2x2x1w r11 = 0x", r64, SWORDS);
+  for (i = 0; i < NWORDS; i++) r48[i] = ((uint64_t *)&r2_4x2x1w[i])[0];
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp6x2_2x2x2x1w r20 = 0x", r64, SWORDS);
+  for (i = 0; i < NWORDS; i++) r48[i] = ((uint64_t *)&r2_4x2x1w[i])[1];
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp6x2_2x2x2x1w r21 = 0x", r64, SWORDS);
 
   mul_fp6x2_1x2x2x2w(z01_2x2x2w, z2_2x2x2w, a0_2x2x2w, a1_2x2x2w, a2_2x2x2w);
   redc_fpx2_4x2w(r01_2x2x2w, z01_2x2x2w);
@@ -815,8 +835,8 @@ int main()
   // test_fp();
   // test_fp2();
   // test_fp4();
-  test_fp6();
-  // test_fp12();
+  // test_fp6();
+  test_fp12();
 
   return 0;
 }

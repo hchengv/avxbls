@@ -2547,7 +2547,7 @@ static void mul_fpx2_4x2w_v1(fpx2_4x2w r, const fp_4x2w a, const fp_4x2w b)
   r[8 ] = z8 ; r[9 ] = z9 ; r[10] = z10; r[11] = z11;
 }
 
-void redc_fpx2_4x2w(fp_4x2w r, const fpx2_4x2w a)
+static void redc_fpx2_4x2w(fp_4x2w r, const fpx2_4x2w a)
 {
   __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
   __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
@@ -3040,11 +3040,6 @@ static void sub_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2x2_2x2x2w a, const fp2x2_2
   sub_fpx2_4x2w(r, a, b);
 }
 
-static void as_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2x2_2x2x2w a, const fp2x2_2x2x2w b)
-{
-  aass_fpx2_4x2w(r, a, b);
-}
-
 // r0 = a0 - a1
 // r1 = a0 + a1
 static void mul_by_u_plus_1_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2x2_2x2x2w a)
@@ -3072,7 +3067,7 @@ static void mul_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2
   perm_3232_hl(t0, a);                  //          A1 |          A1 
   perm_1032_hl(t1, b);                  //          B0 |          B1
   mul_fpx2_4x2w(tt1, t0, t1);           //       A1*B0 |       A1*B1
-  as_fp2x2_2x2x2w(r, tt0, tt1);         // A0*B1+A1*B0 | A0*B0-A1*B1  
+  asx2_fpx2_4x2w(r, tt0, tt1);          // A0*B1+A1*B0 | A0*B0-A1*B1  
 }
 
 // r0 = (a0 + a1)*(a0 - a1)
@@ -3199,7 +3194,7 @@ static void sqr_fp4_1x2x2x2w_v2(fp4_1x2x2x2w r, const fp4_1x2x2x2w a)
 // r1 = (a0 + a1)*(b0 + b1) - a0*b0 - a1*b1 + a2*b2*(u+1) = a0*b1 + a1*b0 + a2*b2*(u+1)
 // r2 = (a0 + a2)*(b0 + b2) - a0*b0 - a2*b2 + a1*b1 = a0*b2 + a2*b0 + a1*b1
 // Karatsuba 
-void mul_fp6x2_4x2x1x1w(fp2x2_8x1x1w r01, fp2x2_8x1x1w r2, const fp2_8x1x1w ab0, const fp2_8x1x1w ab1, const fp2_8x1x1w ab2)
+static void mul_fp6x2_4x2x1x1w(fp2x2_8x1x1w r01, fp2x2_8x1x1w r2, const fp2_8x1x1w ab0, const fp2_8x1x1w ab1, const fp2_8x1x1w ab2)
 {
   fp2_8x1x1w t0, t1, t2, t3, t4;
   fp2x2_8x1x1w tt0, tt1, tt2, tt3, tt4, tt5;
@@ -3247,7 +3242,7 @@ void mul_fp6x2_4x2x1x1w(fp2x2_8x1x1w r01, fp2x2_8x1x1w r2, const fp2_8x1x1w ab0,
 // r1 = (a0 + a1)*(b0 + b1) - a0*b0 - a1*b1 + a2*b2*(u+1) = a0*b1 + a1*b0 + a2*b2*(u+1)
 // r2 = (a0 + a2)*(b0 + b2) - a0*b0 - a2*b2 + a1*b1 = a0*b2 + a2*b0 + a1*b1
 // Karatsuba 
-void mul_fp6x2_2x2x2x1w(fp2x2_4x2x1w r01, fp2x2_4x2x1w r2, const fp2_4x2x1w ab0, const fp2_4x2x1w ab1, const fp2_4x2x1w ab2)
+static void mul_fp6x2_2x2x2x1w(fp2x2_4x2x1w r01, fp2x2_4x2x1w r2, const fp2_4x2x1w ab0, const fp2_4x2x1w ab1, const fp2_4x2x1w ab2)
 {
   fp2_4x2x1w t0, t1, t2, t3, t4;
   fp2x2_4x2x1w tt0, tt1, tt2, tt3, tt4, tt5;
@@ -3295,7 +3290,7 @@ void mul_fp6x2_2x2x2x1w(fp2x2_4x2x1w r01, fp2x2_4x2x1w r2, const fp2_4x2x1w ab0,
 // r1 = (a0 + a1)*(b0 + b1) - a0*b0 - a1*b1 + a2*b2*(u+1) = a0*b1 + a1*b0 + a2*b2*(u+1)
 // r2 = (a0 + a2)*(b0 + b2) - a0*b0 - a2*b2 + a1*b1 = a0*b2 + a2*b0 + a1*b1
 // Karatsuba 
-void mul_fp6x2_1x2x2x2w(fp2x2_2x2x2w r01, fp2x2_2x2x2w r2, const fp2_2x2x2w ab0, const fp2_2x2x2w ab1, const fp2_2x2x2w ab2)
+static void mul_fp6x2_1x2x2x2w(fp2x2_2x2x2w r01, fp2x2_2x2x2w r2, const fp2_2x2x2w ab0, const fp2_2x2x2w ab1, const fp2_2x2x2w ab2)
 {
   fp2_2x2x2w t0, t1, t2, t3, t4;
   fp2x2_2x2x2w tt0, tt1, tt2, tt3, tt4, tt5;
