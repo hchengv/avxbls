@@ -525,9 +525,9 @@ void test_fp6()
     a2_8x1x1w[1][i] = VZERO;
   }
 
-  a0_4x2x1w[0] = VSET(0, 0, 0, 0, 0, 0, 2, 1);
-  a1_4x2x1w[0] = VSET(0, 0, 0, 0, 0, 0, 4, 3);
-  a2_4x2x1w[0] = VSET(0, 0, 0, 0, 0, 0, 6, 5);
+  a0_4x2x1w[0] = VSET(0, 0, 0, 0, 2, 1, 2, 1);
+  a1_4x2x1w[0] = VSET(0, 0, 0, 0, 4, 3, 4, 3);
+  a2_4x2x1w[0] = VSET(0, 0, 0, 0, 6, 5, 6, 5);
 
   for (i = 1; i < NWORDS; i++) {
     a0_4x2x1w[i] = VZERO;
@@ -535,9 +535,9 @@ void test_fp6()
     a2_4x2x1w[i] = VZERO;
   }
 
-  a0_2x2x2w[0] = VSET(0, 0, 0, 0, 0, 2, 0, 1);
-  a1_2x2x2w[0] = VSET(0, 0, 0, 0, 0, 4, 0, 3);
-  a2_2x2x2w[0] = VSET(0, 0, 0, 0, 0, 6, 0, 5);
+  a0_2x2x2w[0] = VSET(0, 2, 0, 1, 0, 2, 0, 1);
+  a1_2x2x2w[0] = VSET(0, 4, 0, 3, 0, 4, 0, 3);
+  a2_2x2x2w[0] = VSET(0, 6, 0, 5, 0, 6, 0, 5);
 
   for (i = 1; i < VWORDS; i++) {
     a0_2x2x2w[i] = VZERO;
@@ -549,13 +549,13 @@ void test_fp6()
 
 #if 1
 
-  mul_fp6x2(r, a, a);
-  mpi_print("* mul_fp6x2 r00 = 0x", r[0][0], 2*SWORDS);
-  mpi_print("* mul_fp6x2 r01 = 0x", r[0][1], 2*SWORDS);
-  mpi_print("* mul_fp6x2 r10 = 0x", r[1][0], 2*SWORDS);
-  mpi_print("* mul_fp6x2 r11 = 0x", r[1][1], 2*SWORDS);
-  mpi_print("* mul_fp6x2 r20 = 0x", r[2][0], 2*SWORDS);
-  mpi_print("* mul_fp6x2 r21 = 0x", r[2][1], 2*SWORDS);
+  // mul_fp6x2(r, a, a);
+  // mpi_print("* mul_fp6x2 r00 = 0x", r[0][0], 2*SWORDS);
+  // mpi_print("* mul_fp6x2 r01 = 0x", r[0][1], 2*SWORDS);
+  // mpi_print("* mul_fp6x2 r10 = 0x", r[1][0], 2*SWORDS);
+  // mpi_print("* mul_fp6x2 r11 = 0x", r[1][1], 2*SWORDS);
+  // mpi_print("* mul_fp6x2 r20 = 0x", r[2][0], 2*SWORDS);
+  // mpi_print("* mul_fp6x2 r21 = 0x", r[2][1], 2*SWORDS);
 
   mul_fp6x2_4x2x1x1w(z01_8x1x1w, z2_8x1x1w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w);
   for (i = 0; i < 2*NWORDS; i++) z48[i] = ((uint64_t *)&z01_8x1x1w[0][i])[0];

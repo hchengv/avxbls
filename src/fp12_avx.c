@@ -2951,6 +2951,14 @@ static void sub_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2x2_2x2x2w a, const fp2x2_2
   sub_fpx2_4x2w(r, a, b);
 }
 
+// a = < B1' | B1 | B0' | B0 | A1' | A1 | A0' | A0 >
+// b = < D1' | D1 | D0' | D0 | C1' | C1 | C0' | C0 >
+// r = < B1'+D1' | B1+D1 | B0'+D0' | B0+D0 | A1'-C1' | A1-C1 | A0'-C0' | A0-C0 >
+static void as_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2x2_2x2x2w a, const fp2x2_2x2x2w b)
+{
+
+}
+
 // r0 = a0 - a1
 // r1 = a0 + a1
 static void mul_by_u_plus_1_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2x2_2x2x2w a)
@@ -2978,7 +2986,7 @@ static void mul_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2
   perm_3232_hl(t0, a);                  //          A1 |          A1 
   perm_1032_hl(t1, b);                  //          B0 |          B1
   mul_fpx2_4x2w(tt1, t0, t1);           //       A1*B0 |       A1*B1
-  as_fp2_2x2x2w(r, tt0, tt1);           // A0*B1+A1*B0 | A0*B0-A1*B1  
+  as_fp2x2_2x2x2w(r, tt0, tt1);         // A0*B1+A1*B0 | A0*B0-A1*B1  
 }
 
 // r0 = (a0 + a1)*(a0 - a1)
@@ -3201,7 +3209,7 @@ void mul_fp6x2_2x2x2x1w(fp2x2_4x2x1w r01, fp2x2_4x2x1w r2, const fp2_4x2x1w ab0,
 // r1 = (a0 + a1)*(b0 + b1) - a0*b0 - a1*b1 + a2*b2*(u+1) = a0*b1 + a1*b0 + a2*b2*(u+1)
 // r2 = (a0 + a2)*(b0 + b2) - a0*b0 - a2*b2 + a1*b1 = a0*b2 + a2*b0 + a1*b1
 // Karatsuba 
-static void mul_fp6x2_1x2x2x2w(fp2x2_2x2x2w r01, fp2x2_2x2x2w r2, const fp2_2x2x2w ab0, const fp2_2x2x2w ab1, const fp2_2x2x2w ab2)
+void mul_fp6x2_1x2x2x2w(fp2x2_2x2x2w r01, fp2x2_2x2x2w r2, const fp2_2x2x2w ab0, const fp2_2x2x2w ab1, const fp2_2x2x2w ab2)
 {
   fp2_2x2x2w t0, t1, t2, t3, t4;
   fp2x2_2x2x2w tt0, tt1, tt2, tt3, tt4, tt5;
@@ -3215,20 +3223,20 @@ static void mul_fp6x2_1x2x2x2w(fp2x2_2x2x2w r01, fp2x2_2x2x2w r2, const fp2_2x2x
   add_fp2_2x2x2w(t0, ab1, ab2);             //                                   b1+b2 |                                     a1+a2
   add_fp2_2x2x2w(t1, ab0, ab1);             //                                   b0+b1 |                                     a0+a1
   add_fp2_2x2x2w(t2, ab0, ab2);             //                                   b0+b2 |                                     a0+a2
-  perm_var(t3, ab1, m0);                    //                                      a1 |                                        b1
-  blend_0x0F(t3, t3, ab0);                  //                                      a1 |                                        a0
-  perm_var(t4, ab0, m0);                    //                                      a0 |                                        b0
-  blend_0x0F(t4, ab1, t4);                  //                                      b1 |                                        b0
+  perm_var_hl(t3, ab1, m0);                 //                                      a1 |                                        b1
+  blend_0x0F_hl(t3, t3, ab0);               //                                      a1 |                                        a0
+  perm_var_hl(t4, ab0, m0);                 //                                      a0 |                                        b0
+  blend_0x0F_hl(t4, ab1, t4);               //                                      b1 |                                        b0
   mul_fp2x2_2x2x2w(tt0, t3, t4);            //                                   a1*b1 |                                     a0*b0
-  perm_var(t3, ab2, m0);                    //                                      a2 |                                        b2
-  blend_0x0F(t3, t3, t0);                   //                                      a2 |                                     a1+a2
-  perm_var(t4, t0, m0);                     //                                   a1+a2 |                                     b1+b2
-  blend_0x0F(t4, ab2, t4);                  //                                      b2 |                                     b1+b2
+  perm_var_hl(t3, ab2, m0);                 //                                      a2 |                                        b2
+  blend_0x0F_hl(t3, t3, t0);                //                                      a2 |                                     a1+a2
+  perm_var_hl(t4, t0, m0);                  //                                   a1+a2 |                                     b1+b2
+  blend_0x0F_hl(t4, ab2, t4);               //                                      b2 |                                     b1+b2
   mul_fp2x2_2x2x2w(tt1, t3, t4);            //                                   a2*b2 |                           (a1+a2)*(b1+b2)
-  perm_var(t3, t1, m0);                     //                                   a0+a1 |                                     b0+b1
-  blend_0x0F(t3, t3, t2);                   //                                   a0+a1 |                                     a0+a2
-  perm_var(t4, t2, m0);                     //                                   a0+a2 |                                     b0+b2
-  blend_0x0F(t4, t1, t4);                   //                                   b0+b1 |                                     b0+b2
+  perm_var_hl(t3, t1, m0);                  //                                   a0+a1 |                                     b0+b1
+  blend_0x0F_hl(t3, t3, t2);                //                                   a0+a1 |                                     a0+a2
+  perm_var_hl(t4, t2, m0);                  //                                   a0+a2 |                                     b0+b2
+  blend_0x0F_hl(t4, t1, t4);                //                                   b0+b1 |                                     b0+b2
   mul_fp2x2_2x2x2w(tt2, t3, t4);            //                         (a0+a1)*(b0+b1) |                           (a0+a2)*(b0+b2)
   blend_0x0F_vl(tt3, tt2, tt1);             //                         (a0+a1)*(b0+b1) |                           (a1+a2)*(b1+b2)
   perm_var_vl(tt4, tt0, m1);                //                                   a1*b1 |                                     a1*b1
