@@ -3650,10 +3650,10 @@ void mul_fp12_vec_v4(fp2_2x2x2w r001, fp2_2x2x2w r02, fp2_2x2x2w r101, fp2_2x2x2
   redc_fp2x2_2x2x2w(r001, ss1);
   //  ss2 =                       ... |                  a0*b0[2] at Fp2 layer 
   conv_dltovl(ss2, tt1);  
-  //  tt0 =         ... |         ... | a1*b1[1][1] | a1*b1[1][0] at Fp  layer
-  perm_var_dl(tt0, tt0, m2);
+  //  tt5 =         ... |         ... | a1*b1[1][1] | a1*b1[1][0] at Fp  layer
+  perm_var_dl(tt5, tt0, m2);
   //  ss1 =                       ... |                  a1*b1[1] at Fp2 layer
-  conv_dltovl(ss1, tt0);
+  conv_dltovl(ss1, tt5);
   //  r02 =                       ... |                     r0[2] at Fp2 layer
   add_fp2x2_2x2x2w(ss1, ss2, ss1);
   redc_fp2x2_2x2x2w(r02, ss1);
