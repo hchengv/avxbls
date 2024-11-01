@@ -3465,79 +3465,6 @@ void mul_fp12_vec_v2(fp2_4x2x1w r01, fp2_2x2x2w r2, const fp2_8x1x1w ab0, const 
   fp2x2_8x1x1w tt01, tt2, tt3, tt4;
   fp2x2_4x2x1w ss0, ss1, ss2, ss3;
   fp2_4x2x1w s0, s1;
-  fp2x2_2x2x2w hh0;
-  const __m512i m0 = VSET(3, 2, 1, 0, 7, 6, 5, 4);
-  const __m512i m1 = VSET(3, 2, 1, 0, 5, 4, 7, 6);
-  const __m512i m2 = VSET(3, 3, 2, 2, 1, 1, 0, 0);
-  const __m512i m3 = VSET(0, FMASK, 0, FMASK, 0, FMASK, 0, FMASK);
-  int i;
-
-  // ab0 =  b1[0] | a1[0] | b0[0] | a1[0] | b1[0] | a0[0] | b0[0] | a0[0] at Fp2 layer
-  // ab1 =  b1[1] | a1[1] | b0[1] | a1[1] | b1[1] | a0[1] | b0[1] | a0[1] at Fp2 layer
-  // ab2 =  b1[2] | a1[2] | b0[2] | a1[2] | b1[2] | a0[2] | b0[2] | a0[2] at Fp2 layer
-
-  // tt01 = a1*b1[1] | a1*b1[0] | a1*b0[1] | a1*b0[0] | a0*b1[1] | a0*b1[0] | a0*b0[1] | a0*b0[0] at Fp2 layer
-  // tt2  =      ... | a1*b1[2] |      ... | a1*b0[2] |      ... | a0*b1[2] |      ... | a0*b0[2] at Fp2 layer
-  mul_fp6x2_4x2x1x1w(tt01, tt2, ab0, ab1, ab2);
-  // tt3  = a1*b1[0] | a1*b1[1] | a1*b0[0] | a1*b0[1] | a0*b1[0] | a0*b1[1] | a0*b0[0] | a0*b0[1] at Fp2 layer
-  shuf_01_fp2x2_8x1x1w(tt3, tt01);
-  // tt4  = a1*b1[2] |      ... | a1*b0[2] |      ... | a0*b1[2] |      ... | a0*b0[2] |      ... at Fp2 layer
-  shuf_01_fp2x2_8x1x1w(tt4, tt2);
-  // tt4  = a1*b1[2] |      ... |      ... |      ... |      ... |      ... | a0*b0[2] | a0*b0[1] at Fp2 layer
-  blend_0x01_fp2x2_8x1x1w(tt4, tt4, tt3);
-  // tt2  =      ... | a1*b1[2] |      ... | a1*b0[2] |      ... | a0*b1[2] |      ... | a0*b0[0] at Fp2 layer
-  blend_0x01_fp2x2_8x1x1w(tt2, tt2, tt01);  
-  // tt01 = a1*b1[1] | a1*b1[0] | a1*b0[1] | a1*b0[0] | a0*b1[1] | a0*b1[0] | a0*b0[2] | a0*b0[1] at Fp2 layer
-  blend_0x03_fp2x2_8x1x1w(tt01, tt01, tt4);
-  // tt3[0]  = a1*b1[0][0] | a1*b1[1][0] | a1*b0[0][0] | a1*b0[1][0] | a0*b1[0][0] | a0*b1[1][0] | a0*b0[1][0] | a0*b0[2][0] at Fp layer
-  // tt3[1]  = a1*b1[0][1] | a1*b1[1][1] | a1*b0[0][1] | a1*b0[1][1] | a0*b1[0][1] | a0*b1[1][1] | a0*b0[1][1] | a0*b0[2][1] at Fp layer
-  shuf_01_fp2x2_8x1x1w(tt3, tt01);
-  //    ss0  =          a1*b1[0] |          a1*b0[0] |          a0*b1[0] |          a0*b0[1] at Fp2 layer
-  blend_0x55_dl(ss0, tt3[1], tt01[0]);
-  //    ss1  =          a1*b1[1] |          a1*b0[1] |          a0*b1[1] |          a0*b0[2] at Fp2 layer
-  blend_0x55_dl(ss1, tt01[1], tt3[0]);
-  //    ss2  =          a1*b0[0] |          a1*b1[0] |          a0*b0[1] |          a0*b1[0] at Fp2 layer
-  perm_1032_dl(ss2, ss0);
-  //    ss2  =          a1*b1[1] |          a1*b1[0] |          a0*b1[1] |          a0*b1[0] at Fp2 layer
-  blend_0x33_dl(ss2, ss1, ss2);
-  //    ss2  =          a0*b1[1] |          a0*b1[0] |          a1*b1[1] |          a1*b1[0] at Fp2 layer
-  perm_var_dl(ss2, ss2, m0);
-  //    ss3  =          a1*b0[1] |          a1*b1[1] |          a0*b0[2] |          a0*b1[1] at Fp2 layer
-  perm_1032_dl(ss3, ss1);
-  //    ss3  =          a1*b0[1] |          a1*b0[0] |          a0*b0[2] |          a0*b0[1] at Fp2 layer
-  blend_0x33_dl(ss3, ss3, ss0);
-  //    ss2  = a0*b1[1]+a1*b0[1] | a0*b1[0]+a1*b0[0] | a0*b0[2]+a1*b1[1] | a0*b0[1]+a1*b1[0] at Fp2 layer
-  add_fp2x2_4x2x1w(ss2, ss2, ss3);
-  //    r01  =             r1[1] |             r1[0] |             r0[2] |             r0[1] at Fp2 layer
-  redc_fp2x2_4x2x1w(r01, ss2);
-
-  // double-length sub-routines
-  // tt3[0] = a1*b1[2][1] | ... | a1*b0[2][1] | ... | a0*b1[2][1] | ... | a0*b0[0][1] | ... at Fp layer
-  shuf_01_dl(tt3[0], tt2[1]);
-  //    ss0 =       a1*b1[2] | a1*b0[2] |          a0*b1[2] |                a0*b0[0] at Fp2 layer
-  blend_0x55_dl(ss0, tt3[0], tt2[0]); 
-  //    ss1 = a1*b1[2]*(u+1) |      ... |               ... |                     ... at Fp2 layer
-  mul_by_u_plus_1_fp2x2_4x2x1w(ss1, ss0);
-  //    ss1 = a1*b1[2]*(u+1) | a1*b0[2] |          a0*b1[2] |                a0*b0[0] at Fp2 layer
-  blend_0xC0_dl(ss1, ss0, ss1);
-  //    ss0 =            ... |      ... |          a1*b0[2] |          a1*b1[2]*(u+1) at Fp2 layer
-  perm_var_dl(ss0, ss1, m1);
-  //    ss0 =            ... |      ... | a0*b1[2]+a1*b0[2] | a1*b1[2]*(u+1)+a0*b0[0] at Fp2 layer
-  add_fp2x2_4x2x1w(ss0, ss0, ss1);
-  //    hh0 =                             a0*b1[2]+a1*b0[2] | a1*b1[2]*(u+1)+a0*b0[0] at Fp2 layer
-  perm_var_dl(ss0, ss0, m2);
-  conv_dltovl(hh0, ss0);
-  //     r2 =                                         r1[2] |                   r0[0] at Fp2 layer
-  redc_fp2x2_2x2x2w(r2, hh0);
-}
-
-// schoolbook
-// double-length version
-void mul_fp12_vec_v3(fp2_4x2x1w r01, fp2_2x2x2w r2, const fp2_8x1x1w ab0, const fp2_8x1x1w ab1, const fp2_8x1x1w ab2)
-{
-  fp2x2_8x1x1w tt01, tt2, tt3, tt4;
-  fp2x2_4x2x1w ss0, ss1, ss2, ss3;
-  fp2_4x2x1w s0, s1;
   fp2x2_2x2x2w hh0, hh1, hh2;
   const __m512i m0 = VSET(3, 2, 1, 0, 7, 6, 5, 4);
   const __m512i m1 = VSET(3, 3, 2, 2, 1, 1, 0, 0);
@@ -3607,7 +3534,7 @@ void mul_fp12_vec_v3(fp2_4x2x1w r01, fp2_2x2x2w r2, const fp2_8x1x1w ab0, const 
 
 // Karatsuba 
 // 2x2x2w sub-routines 
-void mul_fp12_vec_v4(fp2_2x2x2w r001, fp2_2x2x2w r02, fp2_2x2x2w r101, fp2_2x2x2w r12, const fp2_4x2x1w ab0, const fp2_4x2x1w ab1, const fp2_4x2x1w ab2)
+void mul_fp12_vec_v3(fp2_2x2x2w r001, fp2_2x2x2w r02, fp2_2x2x2w r101, fp2_2x2x2w r12, const fp2_4x2x1w ab0, const fp2_4x2x1w ab1, const fp2_4x2x1w ab2)
 {
   fp2x2_4x2x1w tt0, tt1, tt2, tt3, tt4, tt5;
   fp2_4x2x1w t0;
@@ -3710,6 +3637,105 @@ void mul_fp12_vec_v4(fp2_2x2x2w r001, fp2_2x2x2w r02, fp2_2x2x2w r101, fp2_2x2x2
 
 // Karatsuba 
 // 4x2x1w sub-routines 
+void mul_fp12_vec_v4(fp2_4x2x1w r0, fp2_2x2x2w r101, fp2_2x2x2w r12, const fp2_4x2x1w ab0, const fp2_4x2x1w ab1, const fp2_4x2x1w ab2)
+{
+  fp2x2_4x2x1w tt0, tt1, tt2, tt3, tt4, tt5;
+  fp2_4x2x1w t0;
+  fp2x2_2x2x2w ss0, ss1, ss2, ss3, ss4;
+  fp2_2x2x2w s0, s1, s2, s3;
+  const __m512i m0 = VSET(3, 2, 1, 0, 7, 6, 5, 4);
+  const __m512i m1 = VSET(1, 0, 7, 6, 5, 4, 3, 2);
+  const __m512i m2 = VSET(3, 3, 2, 2, 1, 1, 0, 0);
+  const __m512i m3 = VSET(7, 7, 6, 6, 5, 5, 4, 4);
+
+  // ab0 =  b1[0] | a1[0] | b0[0] | a0[0] at Fp2 layer
+  // ab1 =  b1[1] | a1[1] | b0[1] | a0[1] at Fp2 layer
+  // ab2 =  b1[2] | a1[2] | b0[2] | a0[2] at Fp2 layer
+
+  // tt0 =    a1*b1[1] |    a1*b1[0] |    a0*b0[1] |    a0*b0[0] at Fp2 layer
+  // tt1 =         ... |    a1*b1[2] |         ... |    a0*b0[2] at Fp2 layer
+  mul_fp6x2_2x2x2x1w(tt0, tt1, ab0, ab1, ab2);
+
+  // compute r0 in 4x2x1w
+  // tt2 =         ... |    a0*b0[2] |         ... |       a1*b1[2] at Fp2 layer
+  perm_var_dl(tt2, tt1, m0);
+  // tt3 =         ... |    a0*b0[2] |    a0*b0[1] |       a0*b0[0] at Fp2 layer
+  blend_0x0F_dl(tt3, tt2, tt0);
+  // tt4 =         ... |         ... |         ... | a1*b1[2]*(u+1) at Fp2 layer
+  mul_by_u_plus_1_fp2_4x2x1w(tt4, tt2);
+  // tt2 =         ... |    a1*b1[1] |    a1*b1[0] |            ... at Fp2 layer 
+  perm_var_dl(tt2, tt0, m1);
+  // tt2 =         ... |    a1*b1[1] |    a1*b1[0] | a1*b1[2]*(u+1) at Fp2 layer   
+  blend_0x03_dl(tt2, tt2, tt4);       
+  // r0  =         ... |       r0[2] |       r0[1] |          r0[0] at Fp2 layer
+  add_fp2x2_4x2x1w(tt3, tt3, tt2);
+  redc_fp2x2_4x2x1w(r0, tt3);
+
+  //  tt2 = a1*b1[0][1] | a1*b1[0][0] | a0*b0[0][1] | a0*b0[0][0] at Fp  layer
+  perm_1100_dl(tt2, tt0);
+  //  tt1 = a1*b1[2][1] | a1*b1[2][0] | a0*b0[2][1] | a0*b0[2][0] at Fp  layer
+  perm_1100_dl(tt1, tt1);
+  //  tt3 = a0*b0[2][1] | a0*b0[2][0] | a1*b1[2][1] | a1*b1[2][0] at Fp  layer
+  perm_var_dl(tt3, tt1, m0);
+  //  tt4 = a1*b1[0][1] | a1*b1[0][0] | a1*b1[2][1] | a1*b1[2][0] at Fp  layer
+  blend_0x0F_dl(tt4, tt2, tt3);
+  //  tt5 = a0*b0[1][1] | a0*b0[1][0] | a0*b0[0][1] | a0*b0[0][0] at Fp  layer 
+  perm_var_dl(tt5, tt0, m2);
+  //  ss0 =                  a1*b1[0] |                  a1*b1[2] at Fp2 layer
+  conv_dltovl(ss0, tt4);
+  //  ss4 =                  a0*b0[1] |                  a0*b0[0] at Fp2 layer
+  conv_dltovl(ss4, tt5);
+  //  ss2 =                       ... |                  a0*b0[2] at Fp2 layer 
+  conv_dltovl(ss2, tt1);  
+
+  // compute r1 in 2x2x2w
+  //   t0 =     b0[0][1] |     b0[0][0] |     a0[0][1] |     a0[0][0] at Fp  layer
+  perm_var(t0, ab0, m1);
+  //   s0 =                       b0[0] |                       a0[0] at Fp2 layer
+  conv_sltohl(s0, t0);
+  //   t0 =     b1[0][1] |     b1[0][0] |     a1[0][1] |     a1[0][0] at Fp  layer
+  perm_var(t0, ab0, m3);
+  //   s1 =                       b1[0] |                       a1[0] at Fp2 layer
+  conv_sltohl(s1, t0);
+  //   s0 =                 b0[0]+b1[0] |                 a0[0]+a1[0] at Fp2 layer
+  add_fp2_2x2x2w(s0, s0, s1);
+  //   t0 =     b0[1][1] |     b0[1][0] |     a0[1][1] |     a0[1][0] at Fp  layer
+  perm_var(t0, ab1, m1);
+  //   s1 =                       b0[1] |                       a0[1] at Fp2 layer
+  conv_sltohl(s1, t0);
+  //   t0 =     b1[1][1] |     b1[1][0] |     a1[1][1] |     a1[1][0] at Fp  layer
+  perm_var(t0, ab1, m3);
+  //   s2 =                       b1[1] |                       a1[1] at Fp2 layer
+  conv_sltohl(s2, t0);
+  //   s1 =                 b0[1]+b1[1] |                 a0[1]+a1[1] at Fp2 layer
+  add_fp2_2x2x2w(s1, s1, s2);
+  //   t0 =     b0[2][1] |     b0[2][0] |     a0[2][1] |     a0[2][0] at Fp  layer
+  perm_var(t0, ab2, m1);
+  //   s2 =                       b0[2] |                       a0[2] at Fp2 layer
+  conv_sltohl(s2, t0);
+  //   t0 =     b1[2][1] |     b1[2][0] |     a1[2][1] |     a1[2][0] at Fp  layer
+  perm_var(t0, ab2, m3);
+  //   s3 =                       b1[2] |                       a1[2] at Fp2 layer
+  conv_sltohl(s3, t0);
+  //   s2 =                 b0[2]+b1[2] |                 a0[2]+a1[2] at Fp2 layer
+  add_fp2_2x2x2w(s2, s2, s3);
+  //  ss3 =          (a0+a1)*(b0+b1)[1] |          (a0+a1)*(b0+b1)[0] at Fp2 layer
+  //  ss1 =                         ... |          (a0+a1)*(b0+b1)[2] at Fp2 layer
+  mul_fp6x2_1x2x2x2w(ss3, ss1, s0, s1, s2);
+  //  ss3 = (a0+a1)*(b0+b1)[1]-a0*b0[1] | (a0+a1)*(b0+b1)[0]-a0*b0[0] at Fp2 layer
+  sub_fp2x2_2x2x2w(ss3, ss3, ss4);
+  //  tt5 =  a1*b1[1][1] |  a1*b1[1][0] |  a1*b1[0][1] |  a1*b1[0][0] at Fp  layer 
+  perm_var_dl(tt5, tt0, m3);
+  //  ss4 =                    a1*b1[1] |                    a1*b1[0] at Fp2 layer
+  conv_dltovl(ss4, tt5);
+  // r101 =                       r1[1] |                       r1[0] at Fp2 layer
+  sub_fp2x2_2x2x2w(ss3, ss3, ss4);
+  redc_fp2x2_2x2x2w(r101, ss3);
+  //  ss1 =                         ... | (a0+a1)*(b0+b1)[2]-a0*b0[2] at Fp2 layer 
+  sub_fp2x2_2x2x2w(ss1, ss1, ss2);
+  //  r12 =                         ... |                       r1[2] at Fp2 layer
+  sub_fp2x2_2x2x2w(ss1, ss1, ss0);
+  redc_fp2x2_2x2x2w(r12, ss1);
+}
 
 // ----------------------------------------------------------------------------
-
