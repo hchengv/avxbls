@@ -64,9 +64,6 @@ static uint64_t P48[NWORDS] = {
 #define mul_fpx2_8x1w mul_fpx2_8x1w_v2
 #define mul_fpx2_4x2w mul_fpx2_4x2w_v1
 
-void redc_fpx2_8x1w(fp_8x1w r, const fpx2_8x1w a);
-void redc_fpx2_4x2w(fp_4x2w r, const fpx2_4x2w a);
-
 // ----------------------------------------------------------------------------
 // prototypes: Fp2 single-length operations
 
@@ -96,6 +93,10 @@ void mul_fp12_vec_v2(fp2_4x2x1w r01, fp2_2x2x2w r2,
 void mul_fp12_vec_v3(fp2_4x2x1w r01, fp2_2x2x2w r2, 
                     const fp2_8x1x1w ab0, const fp2_8x1x1w ab1, 
                     const fp2_8x1x1w ab2);
+void mul_fp12_vec_v4(fp2_2x2x2w r001, fp2_2x2x2w r02, 
+                     fp2_2x2x2w r101, fp2_2x2x2w r12, 
+                     const fp2_4x2x1w ab0, const fp2_4x2x1w ab1, 
+                     const fp2_4x2x1w ab2);
 
 // ----------------------------------------------------------------------------
 // utils 

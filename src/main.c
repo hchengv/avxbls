@@ -663,11 +663,13 @@ void test_fp12()
   fp2_8x1x1w a0_8x1x1w, a1_8x1x1w, a2_8x1x1w;
   fp2_4x2x1w r01_4x2x1w, r2_4x2x1w;
   fp2_2x2x2w r2_2x2x2w;
+  fp2_4x2x1w a0_4x2x1w, a1_4x2x1w, a2_4x2x1w;
+  fp2_2x2x2w r001_2x2x2w, r02_2x2x2w, r101_2x2x2w, r12_2x2x2w;
   int i;
 
   uint64_t start_cycles, end_cycles, diff_cycles;
 
-#if 0
+#if 1
   puts("\nFP12 TEST\n");
 
   a0_8x1x1w[0][0] = VSET(7 , 7 , 1, 7 , 7 , 1, 1, 1);
@@ -677,13 +679,23 @@ void test_fp12()
   a2_8x1x1w[0][0] = VSET(11, 11, 5, 11, 11, 5, 5, 5);
   a2_8x1x1w[1][0] = VSET(12, 12, 6, 12, 12, 6, 6, 6);
 
-  for(i = 1; i < NWORDS; i++) {
-    a0_8x1x1w[0][i] = VSET1(0);
-    a0_8x1x1w[1][i] = VSET1(0);
-    a1_8x1x1w[0][i] = VSET1(0);
-    a1_8x1x1w[1][i] = VSET1(0);
-    a2_8x1x1w[0][i] = VSET1(0);
-    a2_8x1x1w[1][i] = VSET1(0);
+  for (i = 1; i < NWORDS; i++) {
+    a0_8x1x1w[0][i] = VZERO;
+    a0_8x1x1w[1][i] = VZERO;
+    a1_8x1x1w[0][i] = VZERO;
+    a1_8x1x1w[1][i] = VZERO;
+    a2_8x1x1w[0][i] = VZERO;
+    a2_8x1x1w[1][i] = VZERO;
+  }
+
+  a0_4x2x1w[0] = VSET(8 , 7 , 8 , 7 , 2, 1, 2, 1);
+  a1_4x2x1w[0] = VSET(10, 9 , 10, 9 , 4, 3, 4, 3);
+  a2_4x2x1w[0] = VSET(12, 11, 12, 11, 6, 5, 6, 5);
+
+  for (i = 0; i < NWORDS; i++) {
+    a0_4x2x1w[i] = VZERO;
+    a1_4x2x1w[i] = VZERO;
+    a2_4x2x1w[i] = VZERO;
   }
 
   mul_fp12_scalar(r, a, a);
@@ -738,48 +750,97 @@ void test_fp12()
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* mul_fp12_vec_v1 r121 = 0x", r64, SWORDS);
 
-  mul_fp12_vec_v2(r01_4x2x1w, r2_2x2x2w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w);
+  mul_fp12_vec_v3(r01_4x2x1w, r2_2x2x2w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w);
   get_channel_4x2w(r48, r2_2x2x2w, 0);
   carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* mul_fp12_vec_v2 r000 = 0x", r64, SWORDS);
+  mpi_print("* mul_fp12_vec_v3 r000 = 0x", r64, SWORDS);
   get_channel_4x2w(r48, r2_2x2x2w, 2);
   carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* mul_fp12_vec_v2 r001 = 0x", r64, SWORDS);
+  mpi_print("* mul_fp12_vec_v3 r001 = 0x", r64, SWORDS);
   get_channel_8x1w(r48, r01_4x2x1w, 0);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* mul_fp12_vec_v2 r010 = 0x", r64, SWORDS);
+  mpi_print("* mul_fp12_vec_v3 r010 = 0x", r64, SWORDS);
   get_channel_8x1w(r48, r01_4x2x1w, 1);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* mul_fp12_vec_v2 r011 = 0x", r64, SWORDS);
+  mpi_print("* mul_fp12_vec_v3 r011 = 0x", r64, SWORDS);
   get_channel_8x1w(r48, r01_4x2x1w, 2);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* mul_fp12_vec_v2 r020 = 0x", r64, SWORDS);
+  mpi_print("* mul_fp12_vec_v3 r020 = 0x", r64, SWORDS);
   get_channel_8x1w(r48, r01_4x2x1w, 3);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* mul_fp12_vec_v2 r021 = 0x", r64, SWORDS);
+  mpi_print("* mul_fp12_vec_v3 r021 = 0x", r64, SWORDS);
   get_channel_8x1w(r48, r01_4x2x1w, 4);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* mul_fp12_vec_v2 r100 = 0x", r64, SWORDS);
+  mpi_print("* mul_fp12_vec_v3 r100 = 0x", r64, SWORDS);
   get_channel_8x1w(r48, r01_4x2x1w, 5);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* mul_fp12_vec_v2 r101 = 0x", r64, SWORDS);
+  mpi_print("* mul_fp12_vec_v3 r101 = 0x", r64, SWORDS);
   get_channel_8x1w(r48, r01_4x2x1w, 6);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* mul_fp12_vec_v2 r110 = 0x", r64, SWORDS);
+  mpi_print("* mul_fp12_vec_v3 r110 = 0x", r64, SWORDS);
   get_channel_8x1w(r48, r01_4x2x1w, 7);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* mul_fp12_vec_v2 r111 = 0x", r64, SWORDS);
+  mpi_print("* mul_fp12_vec_v3 r111 = 0x", r64, SWORDS);
   get_channel_4x2w(r48, r2_2x2x2w, 4);
   carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* mul_fp12_vec_v2 r120 = 0x", r64, SWORDS);
+  mpi_print("* mul_fp12_vec_v3 r120 = 0x", r64, SWORDS);
   get_channel_4x2w(r48, r2_2x2x2w, 6);
   carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* mul_fp12_vec_v2 r121 = 0x", r64, SWORDS);
+  mpi_print("* mul_fp12_vec_v3 r121 = 0x", r64, SWORDS);
 
+  mul_fp12_vec_v4(r001_2x2x2w, r02_2x2x2w, r101_2x2x2w, r12_2x2x2w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w);
+  get_channel_4x2w(r48, r001_2x2x2w, 0);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v4 r000 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, r001_2x2x2w, 2);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v4 r001 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, r001_2x2x2w, 4);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v4 r010 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, r001_2x2x2w, 6);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v4 r011 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, r02_2x2x2w, 0);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v4 r020 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, r02_2x2x2w, 2);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v4 r021 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, r101_2x2x2w, 0);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v4 r100 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, r101_2x2x2w, 2);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v4 r101 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, r101_2x2x2w, 4);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v4 r110 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, r101_2x2x2w, 6);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v4 r111 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, r12_2x2x2w, 0);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v4 r120 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, r12_2x2x2w, 2);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_fp12_vec_v4 r121 = 0x", r64, SWORDS);
 #endif 
 
   puts("\nFP12 TIMING\n");
@@ -822,6 +883,11 @@ void test_fp12()
   printf("- mul_fp12_vec_v3: ");
   LOAD_CACHE(mul_fp12_vec_v3(r01_4x2x1w, r2_2x2x2w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 1000);
   MEASURE_CYCLES(mul_fp12_vec_v3(r01_4x2x1w, r2_2x2x2w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 10000);
+  printf("#cycle = %ld\n", diff_cycles);  
+
+  printf("- mul_fp12_vec_v4: ");
+  LOAD_CACHE(mul_fp12_vec_v4(r001_2x2x2w, r02_2x2x2w, r101_2x2x2w, r12_2x2x2w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 1000);
+  MEASURE_CYCLES(mul_fp12_vec_v4(r001_2x2x2w, r02_2x2x2w, r101_2x2x2w, r12_2x2x2w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 10000);
   printf("#cycle = %ld\n", diff_cycles);  
 }
 
