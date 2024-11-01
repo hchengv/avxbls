@@ -3640,13 +3640,14 @@ void mul_fp12_vec_v4(fp2_2x2x2w r001, fp2_2x2x2w r02, fp2_2x2x2w r101, fp2_2x2x2
   //  ss0 =                  a1*b1[0] |                  a1*b1[2] at Fp2 layer
   conv_dltovl(ss0, tt4);
   //  ss1 =                       ... |            a1*b1[2]*(u+1) at Fp2 layer 
-  mul_by_u_plus_1_fp2_2x2x2w(ss1, ss0);
+  mul_by_u_plus_1_fp2x2_2x2x2w(ss1, ss0);
   //  ss1 =                  a1*b1[0] |            a1*b1[2]*(u+1) at Fp2 layer 
   blend_0x0F_vl(ss1, ss0, ss1);
   //  ss4 =                  a0*b0[1] |                  a0*b0[0] at Fp2 layer
   conv_dltovl(ss4, tt5);
   // r001 =                     r0[1] |                     r0[0] at Fp2 layer 
-  add_fp2_2x2x2w(r001, ss4, ss1);
+  add_fp2x2_2x2x2w(ss1, ss4, ss1);
+  redc_fp2x2_2x2x2w(r001, ss1);
   //  ss2 =                       ... |                  a0*b0[2] at Fp2 layer 
   conv_dltovl(ss2, tt1);  
   //  tt0 =         ... |         ... | a1*b1[1][1] | a1*b1[1][0] at Fp  layer
@@ -3654,7 +3655,8 @@ void mul_fp12_vec_v4(fp2_2x2x2w r001, fp2_2x2x2w r02, fp2_2x2x2w r101, fp2_2x2x2
   //  ss1 =                       ... |                  a1*b1[1] at Fp2 layer
   conv_dltovl(ss1, tt0);
   //  r02 =                       ... |                     r0[2] at Fp2 layer
-  add_fp2_2x2x2w(r02, ss2, ss1);
+  add_fp2x2_2x2x2w(ss1, ss2, ss1);
+  redc_fp2x2_2x2x2w(r02, ss1);
 
   // compute r1 in 2x2x2w
   //   t0 =     b0[0][1] |     b0[0][0] |     a0[0][1] |     a0[0][0] at Fp  layer
@@ -3697,11 +3699,13 @@ void mul_fp12_vec_v4(fp2_2x2x2w r001, fp2_2x2x2w r02, fp2_2x2x2w r101, fp2_2x2x2
   //  ss4 =                    a1*b1[1] |                    a1*b1[0] at Fp2 layer
   conv_dltovl(ss4, tt5);
   // r101 =                       r1[1] |                       r1[0] at Fp2 layer
-  sub_fp2x2_2x2x2w(r101, ss3, ss4);
+  sub_fp2x2_2x2x2w(ss3, ss3, ss4);
+  redc_fp2x2_2x2x2w(r101, ss3);
   //  ss1 =                         ... | (a0+a1)*(b0+b1)[2]-a0*b0[2] at Fp2 layer 
   sub_fp2x2_2x2x2w(ss1, ss1, ss2);
   //  r12 =                         ... |                       r1[2] at Fp2 layer
-  sub_fp2x2_2x2x2w(r12, ss1, ss0);
+  sub_fp2x2_2x2x2w(ss1, ss1, ss0);
+  redc_fp2x2_2x2x2w(r12, ss1);
 }
 
 // Karatsuba 
