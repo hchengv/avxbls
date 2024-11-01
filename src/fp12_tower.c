@@ -430,7 +430,7 @@ static void mul_by_xy0_fp6x2(vec768fp6 ret, const vec384fp6 a,
     add_fp2x2(ret[2], ret[2], t1);
 }
 
-void mul_by_xy00z0_fp12(vec384fp12 ret, const vec384fp12 a,
+void mul_by_xy00z0_fp12_scalar(vec384fp12 ret, const vec384fp12 a,
                                         const vec384fp6 xy00z0)
 {
   #ifdef PROFILING

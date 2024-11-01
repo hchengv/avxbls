@@ -655,6 +655,7 @@ void test_fp12()
   vec384fp12 a = {
     {{{1}, {2}}, {{3}, {4 }}, {{5 }, {6 }}},
     {{{7}, {8}}, {{9}, {10}}, {{11}, {12}}}};
+  vec384fp6 b;
   __m512i ra_1x2x2x2w[VWORDS], a_1x2x2x2w[VWORDS];
   __m512i rbc_2x2x2x1w[NWORDS], bc_2x2x2x1w[NWORDS];
 
@@ -668,7 +669,7 @@ void test_fp12()
 
   uint64_t start_cycles, end_cycles, diff_cycles;
 
-#if 1
+#if 0
   puts("\nFP12 TEST\n");
 
   a0_8x1x1w[0][0] = VSET(7 , 7 , 1, 7 , 7 , 1, 1, 1);
@@ -932,6 +933,11 @@ void test_fp12()
   LOAD_CACHE(mul_fp12_vec_v4(r0_4x2x1w, r101_2x2x2w, r12_2x2x2w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 10000);
   MEASURE_CYCLES(mul_fp12_vec_v4(r0_4x2x1w, r101_2x2x2w, r12_2x2x2w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);  
+
+  printf("- mul_by_xy00z0_fp12_scalar: ");
+  LOAD_CACHE(mul_by_xy00z0_fp12_scalar(r, a, b), 10000);
+  MEASURE_CYCLES(mul_by_xy00z0_fp12_scalar(r, a, b), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
 }
 
 // ----------------------------------------------------------------------------
