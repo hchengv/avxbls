@@ -2381,6 +2381,95 @@ static void asx2_fpx2_4x2w(fpx2_4x2w r, const fpx2_4x2w a, const fpx2_4x2w b)
   r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
 }
 
+// a = < D' | D | C' | C | B' | B | A' | A >
+// b = < H' | H | G' | G | F' | F | E' | E >
+// r = < D'+H' | D+H | C'+G' | C+G | B'-F' | B-F | A'-E' | A-E >
+static void aass_fpx2_4x2w(fpx2_4x2w r, const fpx2_4x2w a, const fpx2_4x2w b)
+{
+  __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
+  __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
+  __m512i a8  = a[8 ], a9  = a[9 ], a10 = a[10], a11 = a[11];
+  __m512i b0  = b[0 ], b1  = b[1 ], b2  = b[2 ], b3  = b[3 ];
+  __m512i b4  = b[4 ], b5  = b[5 ], b6  = b[6 ], b7  = b[7 ];
+  __m512i b8  = b[8 ], b9  = b[9 ], b10 = b[10], b11 = b[11];
+  const __m512i p0 = VSET(P48[4], P48[0], P48[4], P48[0], P48[4], P48[0], P48[4], P48[0]);
+  const __m512i p1 = VSET(P48[5], P48[1], P48[5], P48[1], P48[5], P48[1], P48[5], P48[1]);
+  const __m512i p2 = VSET(P48[6], P48[2], P48[6], P48[2], P48[6], P48[2], P48[6], P48[2]);
+  const __m512i p3 = VSET(P48[7], P48[3], P48[7], P48[3], P48[7], P48[3], P48[7], P48[3]);
+  const __m512i bmask0 = VSET(0, BMASK, 0, BMASK, 0, BMASK, 0, BMASK);
+  const __m512i bmask1 = VSET1(BMASK);
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11; 
+  __m512i t0, t1, t2, t3, smask;
+
+  // r = D'+H' | D+H | C'+G' | C+G' | B' | B | A' | A 
+  r0  = VMADD(a0 , 0xF0, a0 , b0 ); r1  = VMADD(a1 , 0xF0, a1 , b1 );
+  r2  = VMADD(a2 , 0xF0, a2 , b2 ); r3  = VMADD(a3 , 0xF0, a3 , b3 );
+  r4  = VMADD(a4 , 0xF0, a4 , b4 ); r5  = VMADD(a5 , 0xF0, a5 , b5 );
+  r6  = VMADD(a6 , 0xF0, a6 , b6 ); r7  = VMADD(a7 , 0xF0, a7 , b7 );
+  r8  = VMADD(a8 , 0xF0, a8 , b8 ); r9  = VMADD(a9 , 0xF0, a9 , b9 );
+  r10 = VMADD(a10, 0xF0, a10, b10); r11 = VMADD(a11, 0xF0, a11, b11);
+
+  // t = p' | p | p' | p | F' | F | E' | E
+  t0 = VMBLEND(0xF0, b8 , p0); t1 = VMBLEND(0xF0, b9 , p1);
+  t2 = VMBLEND(0xF0, b10, p2); t3 = VMBLEND(0xF0, b11, p3);
+
+  // r = D'+H' | D+H | C'+G' | C+G | B'-F' | B-F | A'-E' | A-E
+  r0 = VMSUB(r0, 0x0F, r0, b0); r1 = VMSUB(r1, 0x0F, r1, b1);
+  r2 = VMSUB(r2, 0x0F, r2, b2); r3 = VMSUB(r3, 0x0F, r3, b3);
+  r4 = VMSUB(r4, 0x0F, r4, b4); r5 = VMSUB(r5, 0x0F, r5, b5);
+  r6 = VMSUB(r6, 0x0F, r6, b6); r7 = VMSUB(r7, 0x0F, r7, b7);
+  // r = D'+H'-p | D+H-p | C'+G'-p' | C+G-p | B'-F' | B-F | A'-E' | A-E
+  r8  = VSUB(r8 , t0); r9  = VSUB(r9 , t1);
+  r10 = VSUB(r10, t2); r11 = VSUB(r11, t3);
+
+  // get sign mask + carry propagation
+  r1  = VMADD(r1 , 0x55, r1 , VSRA(r0, BRADIX)); 
+  r4  = VMADD(r4 , 0x55, r4 , VSHUF(r0, 0x4E)); r0 = VAND(r0, bmask0);
+  r2  = VMADD(r2 , 0x55, r2 , VSRA(r1, BRADIX)); 
+  r5  = VMADD(r5 , 0x55, r5 , VSHUF(r1, 0x4E)); r1 = VAND(r1, bmask0);
+  r3  = VMADD(r3 , 0x55, r3 , VSRA(r2, BRADIX)); 
+  r6  = VMADD(r6 , 0x55, r6 , VSHUF(r2, 0x4E)); r2 = VAND(r2, bmask0);
+  r4  = VMADD(r4 , 0x55, r4 , VSRA(r3, BRADIX)); 
+  r7  = VMADD(r7 , 0x55, r7 , VSHUF(r3, 0x4E)); r3 = VAND(r3, bmask0);
+  r5  = VMADD(r5 , 0x55, r5 , VSRA(r4, BRADIX)); 
+  r8  = VMADD(r8 , 0x55, r8 , VSHUF(r4, 0x4E)); r4 = VAND(r4, bmask0);
+  r6  = VMADD(r6 , 0x55, r6 , VSRA(r5, BRADIX)); 
+  r9  = VMADD(r9 , 0x55, r9 , VSHUF(r5, 0x4E)); r5 = VAND(r5, bmask0);
+  r7  = VMADD(r7 , 0x55, r7 , VSRA(r6, BRADIX)); 
+  r10 = VMADD(r10, 0x55, r10, VSHUF(r6, 0x4E)); r6 = VAND(r6, bmask0);
+  r8  = VMADD(r8 , 0x55, r8 , VSRA(r7, BRADIX)); 
+  r11 = VMADD(r11, 0x55, r11, VSHUF(r7, 0x4E)); r7 = VAND(r7, bmask0);
+  t0  = VMADD(r9 , 0x55, r9 , VSRA(r8, BRADIX));
+  t0  = VMADD(r10, 0x55, r10, VSRA(t0, BRADIX));
+  t0  = VMADD(r11, 0x55, r11, VSRA(t0, BRADIX));
+  t0  = VMADD(r8 , 0xAA, r8 , VZSHUF(0xCCCC, VSRA(t0, BRADIX), 0x4E));
+  t0  = VMADD(r9 , 0xAA, r9 , VSRA(t0, BRADIX));
+  t0  = VMADD(r10, 0xAA, r10, VSRA(t0, BRADIX));
+  t0  = VMADD(r11, 0xAA, r11, VSRA(t0, BRADIX));
+
+  // if r is non-negative, smask = all-0 
+  // if r is     negative, smask = all-1
+  smask = VSRA(t0, 63);
+  smask = VSHUF(smask, 0xEE);
+
+  // r = r + (p & smask)
+  r8  = VADD(r8 , VAND(p0, smask)); r9  = VADD(r9 , VAND(p1, smask));
+  r10 = VADD(r10, VAND(p2, smask)); r11 = VADD(r11, VAND(p3, smask)); 
+
+  // carry propagation 
+  // r8 is finally 49-bit not 48-bit
+  r9  = VADD(r9 , VSRA(r8 , BRADIX)); r8  = VAND(r8 , bmask1);
+  r10 = VADD(r10, VSRA(r9 , BRADIX)); r9  = VAND(r9 , bmask1);
+  r11 = VADD(r11, VSRA(r10, BRADIX)); r10 = VAND(r10, bmask1);
+  r8  = VMADD(r8, 0xAA, r8, VSHUF(VSRA(r11, BRADIX), 0x4E)); 
+  r11 = VAND(r11, bmask1);
+
+  r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
+  r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
+  r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
+}
+
+
 // operand-scanning (excl. carry prop.)
 static void mul_fpx2_4x2w_v1(fpx2_4x2w r, const fp_4x2w a, const fp_4x2w b)
 {
@@ -2951,12 +3040,9 @@ static void sub_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2x2_2x2x2w a, const fp2x2_2
   sub_fpx2_4x2w(r, a, b);
 }
 
-// a = < B1' | B1 | B0' | B0 | A1' | A1 | A0' | A0 >
-// b = < D1' | D1 | D0' | D0 | C1' | C1 | C0' | C0 >
-// r = < B1'+D1' | B1+D1 | B0'+D0' | B0+D0 | A1'-C1' | A1-C1 | A0'-C0' | A0-C0 >
 static void as_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2x2_2x2x2w a, const fp2x2_2x2x2w b)
 {
-
+  aass_fpx2_4x2w(r, a, b);
 }
 
 // r0 = a0 - a1
