@@ -3534,11 +3534,11 @@ void mul_fp12_vec_v2(fp2_4x2x1w r01, fp2_2x2x2w r2, const fp2_8x1x1w ab0, const 
 
 // Karatsuba 
 // 2x2x2w sub-routines 
-void mul_fp12_vec_v3(fp2_2x2x2w r001, fp2_2x2x2w r02, fp2_2x2x2w r101, fp2_2x2x2w r12, const fp2_4x2x1w ab0, const fp2_4x2x1w ab1, const fp2_4x2x1w ab2)
+void mul_fp12_vec_v3(fp2_2x2x2w r001, fp2_2x2x2w r101, fp2_2x2x2w r2, const fp2_4x2x1w ab0, const fp2_4x2x1w ab1, const fp2_4x2x1w ab2)
 {
   fp2x2_4x2x1w tt0, tt1, tt2, tt3, tt4, tt5;
   fp2_4x2x1w t0;
-  fp2x2_2x2x2w ss0, ss1, ss2, ss3, ss4;
+  fp2x2_2x2x2w ss0, ss1, ss2, ss3, ss4, ss5;
   fp2_2x2x2w s0, s1, s2, s3;
   const __m512i m0 = VSET(3, 2, 1, 0, 7, 6, 5, 4);
   const __m512i m1 = VSET(3, 3, 2, 2, 1, 1, 0, 0);
@@ -3581,9 +3581,6 @@ void mul_fp12_vec_v3(fp2_2x2x2w r001, fp2_2x2x2w r02, fp2_2x2x2w r101, fp2_2x2x2
   perm_var_dl(tt5, tt0, m2);
   //  ss1 =                       ... |                  a1*b1[1] at Fp2 layer
   conv_dltovl(ss1, tt5);
-  //  r02 =                       ... |                     r0[2] at Fp2 layer
-  add_fp2x2_2x2x2w(ss1, ss2, ss1);
-  redc_fp2x2_2x2x2w(r02, ss1);
 
   // compute r1 in 2x2x2w
   //   t0 =     b0[0][1] |     b0[0][0] |     a0[0][1] |     a0[0][0] at Fp  layer
@@ -3617,8 +3614,8 @@ void mul_fp12_vec_v3(fp2_2x2x2w r001, fp2_2x2x2w r02, fp2_2x2x2w r101, fp2_2x2x2
   //   s2 =                 b0[2]+b1[2] |                 a0[2]+a1[2] at Fp2 layer
   add_fp2_2x2x2w(s2, s2, s3);
   //  ss3 =          (a0+a1)*(b0+b1)[1] |          (a0+a1)*(b0+b1)[0] at Fp2 layer
-  //  ss1 =                         ... |          (a0+a1)*(b0+b1)[2] at Fp2 layer
-  mul_fp6x2_1x2x2x2w(ss3, ss1, s0, s1, s2);
+  //  ss5 =                         ... |          (a0+a1)*(b0+b1)[2] at Fp2 layer
+  mul_fp6x2_1x2x2x2w(ss3, ss5, s0, s1, s2);
   //  ss3 = (a0+a1)*(b0+b1)[1]-a0*b0[1] | (a0+a1)*(b0+b1)[0]-a0*b0[0] at Fp2 layer
   sub_fp2x2_2x2x2w(ss3, ss3, ss4);
   //  tt5 =  a1*b1[1][1] |  a1*b1[1][0] |  a1*b1[0][1] |  a1*b1[0][0] at Fp  layer 
@@ -3628,11 +3625,14 @@ void mul_fp12_vec_v3(fp2_2x2x2w r001, fp2_2x2x2w r02, fp2_2x2x2w r101, fp2_2x2x2
   // r101 =                       r1[1] |                       r1[0] at Fp2 layer
   sub_fp2x2_2x2x2w(ss3, ss3, ss4);
   redc_fp2x2_2x2x2w(r101, ss3);
-  //  ss1 =                         ... | (a0+a1)*(b0+b1)[2]-a0*b0[2] at Fp2 layer 
-  sub_fp2x2_2x2x2w(ss1, ss1, ss2);
-  //  r12 =                         ... |                       r1[2] at Fp2 layer
-  sub_fp2x2_2x2x2w(ss1, ss1, ss0);
-  redc_fp2x2_2x2x2w(r12, ss1);
+  //  ss5 =                         ... | (a0+a1)*(b0+b1)[2]-a0*b0[2] at Fp2 layer 
+  sub_fp2x2_2x2x2w(ss5, ss5, ss2);
+  //  r2  =                       r1[2] |                       r0[2] at Fp2 layer
+  add_fp2x2_2x2x2w(ss1, ss2, ss1);
+  sub_fp2x2_2x2x2w(ss5, ss5, ss0);
+  perm_var_vl(ss5, ss5, m0);
+  blend_0x0F_vl(ss1, ss5, ss1);
+  redc_fp2x2_2x2x2w(r2, ss1);
 }
 
 // Karatsuba 
