@@ -924,8 +924,8 @@ void test_fp12()
   printf("#cycle = %ld\n", diff_cycles);  
 
   printf("- mul_fp12_vec_v3: ");
-  LOAD_CACHE(mul_fp12_vec_v3(r001_2x2x2w, r02_2x2x2w, r101_2x2x2w, r12_2x2x2w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 10000);
-  MEASURE_CYCLES(mul_fp12_vec_v3(r001_2x2x2w, r02_2x2x2w, r101_2x2x2w, r12_2x2x2w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 100000);
+  LOAD_CACHE(mul_fp12_vec_v3(r001_2x2x2w, r101_2x2x2w, r2_2x2x2w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 10000);
+  MEASURE_CYCLES(mul_fp12_vec_v3(r001_2x2x2w, r101_2x2x2w, r2_2x2x2w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);  
 
   printf("- mul_fp12_vec_v4: ");
