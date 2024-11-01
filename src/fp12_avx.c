@@ -3644,8 +3644,8 @@ void mul_fp12_vec_v4(fp2_4x2x1w r0, fp2_2x2x2w r101, fp2_2x2x2w r12, const fp2_4
   fp2x2_2x2x2w ss0, ss1, ss2, ss3, ss4;
   fp2_2x2x2w s0, s1, s2, s3;
   const __m512i m0 = VSET(3, 2, 1, 0, 7, 6, 5, 4);
-  const __m512i m1 = VSET(1, 0, 7, 6, 5, 4, 3, 2);
-  const __m512i m2 = VSET(3, 3, 2, 2, 1, 1, 0, 0);
+  const __m512i m1 = VSET(3, 3, 2, 2, 1, 1, 0, 0);
+  const __m512i m2 = VSET(1, 0, 7, 6, 5, 4, 3, 2);
   const __m512i m3 = VSET(7, 7, 6, 6, 5, 5, 4, 4);
 
   // ab0 =  b1[0] | a1[0] | b0[0] | a0[0] at Fp2 layer
@@ -3662,9 +3662,9 @@ void mul_fp12_vec_v4(fp2_4x2x1w r0, fp2_2x2x2w r101, fp2_2x2x2w r12, const fp2_4
   // tt3 =         ... |    a0*b0[2] |    a0*b0[1] |       a0*b0[0] at Fp2 layer
   blend_0x0F_dl(tt3, tt2, tt0);
   // tt4 =         ... |         ... |         ... | a1*b1[2]*(u+1) at Fp2 layer
-  mul_by_u_plus_1_fp2_4x2x1w(tt4, tt2);
+  mul_by_u_plus_1_fp2x2_4x2x1w(tt4, tt2);
   // tt2 =         ... |    a1*b1[1] |    a1*b1[0] |            ... at Fp2 layer 
-  perm_var_dl(tt2, tt0, m1);
+  perm_var_dl(tt2, tt0, m2);
   // tt2 =         ... |    a1*b1[1] |    a1*b1[0] | a1*b1[2]*(u+1) at Fp2 layer   
   blend_0x03_dl(tt2, tt2, tt4);       
   // r0  =         ... |       r0[2] |       r0[1] |          r0[0] at Fp2 layer
@@ -3680,7 +3680,7 @@ void mul_fp12_vec_v4(fp2_4x2x1w r0, fp2_2x2x2w r101, fp2_2x2x2w r12, const fp2_4
   //  tt4 = a1*b1[0][1] | a1*b1[0][0] | a1*b1[2][1] | a1*b1[2][0] at Fp  layer
   blend_0x0F_dl(tt4, tt2, tt3);
   //  tt5 = a0*b0[1][1] | a0*b0[1][0] | a0*b0[0][1] | a0*b0[0][0] at Fp  layer 
-  perm_var_dl(tt5, tt0, m2);
+  perm_var_dl(tt5, tt0, m1);
   //  ss0 =                  a1*b1[0] |                  a1*b1[2] at Fp2 layer
   conv_dltovl(ss0, tt4);
   //  ss4 =                  a0*b0[1] |                  a0*b0[0] at Fp2 layer
