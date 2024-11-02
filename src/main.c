@@ -678,7 +678,7 @@ void test_fp12()
   b01_4x2x1w[0] = VSET(4 , 3 , 2 , 1 , 4, 3, 2, 1);
   b4_4x2x1w [0] = VSET(6 , 5 , 6 , 5 , 6, 5, 6, 5);
 
-  for (i = 0; i < NWORDS; i++) {
+  for (i = 1; i < NWORDS; i++) {
     a01_4x2x1w[i] = VZERO;
     a2_4x2x1w [i] = VZERO;
     b01_4x2x1w[i] = VZERO;

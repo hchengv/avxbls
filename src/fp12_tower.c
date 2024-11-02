@@ -465,7 +465,7 @@ void mul_by_xy00z0_fp12_scalar(vec384fp12 ret, const vec384fp12 a,
   #endif
 }
 
-void mul_by_xy00z0_fp12_scalar_vector(vec384fp12 ret, const vec384fp12 a,
+void mul_by_xy00z0_fp12_vector(vec384fp12 ret, const vec384fp12 a,
                                                       const vec384fp6 xy00z0)
 {
   #ifdef PROFILING
