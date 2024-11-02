@@ -874,6 +874,7 @@ static void conv_dltovl(__m512i *r, const __m512i *a)
 // ----------------------------------------------------------------------------
 // Fp single-length operations
 
+// TODO: swap-based version
 static void add_fp_8x1w(fp_8x1w r, const fp_8x1w a, const fp_8x1w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
@@ -2965,7 +2966,7 @@ static void mul_by_u_plus_1_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2x2_4x2x1w a)
   asx4_fpx2_8x1w(r, a, tt0);            //  A0+A1 | A0-A1
 }
 
-static void as_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2x2_4x2x1w a, const fp2x2_4x2x1w b)
+static void asx2_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2x2_4x2x1w a, const fp2x2_4x2x1w b)
 {
   asx4_fpx2_8x1w(r, a, b);
 }
@@ -2985,7 +2986,7 @@ static void mul_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2_4x2x1w a, const fp2_4x2x1
   shuf_11(t0, a);                       //          A1 |          A1 
   shuf_01(t1, b);                       //          B0 |          B1 
   mul_fpx2_8x1w(tt1, t0, t1);           //       A1*B0 |       A1*B1
-  as_fp2x2_4x2x1w(r, tt0, tt1);         // A0*B1+A1*B0 | A0*B0-A1*B1
+  asx2_fp2x2_4x2x1w(r, tt0, tt1);       // A0*B1+A1*B0 | A0*B0-A1*B1
 }
 
 // r0 = (a0 + a1)*(a0 - a1)
@@ -3335,6 +3336,42 @@ static void mul_fp6x2_1x2x2x2w(fp2x2_2x2x2w r01, fp2x2_2x2x2w r2, const fp2_2x2x
   blend_0x0F_vl(tt0, tt5, tt0);             //             (a0+a1)*(b0+b1)-a1*b1-a0*b0 |                                     a0*b0
   add_fp2x2_2x2x2w(r01, tt0, tt1);          // (a0+a1)*(b0+b1)-a1*b1-a0*b0+a2*b2*(u+1) | ((a1+a2)*(b1+b2)-a1*b1-a2*b2)*(u+1)+a0*b0
   add_fp2x2_2x2x2w(r2, tt5, tt4);           //                                     ... |         (a0+a2)*(b0+b2)-a2*b2-a0*b0+a1*b1
+}
+
+// r0 = ((a1 + a2)*b1 - a1*b1)*(u+1) + a0*b0 = a2*b1*(u+1) + a0*b0
+// r1 = (a0 + a1)*(b0 + b1) - a0*b0 - a1*b1 = a0*b1 + a1*b0
+// r2 = (a0 + a2)*b0 - a0*b0 + a1*b1 = a2*b0 + a1*b1
+// r3 = a2*b4*(u+1)
+// r4 = a0*b4
+// r5 = a1*b4
+// Karatsuba
+static void mul_by_xy00z0_fp6x2_2x2x2x1w(fp2x2_4x2x1w r01, fp2x2_4x2x1w r2, fp2x2_4x2x1w r3, fp2x2_4x2x1w r45, const fp2_4x2x1w a01, const fp2_4x2x1w a2, const fp2_4x2x1w b01, const fp2_4x2x1w b4)
+{
+  fp2_4x2x1w t0, t1;
+  fp2x2_4x2x1w tt0, tt1, tt2;
+
+  // a01 = a1 | a0 at Fp2 layer
+  // a2  = a2 | a2 at Fp2 layer
+  // b01 = b1 | b0 at Fp2 layer
+  // b4  = b4 | b4 at Fp2 layer
+
+  perm_1032(t0, b01);                       //                          b0 |                b1
+  blend_0x33(t1, b4, t0);                   //                          b4 |                b1
+  mul_fp2x2_4x2x1w(tt0, t1, a2);            //                       a2*b4 |             a2*b1
+  mul_by_u_plus_1_fp2x2_4x2x1w(r3, tt0);    //                 a2*b4*(u+1) |        2*b1*(u+1)
+  mul_fp2x2_4x2x1w(r45, a01, b4);           //                       a1*b4 |             a0*b4
+  mul_fp2x2_4x2x1w(tt0, a01, b01);          //                       a1*b1 |             a0*b0
+  blend_0x33(t0, t0, a01);                  //                          b0 |                a0
+  perm_1032(t1, a01);                       //                          a0 |                a1
+  blend_0x33(t1, b01, t1);                  //                          b1 |                a1
+  add_fp2_4x2x1w(t0, t0, t1);               //                       b0+b1 |             a0+a1
+  blend_0x33(t1, t0, b01);                  //                       b0+b1 |                b0
+  perm_1032(t0, t0);                        //                       a0+a1 |             b0+b1 
+  blend_0x33(t0, t0, a2);                   //                       a0+a1 |                a2
+  mul_fp2x2_4x2x1w(tt1, t1, t0);            //             (a0+a1)*(b0+b1) |             a2*b0
+  perm_1032_dl(tt2, tt0);                   //                       a0*b0 |             a1*b1
+  asx2_fp2x2_4x2x1w(r2, tt1, tt2);          //       (a0+a1)*(b0+b1)-a0*b0 |       a2*b0+a1*b1
+  asx2_fp2x2_4x2x1w(r01, r2, tt0);          // (a0+a1)*(b0+b1)-a0*b0-a1*b1 | a2*b1*(u+1)+a0*b0
 }
 
 // ----------------------------------------------------------------------------
@@ -3736,6 +3773,62 @@ void mul_fp12_vec_v4(fp2_4x2x1w r0, fp2_2x2x2w r101, fp2_2x2x2w r12, const fp2_4
   //  r12 =                         ... |                       r1[2] at Fp2 layer
   sub_fp2x2_2x2x2w(ss1, ss1, ss0);
   redc_fp2x2_2x2x2w(r12, ss1);
+}
+
+// schoolbook
+// double-length 
+void mul_by_xy00z0_fp12_vec_v1(fp2_4x2x1w r0, fp2_2x2x2w r1, const fp2_4x2x1w a01, const fp2_4x2x1w a2, const fp2_4x2x1w b01, const fp2_4x2x1w b4)
+{
+  fp2x2_4x2x1w tt0, tt1, tt2, tt3, tt4, tt5;
+  fp2x2_2x2x2w ss0, ss1, ss2;
+  const __m512i m0 = VSET(1, 0, 3, 2, 7, 6, 5, 4);
+  const __m512i m1 = VSET(1, 0, 1, 0, 1, 0, 1, 0);
+  const __m512i m2 = VSET(5, 4, 5, 4, 5, 4, 5, 4);
+
+  // a1[1] | a1[0] | a0[1] | a0[0] at Fp2 layer
+  // a1[2] | a1[2] | a0[2] | a0[2] at Fp2 layer
+  // b0[1] | b0[0] | b0[1] | b0[0] at Fp2 layer
+  // b1[2] | b1[2] | b1[2] | b1[2] at Fp2 layer
+
+  // tt0 = a1*b0[1] | a1*b0[0] | a0*b0[1] | a0*b0[0]
+  // tt1 =      ... | a1*b0[2] |      ... | a0*b0[2]
+  // tt2 =      ... | a1*b1[0] |      ... | a0*b1[0]
+  // tt3 = a1*b1[1] | a1*b1[2] | a0*b1[1] | a0*b1[2]
+  mul_by_xy00z0_fp6x2_2x2x2x1w(tt0, tt1, tt2, tt3, a01, a2, b01, b4);
+
+  // tt4 = a1*b1[1] | a1*b1[0] | a0*b1[1] | a0*b1[0]
+  blend_0x33_dl(tt4, tt3, tt2);
+  // tt5 = a1*b0[1] | a1*b0[0] | a0*b0[1] | a0*b0[2]  
+  blend_0x03_dl(tt5, tt0, tt1);
+  // tt5 = a0*b0[2] | a0*b0[1] | a1*b0[1] | a1*b0[0] 
+  perm_var_dl(tt5, tt5, m0);
+  //  r0 =    r0[2] |    r0[1] |    r1[1] |    r1[0]
+  add_fp2x2_4x2x1w(tt5, tt5, tt4);
+  redc_fp2x2_4x2x1w(r0, tt5);
+
+  // tt0 = a1*b0[0] | a1*b0[0] | a0*b0[0] | a0*b0[0] 
+  perm_1010_dl(tt0, tt0);
+  // tt4 = a0*b1[2] | a0*b1[2] | a0*b1[2] | a0*b1[2]
+  perm_var_dl(tt4, tt3, m1);
+  // tt4 = a0*b1[2] | a0*b1[2] | a0*b0[0] | a0*b0[0]
+  blend_0x0F_dl(tt4, tt4, tt0);
+  // ss0 =            a0*b1[2] |            a0*b0[0]
+  conv_dltovl(ss0, tt4);
+  // tt1 = a1*b0[2] | a1*b0[2] | a0*b0[2] | a0*b0[2] 
+  perm_1010_dl(tt1, tt1);
+  // tt3 = a1*b1[2] | a1*b1[2] | a1*b1[2] | a1*b1[2]
+  perm_var_dl(tt3, tt3, m2);
+  // tt1 = a1*b0[2] | a1*b0[2] | a1*b1[2] | a1*b1[2]
+  blend_0x0F_dl(tt1, tt1, tt3);
+  // ss1 =            a1*b0[2] |            a1*b1[2]
+  conv_dltovl(ss1, tt1);
+  // ss2 =                 ... |      a1*b1[2]*(u+1)
+  mul_by_u_plus_1_fp2x2_2x2x2w(ss2, ss1);
+  // ss1 =            a1*b0[2] |      a1*b1[2]*(u+1)
+  blend_0x0F_dl(ss1, ss1, ss2);
+  //  r1 =               r1[2] |               r0[0]
+  add_fp2x2_2x2x2w(ss1, ss1, ss0);
+  redc_fp2x2_2x2x2w(r1, ss1);
 }
 
 // ----------------------------------------------------------------------------
