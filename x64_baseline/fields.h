@@ -106,8 +106,4 @@ void sqr_fp6(vec384fp6 ret, const vec384fp6 a);
 void mul_fp12(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b);
 void sqr_fp12(vec384fp12 ret, const vec384fp12 a);
 
-//tested subroutine
-typedef vec384x vec384fp4[2];
-void sqr_fp4_test(vec384fp4 ret, const vec384x a0, const vec384x a1);
-
 #endif /* __BLS12_381_ASM_FIELDS_H__ */

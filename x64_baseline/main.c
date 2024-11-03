@@ -380,34 +380,12 @@ static void mpi_print(const char *c, const uint64_t *a, int len)
   printf("%016lX\n", a[0]);
 }
 
-void test_subroutine()
-{
-  vec384fp4 r;
-  vec384x a0 = { {TV_A}, {TV_B} }, a1 = { {TV_A}, {TV_B} };
-  uint64_t start_cycles, end_cycles, diff_cycles;
-  int i;
-
-  sqr_fp4_test(r, a0, a1);
-
-  mpi_print("* sqr_fp4 r00 = 0x", r[0][0], 6);
-  mpi_print("* sqr_fp4 r01 = 0x", r[0][1], 6);
-  mpi_print("* sqr_fp4 r10 = 0x", r[1][0], 6);
-  mpi_print("* sqr_fp4 r11 = 0x", r[1][1], 6);
-
-
-  printf("- sqr_fp4:        ");
-  LOAD_CACHE(sqr_fp4_test(r, a0, a1), 1000);
-  MEASURE_CYCLES(sqr_fp4_test(r, a0, a1), 10000);
-  printf("  #cycle = %lld\n", diff_cycles);
-
-}
 // ----------------------------------------------------------------------------
 
 int main()
 {
   test_pairing();
   timing();
-  // test_subroutine();
 
   return 0;
 }
