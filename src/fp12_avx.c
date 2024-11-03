@@ -3873,7 +3873,7 @@ void mul_by_xy00z0_fp12_vec_v1(fp2_4x2x1w r0, fp2_2x2x2w r1, const fp2_4x2x1w a0
   fp2x2_4x2x1w tt0, tt1, tt2, tt3, tt4, tt5;
   fp2x2_2x2x2w ss0, ss1, ss2;
   const __m512i m0 = VSET(1, 0, 3, 2, 7, 6, 5, 4);
-  const __m512i m1 = VSET(4, 4, 3, 3, 4, 4, 3, 3);
+  const __m512i m1 = VSET(3, 3, 2, 2, 3, 3, 2, 2);
   const __m512i m2 = VSET(7, 7, 6, 6, 7, 7, 6, 6);
 
   // a1[1] | a1[0] | a0[1] | a0[0] at Fp2 layer

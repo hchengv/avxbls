@@ -778,10 +778,10 @@ void test_fp12()
   carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* mul_by_xy00z0_fp12_vec_v1 r001 = 0x", r64, SWORDS);
-  get_channel_8x1w(r48, r0_4x2x1w, 3);
+  get_channel_8x1w(r48, r0_4x2x1w, 2);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* mul_by_xy00z0_fp12_vec_v1 r010 = 0x", r64, SWORDS);
-  get_channel_8x1w(r48, r0_4x2x1w, 4);
+  get_channel_8x1w(r48, r0_4x2x1w, 3);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* mul_by_xy00z0_fp12_vec_v1 r011 = 0x", r64, SWORDS);
   get_channel_8x1w(r48, r0_4x2x1w, 0);
