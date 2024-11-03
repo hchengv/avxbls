@@ -3873,8 +3873,8 @@ void mul_by_xy00z0_fp12_vec_v1(fp2_4x2x1w r0, fp2_2x2x2w r1, const fp2_4x2x1w a0
   fp2x2_4x2x1w tt0, tt1, tt2, tt3, tt4, tt5;
   fp2x2_2x2x2w ss0, ss1, ss2;
   const __m512i m0 = VSET(1, 0, 3, 2, 7, 6, 5, 4);
-  const __m512i m1 = VSET(1, 0, 1, 0, 1, 0, 1, 0);
-  const __m512i m2 = VSET(5, 4, 5, 4, 5, 4, 5, 4);
+  const __m512i m1 = VSET(4, 4, 3, 3, 4, 4, 3, 3);
+  const __m512i m2 = VSET(7, 7, 6, 6, 7, 7, 6, 6);
 
   // a1[1] | a1[0] | a0[1] | a0[0] at Fp2 layer
   // a1[2] | a1[2] | a0[2] | a0[2] at Fp2 layer
@@ -3887,43 +3887,37 @@ void mul_by_xy00z0_fp12_vec_v1(fp2_4x2x1w r0, fp2_2x2x2w r1, const fp2_4x2x1w a0
   // tt3 = a1*b1[2] | a1*b1[1] | a0*b1[2] | a0*b1[1]
   mul_by_xy00z0_fp6x2_2x2x2x1w(tt0, tt1, tt2, tt3, a01, a2, b01, b4);
 
-  // tt2 =      ... | a1*b1[0] |      ... | a0*b1[0] 
-  perm_1032_dl(tt2, tt2);
-  // tt3 = a1*b1[1] | a1*b1[2] | a0*b1[1] | a0*b1[2]
-  perm_1032_dl(tt3, tt3);
-  // tt4 = a1*b1[1] | a1*b1[0] | a0*b1[1] | a0*b1[0]
-  blend_0x33_dl(tt4, tt3, tt2);
   // tt5 = a1*b0[1] | a1*b0[0] | a0*b0[1] | a0*b0[2]  
   blend_0x03_dl(tt5, tt0, tt1);
-  // tt5 = a0*b0[2] | a0*b0[1] | a1*b0[1] | a1*b0[0] 
-  perm_var_dl(tt5, tt5, m0);
-  //  r0 =    r0[2] |    r0[1] |    r1[1] |    r1[0]
+  // tt4 = a1*b1[0] | a1*b1[1] | a0*b1[0] | a0*b1[1]
+  blend_0x33_dl(tt4, tt2, tt3);
+  // tt4 = a0*b1[1] | a0*b1[0] | a1*b1[0] | a1*b1[1]
+  perm_var_dl(tt4, tt4, m0);
+  //  r0 =    r1[1] |    r1[0] |    r0[1] |    r0[2]
   add_fp2x2_4x2x1w(tt5, tt5, tt4);
   redc_fp2x2_4x2x1w(r0, tt5);
 
-  // tt0 = a1*b0[0] | a1*b0[0] | a0*b0[0] | a0*b0[0] 
-  perm_1010_dl(tt0, tt0);
-  // tt4 = a0*b1[2] | a0*b1[2] | a0*b1[2] | a0*b1[2]
+  // tt0 = a1*b0[0][1] | a1*b0[0][0] | a0*b0[0][1] | a0*b0[0][0]
+  perm_1100_dl(tt0, tt0);
+  // tt4 = a0*b1[2][1] | a0*b1[2][0] | a0*b1[2][1] | a0*b1[2][0]
   perm_var_dl(tt4, tt3, m1);
-  // tt4 = a0*b1[2] | a0*b1[2] | a0*b0[0] | a0*b0[0]
+  // tt4 = a0*b1[2][1] | a0*b1[2][0] | a0*b0[0][1] | a0*b0[0][0]
   blend_0x0F_dl(tt4, tt4, tt0);
-  // ss0 =            a0*b1[2] |            a0*b0[0]
-  perm_1100_dl(tt4, tt4);
+  // ss0 =                  a0*b1[2] |                  a0*b0[0]
   conv_dltovl(ss0, tt4);
-  // tt1 = a1*b0[2] | a1*b0[2] | a0*b0[2] | a0*b0[2] 
-  perm_1010_dl(tt1, tt1);
-  // tt3 = a1*b1[2] | a1*b1[2] | a1*b1[2] | a1*b1[2]
-  perm_var_dl(tt3, tt3, m2);
-  // tt1 = a1*b0[2] | a1*b0[2] | a1*b1[2] | a1*b1[2]
-  blend_0x0F_dl(tt1, tt1, tt3);
-  // ss1 =            a1*b0[2] |            a1*b1[2]
+  // tt1 = a1*b0[2][1] | a1*b0[2][0] | a0*b0[2][1] | a0*b0[2][0] 
   perm_1100_dl(tt1, tt1);
+  // tt3 = a1*b1[2][1] | a1*b1[2][0] | a1*b1[2][1] | a1*b1[2][0]
+  perm_var_dl(tt3, tt3, m2);
+  // tt1 = a1*b0[2][1] | a1*b0[2][0] | a1*b1[2][1] | a1*b1[2][0]
+  blend_0x0F_dl(tt1, tt1, tt3);
+  // ss1 =                  a1*b0[2] |                  a1*b1[2]
   conv_dltovl(ss1, tt1);
-  // ss2 =                 ... |      a1*b1[2]*(u+1)
+  // ss2 =                       ... |            a1*b1[2]*(u+1)
   mul_by_u_plus_1_fp2x2_2x2x2w(ss2, ss1);
-  // ss1 =            a1*b0[2] |      a1*b1[2]*(u+1)
+  // ss1 =                  a1*b0[2] |            a1*b1[2]*(u+1)
   blend_0x0F_vl(ss1, ss1, ss2);
-  //  r1 =               r1[2] |               r0[0]
+  //  r1 =                     r1[2] |                    r0[0]
   add_fp2x2_2x2x2w(ss1, ss1, ss0);
   redc_fp2x2_2x2x2w(r1, ss1);
 }
