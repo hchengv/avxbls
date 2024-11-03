@@ -76,6 +76,8 @@ static uint64_t P48[NWORDS] = {
 // ----------------------------------------------------------------------------
 // prototypes: Fp6 operations
 
+void mul_by_xy00z0_fp6x2_2x2x2x1w(fp2x2_4x2x1w r01, fp2x2_4x2x1w r2, fp2x2_4x2x1w r3, fp2x2_4x2x1w r45, const fp2_4x2x1w a01, const fp2_4x2x1w a2, const fp2_4x2x1w b01, const fp2_4x2x1w b4);
+
 // ----------------------------------------------------------------------------
 // prototypes: Fp12 operations
 
