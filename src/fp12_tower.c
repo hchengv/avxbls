@@ -534,7 +534,7 @@ void mul_by_xy00z0_fp12_vector(vec384fp12 ret, const vec384fp12 a,
   #endif
 }
 
-void sqr_fp12(vec384fp12 ret, const vec384fp12 a)
+void sqr_fp12_scalar(vec384fp12 ret, const vec384fp12 a)
 {
   #ifdef PROFILING
     uint64_t start_cycles = read_tsc();

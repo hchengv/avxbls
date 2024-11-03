@@ -1082,6 +1082,11 @@ void test_fp12()
   LOAD_CACHE(mul_by_xy00z0_fp12_vec_v1(r0_4x2x1w, r1_2x2x2w, a01_4x2x1w, a2_4x2x1w, b01_4x2x1w, b4_4x2x1w), 10000);
   MEASURE_CYCLES(mul_by_xy00z0_fp12_vec_v1(r0_4x2x1w, r1_2x2x2w, a01_4x2x1w, a2_4x2x1w, b01_4x2x1w, b4_4x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- sqr_fp12_scalar: ");
+  LOAD_CACHE(sqr_fp12_scalar(r, a), 10000);
+  MEASURE_CYCLES(sqr_fp12_scalar(r, a), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
 }
 
 // ----------------------------------------------------------------------------
