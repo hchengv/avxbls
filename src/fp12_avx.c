@@ -3883,10 +3883,12 @@ void mul_by_xy00z0_fp12_vec_v1(fp2_4x2x1w r0, fp2_2x2x2w r1, const fp2_4x2x1w a0
 
   // tt0 = a1*b0[1] | a1*b0[0] | a0*b0[1] | a0*b0[0]
   // tt1 =      ... | a1*b0[2] |      ... | a0*b0[2]
-  // tt2 =      ... | a1*b1[0] |      ... | a0*b1[0]
+  // tt2 = a1*b1[0] |      ... | a0*b1[0] |      ...
   // tt3 = a1*b1[1] | a1*b1[2] | a0*b1[1] | a0*b1[2]
   mul_by_xy00z0_fp6x2_2x2x2x1w(tt0, tt1, tt2, tt3, a01, a2, b01, b4);
 
+  // tt2 =      ... | a1*b1[0] |      ... | a0*b1[0] 
+  perm_1032_dl(tt2, tt2);
   // tt4 = a1*b1[1] | a1*b1[0] | a0*b1[1] | a0*b1[0]
   blend_0x33_dl(tt4, tt3, tt2);
   // tt5 = a1*b0[1] | a1*b0[0] | a0*b0[1] | a0*b0[2]  
@@ -3916,7 +3918,7 @@ void mul_by_xy00z0_fp12_vec_v1(fp2_4x2x1w r0, fp2_2x2x2w r1, const fp2_4x2x1w a0
   // ss2 =                 ... |      a1*b1[2]*(u+1)
   mul_by_u_plus_1_fp2x2_2x2x2w(ss2, ss1);
   // ss1 =            a1*b0[2] |      a1*b1[2]*(u+1)
-  blend_0x0F_dl(ss1, ss1, ss2);
+  blend_0x0F_vl(ss1, ss1, ss2);
   //  r1 =               r1[2] |               r0[0]
   add_fp2x2_2x2x2w(ss1, ss1, ss0);
   redc_fp2x2_2x2x2w(r1, ss1);
