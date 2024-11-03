@@ -391,7 +391,7 @@ void mul_fp12_vector(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b)
   #endif    
 }
 
-void mul_by_0y0_fp6x2(vec768fp6 ret, const vec384fp6 a,
+static inline void mul_by_0y0_fp6x2(vec768fp6 ret, const vec384fp6 a,
                                                    const vec384fp2 b)
 {
     mul_fp2x2(ret[1], a[2], b);     /* borrow ret[1] for a moment */
@@ -400,7 +400,7 @@ void mul_by_0y0_fp6x2(vec768fp6 ret, const vec384fp6 a,
     mul_fp2x2(ret[2], a[1], b);
 }
 
-void mul_by_xy0_fp6x2(vec768fp6 ret, const vec384fp6 a,
+static void mul_by_xy0_fp6x2(vec768fp6 ret, const vec384fp6 a,
                                             const vec384fp6 b)
 {
     vec768x t0, t1;

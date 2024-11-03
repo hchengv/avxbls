@@ -509,7 +509,7 @@ void test_fp6()
   vec384fp6 a = {{{1}, {2}}, {{3}, {4}}, {{5}, {6}}};
   int i;
 
-#if 1
+#if 0
 
   puts("\nFP6 TEST\n");
 
@@ -1094,8 +1094,8 @@ int main()
   // test_fp();
   // test_fp2();
   // test_fp4();
-  test_fp6();
-  // test_fp12();
+  // test_fp6();
+  test_fp12();
 
   return 0;
 }
