@@ -3902,20 +3902,22 @@ void mul_by_xy00z0_fp12_vec_v1(fp2_4x2x1w r0, fp2_2x2x2w r1, const fp2_4x2x1w a0
   redc_fp2x2_4x2x1w(r0, tt5);
 
   // tt0 = a1*b0[0] | a1*b0[0] | a0*b0[0] | a0*b0[0] 
-  perm_1100_dl(tt0, tt0);
+  perm_1010_dl(tt0, tt0);
   // tt4 = a0*b1[2] | a0*b1[2] | a0*b1[2] | a0*b1[2]
   perm_var_dl(tt4, tt3, m1);
   // tt4 = a0*b1[2] | a0*b1[2] | a0*b0[0] | a0*b0[0]
   blend_0x0F_dl(tt4, tt4, tt0);
   // ss0 =            a0*b1[2] |            a0*b0[0]
+  perm_1100_dl(tt4, tt4);
   conv_dltovl(ss0, tt4);
   // tt1 = a1*b0[2] | a1*b0[2] | a0*b0[2] | a0*b0[2] 
-  perm_1100_dl(tt1, tt1);
+  perm_1010_dl(tt1, tt1);
   // tt3 = a1*b1[2] | a1*b1[2] | a1*b1[2] | a1*b1[2]
   perm_var_dl(tt3, tt3, m2);
   // tt1 = a1*b0[2] | a1*b0[2] | a1*b1[2] | a1*b1[2]
   blend_0x0F_dl(tt1, tt1, tt3);
   // ss1 =            a1*b0[2] |            a1*b1[2]
+  perm_1100_dl(tt1, tt1);
   conv_dltovl(ss1, tt1);
   // ss2 =                 ... |      a1*b1[2]*(u+1)
   mul_by_u_plus_1_fp2x2_2x2x2w(ss2, ss1);
