@@ -433,8 +433,6 @@ typedef vec384x vec384fp4[2];
 
 static void sqr_fp4(vec384fp4 ret, const vec384x a0, const vec384x a1)
 {
-#if 1
-
     vec768x t0, t1, t2;
 
     sqr_fp2x2(t0, a0);
@@ -449,24 +447,6 @@ static void sqr_fp4(vec384fp4 ret, const vec384x a0, const vec384x a1)
     sub_fp2x2(t2, t2, t0);
     sub_fp2x2(t2, t2, t1);
     redc_fp2x2(ret[1], t2);
-#else
-
-  vec384x s0, s1, s2;
-  vec768x ss0, ss1, ss2;
-
-  mul_fp2x2(ss1, a0, a1);               // a0*a1
-  add_fp2x2(ss2, ss1, ss1);             // 2*a0*a1
-  redc_fp2x2(ret[1], ss2);
-
-  add_fp2(s0, a0, a1);                  // a0+a1
-  mul_by_u_plus_1_fp2(s1, a1);          // a1*v
-  add_fp2(s2, a0, s1);                  // a0+a1v
-  mul_fp2x2(ss0, s0, s2);               // (a0+a1)*(a0+a1v)
-  sub_fp2x2(ss0, ss0, ss1);             // (a0+a1)*(a0+a1v) - a0*a1
-  mul_by_u_plus_1_fp2x2(ss2, ss1);      // a0*a1*v
-  sub_fp2x2(ss0, ss0, ss2);             // (a0+a1)*(a0+a1v) - a0*a1 - a0*a1v
-  redc_fp2x2(ret[0], ss0);
-#endif
 }
 
 void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
