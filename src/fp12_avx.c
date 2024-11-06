@@ -1140,6 +1140,72 @@ static void asax6_fp_8x1w(fp_8x1w r, const fp_8x1w a, const fp_8x1w b)
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
 
+// a = < H | G | F | E | D | C | B | A >
+// b = < P | O | N | M | L | K | J | I >
+// r = < H+P | G-O | F-N | E-M | D-L | C-K | B-J | A-I >
+static void assx6_fp_8x1w(fp_8x1w r, const fp_8x1w a, const fp_8x1w b)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
+  const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+  const __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
+  const __m512i p0 = VSET1(P48[0]), p1 = VSET1(P48[1]), p2 = VSET1(P48[2]);
+  const __m512i p3 = VSET1(P48[3]), p4 = VSET1(P48[4]), p5 = VSET1(P48[5]);
+  const __m512i p6 = VSET1(P48[6]), p7 = VSET1(P48[7]);
+  const __m512i bmask = VSET1(BMASK);
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7, smask;
+  __m512i t0, t1, t2, t3, t4, t5, t6, t7;
+
+  // r = H+P | G | F | E | D | C | B | A
+  r0  = VMADD(a0, 0x80, a0, b0); r1  = VMADD(a1, 0x80, a1, b1);
+  r2  = VMADD(a2, 0x80, a2, b2); r3  = VMADD(a3, 0x80, a3, b3);
+  r4  = VMADD(a4, 0x80, a4, b4); r5  = VMADD(a5, 0x80, a5, b5);
+  r6  = VMADD(a6, 0x80, a6, b6); r7  = VMADD(a7, 0x80, a7, b7);
+
+  // t = p | O | N | M | L | K | J | I
+  t0 = VMBLEND(0x80, b0, p0); t1 = VMBLEND(0x80, b1, p1);
+  t2 = VMBLEND(0x80, b2, p2); t3 = VMBLEND(0x80, b3, p3);
+  t4 = VMBLEND(0x80, b4, p4); t5 = VMBLEND(0x80, b5, p5);
+  t6 = VMBLEND(0x80, b6, p6); t7 = VMBLEND(0x80, b7, p7); 
+
+  // r = H+P-p | G-O | F-N | E-M | D-L | C-K | B-J | A-I
+  r0 = VSUB(r0, t0); r1 = VSUB(r1, t1);
+  r2 = VSUB(r2, t2); r3 = VSUB(r3, t3);
+  r4 = VSUB(r4, t4); r5 = VSUB(r5, t5);
+  r6 = VSUB(r6, t6); r7 = VSUB(r7, t7);
+
+  // get sign mask 
+  t0 = VADD(r1, VSRA(r0, BRADIX));
+  t0 = VADD(r2, VSRA(t0, BRADIX));
+  t0 = VADD(r3, VSRA(t0, BRADIX));
+  t0 = VADD(r4, VSRA(t0, BRADIX));
+  t0 = VADD(r5, VSRA(t0, BRADIX));
+  t0 = VADD(r6, VSRA(t0, BRADIX));
+  t0 = VADD(r7, VSRA(t0, BRADIX));
+
+  // if r is non-negative, smask = all-0 
+  // if r is     negative, smask = all-1
+  smask = VSRA(t0, 63);
+  // r = r + (p & smask)
+  r0 = VADD(r0, VAND(p0, smask)); r1 = VADD(r1, VAND(p1, smask)); 
+  r2 = VADD(r2, VAND(p2, smask)); r3 = VADD(r3, VAND(p3, smask)); 
+  r4 = VADD(r4, VAND(p4, smask)); r5 = VADD(r5, VAND(p5, smask)); 
+  r6 = VADD(r6, VAND(p6, smask)); r7 = VADD(r7, VAND(p7, smask)); 
+
+  // carry propagation 
+  r1 = VADD(r1, VSRA(r0, BRADIX)); r0 = VAND(r0, bmask);
+  r2 = VADD(r2, VSRA(r1, BRADIX)); r1 = VAND(r1, bmask);
+  r3 = VADD(r3, VSRA(r2, BRADIX)); r2 = VAND(r2, bmask);
+  r4 = VADD(r4, VSRA(r3, BRADIX)); r3 = VAND(r3, bmask);
+  r5 = VADD(r5, VSRA(r4, BRADIX)); r4 = VAND(r4, bmask);
+  r6 = VADD(r6, VSRA(r5, BRADIX)); r5 = VAND(r5, bmask);
+  r7 = VADD(r7, VSRA(r6, BRADIX)); r6 = VAND(r6, bmask);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+  r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
+}
+
+
 static void add_fp_4x2w(fp_4x2w r, const fp_4x2w a, const fp_4x2w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
