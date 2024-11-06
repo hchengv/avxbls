@@ -750,7 +750,7 @@ void test_fp12()
 
   for (i = 1; i < NWORDS; i++) {
     a0_4x2x1w[i] = VZERO;
-    a1_4x2x1w [i] = VZERO;
+    a1_4x2x1w[i] = VZERO;
   }
 
   sqr_fp12_scalar(r, a);

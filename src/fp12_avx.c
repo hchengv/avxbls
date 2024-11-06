@@ -4235,7 +4235,7 @@ void sqr_fp12_vec_v1(fp2_4x2x1w r0, fp2_4x2x1w r1, const fp2_4x2x1w a0, const fp
   // t1 = a1[2]*(u+1) |         ... |       a1[1] |             a1[0] at Fp2 layer
   blend_0x0F(t1, t0, a1);
   // t1 =         ... |       a1[1] |       a1[0] |       a1[2]*(u+1) at Fp2 layer
-  perm_var(t1, t0, m0);
+  perm_var(t1, t1, m0);
   // t1 =         ... | a0[2]+a1[1] | a0[1]+a1[0] | a0[0]+a1[2]*(u+1) at Fp2 layer 
   add_fp2_4x2x1w(t1, a0, t1);
   // t2 =       a1[1] |       a1[0] |         ... |               ... at Fp2 layer
@@ -4294,7 +4294,7 @@ void sqr_fp12_vec_v1(fp2_4x2x1w r0, fp2_4x2x1w r1, const fp2_4x2x1w a0, const fp
   blend_0x0F(t3, t3, t2);
 
   // t3 = a0*a1[2]*(u+1) | (a0+a1)*(a0+a1*v)[2]-a0*a1[2] | (a0+a1)*(a0+a1*v)[1]-a0*a1[1] | (a0+a1)*(a0+a1*v)[0]-a0*a1[0]
-  asax6_fp_8x1w(t3, t4, t3);
+  assx6_fp_8x1w(t3, t4, t3);
   // t4 = a0*a1[2]*(u+1)                             ... |                      a0*a1[1] |                      a0*a1[0] 
   blend_0x0F(t4, t3, t2);
   // t4 =            ... |                      a0*a1[1] |                      a0*a1[0] |                a0*a1[2]*(u+1)
