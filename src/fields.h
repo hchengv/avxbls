@@ -87,8 +87,9 @@ typedef vec384x   vec384fp2;
 typedef vec384fp2 vec384fp6[3];
 typedef vec384fp6 vec384fp12[2];
 
-#define sqr_fp12 sqr_fp12_scalar
+#define sqr_fp12 sqr_fp12_vector
 void sqr_fp12_scalar(vec384fp12 ret, const vec384fp12 a);
+void sqr_fp12_vector(vec384fp12 ret, const vec384fp12 a);
 
 // void cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a);
 #define cyclotomic_sqr_fp12 cyclotomic_sqr_fp12_vector

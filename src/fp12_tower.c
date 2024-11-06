@@ -567,6 +567,56 @@ void sqr_fp12_scalar(vec384fp12 ret, const vec384fp12 a)
   #endif
 }
 
+void sqr_fp12_vector(vec384fp12 ret, const vec384fp12 a)
+{
+  #ifdef PROFILING
+    uint64_t start_cycles = read_tsc();
+  #endif
+
+  fp2_4x2x1w r0, r1, a0, a1;
+  __m512i t[2][SWORDS];
+  int i;
+
+  for (i = 0; i < SWORDS; i++) {
+    t[0][i] = VSET(a[1][2][0][i], a[1][2][0][i],
+                   a[0][2][1][i], a[0][2][0][i],
+                   a[0][1][1][i], a[0][1][0][i],
+                   a[0][0][1][i], a[0][0][0][i]);
+    t[1][i] = VSET(a[1][2][1][i], a[1][2][1][i],
+                   a[1][2][1][i], a[1][2][0][i],
+                   a[1][1][1][i], a[1][1][0][i],
+                   a[1][0][1][i], a[1][0][0][i]);
+  }
+  conv_64to48_fp_8x1w(a0, t[0]);
+  conv_64to48_fp_8x1w(a1, t[1]);
+
+  sqr_fp12_vec_v1(r0, r1, a0, a1);
+
+  conv_48to64_fp_8x1w(t[0], r0);
+  conv_48to64_fp_8x1w(t[1], r1);
+
+  for (i = 0; i < SWORDS; i++) {
+    ret[0][0][0][i] = ((uint64_t *)&t[0][i])[0];
+    ret[0][0][1][i] = ((uint64_t *)&t[0][i])[1];
+    ret[0][1][0][i] = ((uint64_t *)&t[0][i])[2];
+    ret[0][1][1][i] = ((uint64_t *)&t[0][i])[3];
+    ret[0][2][0][i] = ((uint64_t *)&t[0][i])[4];
+    ret[0][2][1][i] = ((uint64_t *)&t[0][i])[5];
+    ret[1][0][0][i] = ((uint64_t *)&t[1][i])[0];
+    ret[1][0][1][i] = ((uint64_t *)&t[1][i])[1];
+    ret[1][1][0][i] = ((uint64_t *)&t[1][i])[2];
+    ret[1][1][1][i] = ((uint64_t *)&t[1][i])[3];
+    ret[1][2][0][i] = ((uint64_t *)&t[1][i])[4];
+    ret[1][2][1][i] = ((uint64_t *)&t[1][i])[5];
+  }
+
+  #ifdef PROFILING
+    uint64_t end_cycles = read_tsc();
+    sqr_fp12_cycles += end_cycles - start_cycles;
+  #endif
+
+}
+
 void conjugate_fp12(vec384fp12 a)
 {   neg_fp6(a[1], a[1]);   }
 

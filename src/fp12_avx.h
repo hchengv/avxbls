@@ -101,6 +101,9 @@ void mul_by_xy00z0_fp12_vec_v1(fp2_4x2x1w r0, fp2_2x2x2w r1,
                                const fp2_4x2x1w a01, const fp2_4x2x1w a2, 
                                const fp2_4x2x1w b01, const fp2_4x2x1w b4);
 
+void sqr_fp12_vec_v1(fp2_4x2x1w r0, fp2_4x2x1w r1, 
+                     const fp2_4x2x1w a0, const fp2_4x2x1w a1);
+
 // ----------------------------------------------------------------------------
 // utils 
 
