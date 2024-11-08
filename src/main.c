@@ -1158,6 +1158,117 @@ void test_fp12()
 
 // ----------------------------------------------------------------------------
 
+void test_line()
+{
+  vec384fp6 line;
+  POINTonE2 T[1], Q[1];
+  fp2x2_2x2x2w X1Y1, Z1, X3, Y3, Z3, l0, l1, l2;
+  uint64_t r64[NWORDS];
+  uint64_t r48[NWORDS];
+  uint64_t start_cycles, end_cycles, diff_cycles;
+  int i;
+
+#if 1
+  puts("\nLINE TEST\n");
+
+  Q[0].X[0][0] = 1; Q[0].X[1][0] = 2;
+  Q[0].Y[0][0] = 3; Q[0].Y[1][0] = 4;
+  Q[0].Z[0][0] = 5; Q[0].Z[1][0] = 6;
+
+  for (i = 1 ; i < SWORDS; i++) {
+    Q[0].X[0][i] = Q[0].X[1][i] = 0;
+    Q[0].Y[0][i] = Q[0].Y[1][i] = 0;
+    Q[0].Z[0][i] = Q[0].Z[1][i] = 0;
+  }
+
+  X1Y1[0] = VSET(0, 4, 0, 3, 0, 2, 0, 1);
+  Z1  [0] = VSET(0, 6, 0, 5, 0, 6, 0, 5);
+
+  for (i = 1; i < VWORDS/2; i++) {
+    X1Y1[0] = VZERO;
+    Z1  [0] = VZERO;
+  }
+
+  line_dbl_scalar(line, T, Q);
+  mpi_print("* line_dbl_scalar line00 = 0x", line[0][0], SWORDS);
+  mpi_print("* line_dbl_scalar line01 = 0x", line[0][1], SWORDS);
+  mpi_print("* line_dbl_scalar line10 = 0x", line[1][0], SWORDS);
+  mpi_print("* line_dbl_scalar line10 = 0x", line[1][1], SWORDS);
+  mpi_print("* line_dbl_scalar line20 = 0x", line[2][0], SWORDS);
+  mpi_print("* line_dbl_scalar line21 = 0x", line[2][1], SWORDS);
+  mpi_print("* line_dbl_scalar X30    = 0x", T[0].X[0] , SWORDS);
+  mpi_print("* line_dbl_scalar X31    = 0x", T[0].X[1] , SWORDS);
+  mpi_print("* line_dbl_scalar Y30    = 0x", T[0].Y[0] , SWORDS);
+  mpi_print("* line_dbl_scalar Y31    = 0x", T[0].Y[1] , SWORDS);
+  mpi_print("* line_dbl_scalar Z30    = 0x", T[0].Z[0] , SWORDS);
+  mpi_print("* line_dbl_scalar Z31    = 0x", T[0].Z[1] , SWORDS);
+
+  line_dbl_vec_v1(l0, l1, l2, X3, Y3, Z3, X1Y1, Z1);
+  get_channel_4x2w(r48, l0, 0);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* line_dbl_vector line00 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, l0, 2);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* line_dbl_vector line01 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, l1, 0);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* line_dbl_vector line10 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, l1, 2);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* line_dbl_vector line11 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, l2, 4);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* line_dbl_vector line20 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, l2, 6);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* line_dbl_vector line21 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, X3, 4);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* line_dbl_vector X30    = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, X3, 6);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* line_dbl_vector X31    = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, Y3, 4);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* line_dbl_vector Y30    = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, Y3, 6);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* line_dbl_vector Y31    = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, Z3, 4);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* line_dbl_vector Z30    = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, Z3, 6);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* line_dbl_vector Z31    = 0x", r64, SWORDS);
+#endif
+
+  puts("\nLINE TIMING\n");
+
+  printf("- line_dbl_scalar: ");
+  LOAD_CACHE(line_dbl_scalar(line, T, Q), 10000);
+  MEASURE_CYCLES(line_dbl_scalar(line, T, Q), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- line_dbl_vec_v1: ");
+  LOAD_CACHE(line_dbl_vec_v1(l0, l1, l2, X3, Y3, Z3, X1Y1, Z1), 10000);
+  MEASURE_CYCLES(line_dbl_vec_v1(l0, l1, l2, X3, Y3, Z3, X1Y1, Z1), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+}
+
+// ----------------------------------------------------------------------------
+
 int main()
 {
   test_pairing();
@@ -1167,7 +1278,8 @@ int main()
   // test_fp2();
   // test_fp4();
   // test_fp6();
-  test_fp12();
+  // test_fp12();
+  test_line();
 
   return 0;
 }

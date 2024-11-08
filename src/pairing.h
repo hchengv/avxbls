@@ -6,6 +6,11 @@
 #include "consts.h"
 #include "fp12_avx.h"
 
+#define line_dbl line_dbl_vector
+void line_dbl_scalar(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q);
+void line_dbl_vector(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q);
+
+
 void miller_loop_n(vec384fp12 ret, const POINTonE2_affine Q[],
                                    const POINTonE1_affine P[], size_t n);
                                    

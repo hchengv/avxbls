@@ -4434,7 +4434,7 @@ void line_dbl_vec_v1(fp2_2x2x2w l0, fp2_2x2x2w l1, fp2_2x2x2w l2, fp2_2x2x2w X3,
   const __m512i m2 = VSET(3, 2, 1, 0, 3, 2, 1, 0);
 
   //  Y1 |  X1 at Fp2 layer
-  //  Z1 | ... at Fp2 layer
+  //  Z1 |  Z1 at Fp2 layer
 
   sqr_fp2_2x2x2w(AB, X1Y1);             //             B = Y1^2 |            A = X1^2
   perm_var_hl(t3, X1Y1, m0);            //                   X1 |                  Y1
@@ -4452,8 +4452,7 @@ void line_dbl_vec_v1(fp2_2x2x2w l0, fp2_2x2x2w l1, fp2_2x2x2w l2, fp2_2x2x2w X3,
   blend_0x0F_hl(t2, Z1, E);             //                   Z1 |                   E
   sqr_fp2_2x2x2w(FZZ, t2);              //            ZZ = Z1^2 |             F = E^2
   blend_0x0F_hl(t3, t0, t3);            //         (X1+B)^2-A-C |                  Y1
-  perm_var_hl(t2, Z1, m0);              //                  ... |                  Z1
-  blend_0x0F_hl(t2, t0, t2);            //         (X1+B)^2-A-C |                  Z1
+  blend_0x0F_hl(t2, t0, Z1);            //         (X1+B)^2-A-C |                  Z1
   add_fp2_2x2x2w(D, t3, t2);            // D = 2*((X1+B)^2-A-C) |               Y1+Z1
   perm_var_hl(t0, t0, m0);              //                3A+X1 |                 ...
   blend_0x0F_hl(t0, t0, D);             //                3A+X1 |               Y1+Z1
@@ -4467,7 +4466,7 @@ void line_dbl_vec_v1(fp2_2x2x2w l0, fp2_2x2x2w l1, fp2_2x2x2w l2, fp2_2x2x2w X3,
   blend_0x0F_hl(t4, D, AB);             //                    D |                   A
   sub_fp2_2x2x2w(X3, t0, t4);           //            X3 = F-2D |      (3A+X1)^2-X1^2
   perm_var_hl(t3, t3, m0);              //          (Y1+Z1)^2-B |                 ...
-  blend_0x0F(t3, t3, X3);               //          (Y1+Z1)^2-B |      (3A+X1)^2-X1^2
+  blend_0x0F_hl(t3, t3, X3);            //          (Y1+Z1)^2-B |      (3A+X1)^2-X1^2
   sub_fp2_2x2x2w(Z3, t3, FZZ);          //  Z3 = (Y1+Z1)^2-B-ZZ | (3A+X1)^2-X1^2-9A^2
   blend_0x0F_hl(t1, t5, t1);            //                    C |                   B 
   shl_fp2_2x2x2w(t1, t1, m1);           //                   8C |               4Y1^2

@@ -84,7 +84,7 @@ static void line_add(vec384fp6 line, POINTonE2 *T, const POINTonE2 *R,
   #endif    
 }
 
-static void line_dbl(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q)
+void line_dbl_scalar(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q)
 {
   #ifdef PROFILING
     uint64_t start_cycles = read_tsc();
@@ -141,6 +141,79 @@ static void line_dbl(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q)
     uint64_t end_cycles = read_tsc();
     line_dbl_cycles += end_cycles - start_cycles;
   #endif     
+}
+
+void line_dbl_vector(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q)
+{
+  #ifdef PROFILING
+    uint64_t start_cycles = read_tsc();
+  #endif
+
+  fp2_2x2x2w X1Y1, Z1, X3, Y3, Z3, l0, l1, l2;
+  __m512i t[6][SWORDS/2];
+  int i;
+
+  for (i = 0; i < SWORDS/2; i++) {
+    t[0][i] = VSET(Q->Y[1][i+SWORDS/2], Q->Y[1][i],
+                   Q->Y[0][i+SWORDS/2], Q->Y[0][i],
+                   Q->X[1][i+SWORDS/2], Q->X[1][i],
+                   Q->X[0][i+SWORDS/2], Q->X[0][i]);
+    t[1][i] = VSET(Q->Z[1][i+SWORDS/2], Q->Z[1][i],
+                   Q->Z[0][i+SWORDS/2], Q->Z[0][i],
+                   Q->Z[1][i+SWORDS/2], Q->Z[1][i],
+                   Q->Z[0][i+SWORDS/2], Q->Z[0][i]);
+  }
+
+  conv_64to48_fp_4x2w(X1Y1, t[0]);
+  conv_64to48_fp_4x2w(Z1  , t[1]);
+
+  line_dbl_vec_v1(l0, l1, l2, X3, Y3, Z3, X1Y1, Z1);
+
+  carryp_fp_4x2w(l0);
+  carryp_fp_4x2w(l1);
+  carryp_fp_4x2w(l2);
+  carryp_fp_4x2w(X3);
+  carryp_fp_4x2w(Y3);
+  carryp_fp_4x2w(Z3);
+
+  conv_48to64_fp_4x2w(t[0], l0);
+  conv_48to64_fp_4x2w(t[1], l1);
+  conv_48to64_fp_4x2w(t[2], l2);
+  conv_48to64_fp_4x2w(t[3], X3);
+  conv_48to64_fp_4x2w(t[4], Y3);
+  conv_48to64_fp_4x2w(t[5], Z3);
+
+  for(i = 0; i < SWORDS/2; i++) {
+    line[0][0][i         ] = ((uint64_t *)&l0[i])[0];
+    line[0][0][i+SWORDS/2] = ((uint64_t *)&l0[i])[1];
+    line[0][1][i         ] = ((uint64_t *)&l0[i])[2];
+    line[0][1][i+SWORDS/2] = ((uint64_t *)&l0[i])[3];
+    line[1][0][i         ] = ((uint64_t *)&l1[i])[0];
+    line[1][0][i+SWORDS/2] = ((uint64_t *)&l1[i])[1];
+    line[1][1][i         ] = ((uint64_t *)&l1[i])[2];
+    line[1][1][i+SWORDS/2] = ((uint64_t *)&l1[i])[3];
+    line[2][0][i         ] = ((uint64_t *)&l2[i])[4];
+    line[2][0][i+SWORDS/2] = ((uint64_t *)&l2[i])[5];
+    line[2][1][i         ] = ((uint64_t *)&l2[i])[6];
+    line[2][1][i+SWORDS/2] = ((uint64_t *)&l2[i])[7];
+    T->X[0][   i         ] = ((uint64_t *)&X3[i])[4];
+    T->X[0][   i+SWORDS/2] = ((uint64_t *)&X3[i])[5];
+    T->X[1][   i         ] = ((uint64_t *)&X3[i])[6];
+    T->X[1][   i+SWORDS/2] = ((uint64_t *)&X3[i])[7];
+    T->Y[0][   i         ] = ((uint64_t *)&Y3[i])[4];
+    T->Y[0][   i+SWORDS/2] = ((uint64_t *)&Y3[i])[5];
+    T->Y[1][   i         ] = ((uint64_t *)&Y3[i])[6];
+    T->Y[1][   i+SWORDS/2] = ((uint64_t *)&Y3[i])[7];
+    T->Z[0][   i         ] = ((uint64_t *)&Z3[i])[4];
+    T->Z[0][   i+SWORDS/2] = ((uint64_t *)&Z3[i])[5];
+    T->Z[1][   i         ] = ((uint64_t *)&Z3[i])[6];
+    T->Z[1][   i+SWORDS/2] = ((uint64_t *)&Z3[i])[7];
+  }
+
+  #ifdef PROFILING
+    uint64_t end_cycles = read_tsc();
+    line_dbl_cycles += end_cycles - start_cycles;
+  #endif 
 }
 
 static void line_by_Px2(vec384fp6 line, const POINTonE1_affine *Px2)
