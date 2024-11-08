@@ -1162,7 +1162,7 @@ void test_line()
 {
   vec384fp6 line;
   POINTonE2 T[1], Q[1];
-  fp2x2_2x2x2w X1Y1, Z1, X3, Y3, Z3, l0, l1, l2;
+  fp2x2_2x2x2w X1Y1, Z1, l0Y3, l1, l2, X3, Z3;
   uint64_t r64[NWORDS];
   uint64_t r48[NWORDS];
   uint64_t start_cycles, end_cycles, diff_cycles;
@@ -1203,12 +1203,12 @@ void test_line()
   mpi_print("* line_dbl_scalar Z30    = 0x", T[0].Z[0] , SWORDS);
   mpi_print("* line_dbl_scalar Z31    = 0x", T[0].Z[1] , SWORDS);
 
-  line_dbl_vec_v1(l0, l1, l2, X3, Y3, Z3, X1Y1, Z1);
-  get_channel_4x2w(r48, l0, 0);
+  line_dbl_vec_v1(l0Y3, l1, l2, X3, Z3, X1Y1, Z1);
+  get_channel_4x2w(r48, l0Y3, 0);
   carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* line_dbl_vector line00 = 0x", r64, SWORDS);
-  get_channel_4x2w(r48, l0, 2);
+  get_channel_4x2w(r48, l0Y3, 2);
   carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* line_dbl_vector line01 = 0x", r64, SWORDS);
@@ -1236,11 +1236,11 @@ void test_line()
   carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* line_dbl_vector X31    = 0x", r64, SWORDS);
-  get_channel_4x2w(r48, Y3, 4);
+  get_channel_4x2w(r48, l0Y3, 4);
   carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* line_dbl_vector Y30    = 0x", r64, SWORDS);
-  get_channel_4x2w(r48, Y3, 6);
+  get_channel_4x2w(r48, l0Y3, 6);
   carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* line_dbl_vector Y31    = 0x", r64, SWORDS);
