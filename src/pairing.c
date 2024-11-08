@@ -19,7 +19,7 @@
  * Line evaluations from  https://eprint.iacr.org/2010/354.pdf
  * with a twist moving common expression to line_by_Px2.
  */
-static void line_add(vec384fp6 line, POINTonE2 *T, const POINTonE2 *R,
+void line_add_scalar(vec384fp6 line, POINTonE2 *T, const POINTonE2 *R,
                                                    const POINTonE2_affine *Q)
 {
   #ifdef PROFILING
@@ -83,6 +83,82 @@ static void line_add(vec384fp6 line, POINTonE2 *T, const POINTonE2 *R,
     line_add_cycles += end_cycles - start_cycles;
   #endif    
 }
+
+void line_add_vector(vec384fp6 line, POINTonE2 *T, const POINTonE2 *R,
+                                                   const POINTonE2_affine *Q)
+{
+  #ifdef PROFILING
+    uint64_t start_cycles = read_tsc();
+  #endif
+
+  fp2_2x2x2w X1Y1, Z1Y2, X2, l0Y3, l1, X3, Z3;
+  __m512i t[4][SWORDS/2];
+  int i;
+
+  for (i = 0; i < SWORDS/2; i++) {
+    t[0][i] = VSET(R->X[1][i+SWORDS/2], R->X[1][i],
+                   R->X[0][i+SWORDS/2], R->X[0][i],
+                   R->Y[1][i+SWORDS/2], R->Y[1][i],
+                   R->Y[0][i+SWORDS/2], R->Y[0][i]);
+    t[1][i] = VSET(R->Z[1][i+SWORDS/2], R->Z[1][i],
+                   R->Z[0][i+SWORDS/2], R->Z[0][i],
+                   Q->Y[1][i+SWORDS/2], Q->Y[1][i],
+                   Q->Y[0][i+SWORDS/2], Q->Y[0][i]);
+    t[2][i] = VSET(Q->X[1][i+SWORDS/2], Q->X[1][i],
+                   Q->X[0][i+SWORDS/2], Q->X[0][i],
+                   Q->X[1][i+SWORDS/2], Q->X[1][i],
+                   Q->X[0][i+SWORDS/2], Q->X[0][i]);
+  }
+
+  conv_64to48_fp_4x2w(X1Y1, t[0]);
+  conv_64to48_fp_4x2w(Z1Y2, t[1]);
+  conv_64to48_fp_4x2w(X2  , t[2]);
+
+  line_add_vec_v1(l0Y3, l1, X3, Z3, X1Y1, Z1Y2, X2);
+
+  carryp_fp_4x2w(l0Y3);
+  carryp_fp_4x2w(l1);
+  carryp_fp_4x2w(X3);
+  carryp_fp_4x2w(Z3);
+
+  conv_48to64_fp_4x2w(t[0], l0Y3);
+  conv_48to64_fp_4x2w(t[1], l1);
+  conv_48to64_fp_4x2w(t[2], X3);
+  conv_48to64_fp_4x2w(t[3], Z3);
+
+  for (i = 0; i < SWORDS/2; i++) {
+    line   [0][0][i         ] = ((uint64_t *)&t[0][i])[0];
+    line   [0][0][i+SWORDS/2] = ((uint64_t *)&t[0][i])[1];
+    line   [0][1][i         ] = ((uint64_t *)&t[0][i])[2];
+    line   [0][1][i+SWORDS/2] = ((uint64_t *)&t[0][i])[3];
+    line   [1][0][i         ] = ((uint64_t *)&t[1][i])[0];
+    line   [1][0][i+SWORDS/2] = ((uint64_t *)&t[1][i])[1];
+    line   [1][1][i         ] = ((uint64_t *)&t[1][i])[2];
+    line   [1][1][i+SWORDS/2] = ((uint64_t *)&t[1][i])[3];
+    T   ->X[0][   i         ] = ((uint64_t *)&t[2][i])[4];
+    T   ->X[0][   i+SWORDS/2] = ((uint64_t *)&t[2][i])[5];
+    T   ->X[1][   i         ] = ((uint64_t *)&t[2][i])[6];
+    T   ->X[1][   i+SWORDS/2] = ((uint64_t *)&t[2][i])[7];
+    T   ->Y[0][   i         ] = ((uint64_t *)&t[0][i])[4];
+    T   ->Y[0][   i+SWORDS/2] = ((uint64_t *)&t[0][i])[5];
+    T   ->Y[1][   i         ] = ((uint64_t *)&t[0][i])[6];
+    T   ->Y[1][   i+SWORDS/2] = ((uint64_t *)&t[0][i])[7];
+    T   ->Z[0][   i         ] = ((uint64_t *)&t[3][i])[4];
+    T   ->Z[0][   i+SWORDS/2] = ((uint64_t *)&t[3][i])[5];
+    T   ->Z[1][   i         ] = ((uint64_t *)&t[3][i])[6];
+    T   ->Z[1][   i+SWORDS/2] = ((uint64_t *)&t[3][i])[7];
+    line   [2][0][i         ] = T   ->Z[0][   i         ];
+    line   [2][0][i+SWORDS/2] = T   ->Z[0][   i+SWORDS/2];
+    line   [2][1][i         ] = T   ->Z[1][   i         ];
+    line   [2][1][i+SWORDS/2] = T   ->Z[1][   i+SWORDS/2];
+  }
+
+  #ifdef PROFILING
+    uint64_t end_cycles = read_tsc();
+    line_add_cycles += end_cycles - start_cycles;
+  #endif    
+}
+
 
 void line_dbl_scalar(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q)
 {
@@ -181,7 +257,7 @@ void line_dbl_vector(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q)
   conv_48to64_fp_4x2w(t[3], X3);
   conv_48to64_fp_4x2w(t[4], Z3);
 
-  for(i = 0; i < SWORDS/2; i++) {
+  for (i = 0; i < SWORDS/2; i++) {
     line   [0][0][i         ] = ((uint64_t *)&t[0][i])[0];
     line   [0][0][i+SWORDS/2] = ((uint64_t *)&t[0][i])[1];
     line   [0][1][i         ] = ((uint64_t *)&t[0][i])[2];

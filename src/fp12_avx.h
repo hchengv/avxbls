@@ -108,6 +108,11 @@ void line_dbl_vec_v1(fp2_2x2x2w l0Y3, fp2_2x2x2w l1, fp2_2x2x2w l2,
                      fp2_2x2x2w X3,   fp2_2x2x2w Z3, 
                      const fp2_2x2x2w X1Y1, const fp2_2x2x2w Z1);
 
+void line_add_vec_v1(fp2_2x2x2w l0Y3, fp2_2x2x2w l1, 
+                     fp2_2x2x2w X3, fp2_2x2x2w Z3, 
+                     const fp2_2x2x2w X1Y1, const fp2_2x2x2w Z1Y2, 
+                     const fp2_2x2x2w X2);
+
 // ----------------------------------------------------------------------------
 // utils 
 

@@ -4379,6 +4379,7 @@ void sqr_fp12_vec_v1(fp2_4x2x1w r0, fp2_4x2x1w r1, const fp2_4x2x1w a0, const fp
   sub_fp2_4x2x1w(r0, t3, t4);
 }
 
+// dbl-2009-alnr formula
 void line_dbl_vec_v1(fp2_2x2x2w l0Y3, fp2_2x2x2w l1, fp2_2x2x2w l2, fp2_2x2x2w X3, fp2_2x2x2w Z3, const fp2_2x2x2w X1Y1, const fp2_2x2x2w Z1)
 {
   fp2_2x2x2w AB, C, D, E, FZZ;
@@ -4386,8 +4387,8 @@ void line_dbl_vec_v1(fp2_2x2x2w l0Y3, fp2_2x2x2w l1, fp2_2x2x2w l2, fp2_2x2x2w X
   const __m512i m0 = VSET(3, 2, 1, 0, 7, 6, 5, 4);
   const __m512i m1 = VSET(3, 2, 1, 0, 3, 2, 1, 0);
 
-  //  Y1 |  X1 at Fp2 layer
-  //  Z1 |  Z1 at Fp2 layer
+  // Y1 | X1 at Fp2 layer
+  // Z1 | Z1 at Fp2 layer
   sqr_fp2_2x2x2w(AB, X1Y1);             //             B = Y1^2 |            A = X1^2
   perm_var_hl(t3, X1Y1, m0);            //                   X1 |                  Y1
   blend_0x0F_hl(t0, t3, AB);            //                   X1 |                   A
@@ -4434,6 +4435,62 @@ void line_dbl_vec_v1(fp2_2x2x2w l0Y3, fp2_2x2x2w l1, fp2_2x2x2w l2, fp2_2x2x2w X
   blend_0x0F_hl(t0, l1, t0);            //              E(D-X3) | (3A+X1)^2-X1^2-9A^2
   sub_fp2_2x2x2w(l0Y3, t0, t1);         //      Y3 = E(D-X3)-8C |    l0 = 6X1^3-4Y1^2
   mul_fp2_2x2x2w(l2, Z3, FZZ);          //          l2 = Z3Z1^2 |                 ...
+}
+
+// madd-2007-bl
+void line_add_vec_v1(fp2_2x2x2w l0Y3, fp2_2x2x2w l1, fp2_2x2x2w X3, fp2_2x2x2w Z3, const fp2_2x2x2w X1Y1, const fp2_2x2x2w Z1Y2, const fp2_2x2x2w X2)
+{
+  fp2_2x2x2w H, J, ZZ, US, V;
+  fp2_2x2x2w t0, t1, t2, t3, t4;
+  const __m512i m0 = VSET(3, 2, 1, 0, 7, 6, 5, 4);
+  const __m512i m1 = VSET(7, 6, 5, 4, 7, 6, 5, 4);
+
+  // X1Y1 = X1 |  Y1 at Fp2 layer
+  // Z1Y2 = Z1 |  Y2 at Fp2 layer
+  //   X2 = X2 |  X2 at Fp2 layer
+  perm_var_hl(t0, Z1Y2, m1);            //                  Z1 |                  Z1 
+  mul_fp2_2x2x2w(ZZ, t0, Z1Y2);         //           ZZ = Z1^2 |               Y2*Z1
+  blend_0x0F_hl(t0, X2, ZZ);            //                  X2 |               Y2*Z1
+  perm_var_hl(t1, ZZ, m1);              //                  ZZ |                  ZZ
+  mul_fp2_2x2x2w(US, t0, t1);           //           U = X2*ZZ |        S = Y2*Z1*ZZ
+  sub_fp2_2x2x2w(H, US, X1Y1);          //            H = U-X1 |                S-Y1
+  blend_0x0F(t0, Z1Y2, H);              //                  Z1 |                S-Y1
+  add_fp2_2x2x2w(l1, H, t0);            //                Z1+H |   l1 = r = 2*(S-Y1)
+  perm_var_hl(t0, H, m0);               //                 ... |                   H
+  blend_0x0F_hl(t0, l1, t0);            //                Z1+H |                   H
+  sqr_fp2_2x2x2w(t0, t0);               //            (Z1+H)^2 |            HH = H^2
+  blend_0x0F_hl(t1, ZZ, t0);            //                  ZZ |                  HH
+  sa_fp2_2x2x2w(t0, t0, t1);            //         (Z1+H)^2-ZZ |                2*HH
+  perm_var_hl(t1, t1, m0);              //                  HH |                 ...
+  blend_0x0F_hl(t1, t1, t0);            //                  HH |                2*HH
+  sa_fp2_2x2x2w(Z3, t0, t1);            // Z3 = (Z1+H)^2-ZZ-HH |            I = 4*HH 
+  blend_0x0F_hl(t0, H, l1);             //                   H |                   r 
+  perm_var_hl(t3, Z3, m0);              //                   I |                  Z3
+  blend_0x0F_hl(t1, t3, X2);            //                   I |                  X2
+  mul_fp2_2x2x2w(J, t0, t1);            //             J = H*I |                r*X2
+  perm_var_hl(t1, l1, m0);              //                   r |                 ...
+  blend_0x0F_hl(t2, t1, Z1Y2);          //                   r |                  Y2
+  blend_0x0F_hl(t0, t0, t3);            //                   r |                  Z3 
+  mul_fp2_2x2x2w(t0, t0, t2);           //                 r^2 |               Y2*Z3
+  perm_var_hl(t2, J, m0);               //                 ... |                   J
+  blend_0x0F_hl(t2, t3, t2);            //                   I |                   J
+  mul_fp2_2x2x2w(V, X1Y1, t2);          //            V = X1*I |                Y1*J
+  perm_var_hl(t3, V, m0);               //                 ... |                   V
+  blend_0x0F_hl(t2, t0, t3);            //                 r^2 |                   V
+  blend_0x0F_hl(t3, J, t3);             //                   J |                   V
+  sa_fp2_2x2x2w(t2, t2, t3);            //               r^2-J |                 2*V
+  blend_0x0F_hl(t3, t2, V);             //               r^2-J |                Y1*J
+  perm_var_hl(t2, t2, m0);              //                 2*V |                 ...
+  blend_0x0F_hl(t2, t2, t3);            //                 2*V |                Y1*J
+  sa_fp2_2x2x2w(X3, t3, t2);            //      X3 = r^2-J-2*V |              2*Y1*J
+  blend_0x0F_hl(t3, V, J);              //                   V |                r*X2
+  blend_0x0F_hl(t0, X3, t0);            //                  X3 |               Y2*Z3
+  sub_fp2_2x2x2w(t0, t3, t0);           //                V-X3 |          r*X2-Y2*Z3
+  mul_fp2_2x2x2w(t2, t0, t1);           //             r(V-X3) |                 ... 
+  blend_0x0F_hl(t0, t2, t0);            //             r(V-X3) |          r*X2-Y2*Z3
+  perm_var_hl(t1, X3, m0);              //              2*Y1*J |                 ...
+  blend_0x0F_hl(t1, t1, t0);            //              2*Y1*J |          r*X2-Y2*Z3
+  add_fp2_2x2x2w(l0Y3, t0, t1);         // Y3 = r(V-X3)-2*Y1*J | l0 = 2*(r*X2-Y2*Z3)
 }
 
 // ----------------------------------------------------------------------------

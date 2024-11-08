@@ -10,6 +10,12 @@
 void line_dbl_scalar(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q);
 void line_dbl_vector(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q);
 
+#define line_add line_add_vector
+void line_add_scalar(vec384fp6 line, POINTonE2 *T, const POINTonE2 *R,
+                                                   const POINTonE2_affine *Q);
+void line_add_vector(vec384fp6 line, POINTonE2 *T, const POINTonE2 *R,
+                                                   const POINTonE2_affine *Q);
+                                                   
 
 void miller_loop_n(vec384fp12 ret, const POINTonE2_affine Q[],
                                    const POINTonE1_affine P[], size_t n);

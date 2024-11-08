@@ -1162,7 +1162,9 @@ void test_line()
 {
   vec384fp6 line;
   POINTonE2 T[1], Q[1];
-  fp2x2_2x2x2w X1Y1, Z1, l0Y3, l1, l2, X3, Z3;
+  POINTonE2_affine R[1];
+  fp2_2x2x2w X1Y1, Z1, l0Y3, l1, l2, X3, Z3;
+  fp2_2x2x2w Z1Y2, X2;
   uint64_t r64[NWORDS];
   uint64_t r48[NWORDS];
   uint64_t start_cycles, end_cycles, diff_cycles;
@@ -1175,83 +1177,157 @@ void test_line()
   Q[0].Y[0][0] = 3; Q[0].Y[1][0] = 4;
   Q[0].Z[0][0] = 5; Q[0].Z[1][0] = 6;
 
+  R[0].X[0][0] = 7; R[0].X[1][0] = 8 ;
+  R[0].Y[0][0] = 9; R[0].Y[1][0] = 10;
+
   for (i = 1 ; i < SWORDS; i++) {
     Q[0].X[0][i] = Q[0].X[1][i] = 0;
     Q[0].Y[0][i] = Q[0].Y[1][i] = 0;
     Q[0].Z[0][i] = Q[0].Z[1][i] = 0;
+    R[0].X[0][i] = R[0].X[1][i] = 0;
+    R[0].Y[0][i] = R[0].Y[1][i] = 0;
   }
 
-  X1Y1[0] = VSET(0, 4, 0, 3, 0, 2, 0, 1);
-  Z1  [0] = VSET(0, 6, 0, 5, 0, 6, 0, 5);
+  X1Y1[0] = VSET(0, 4, 0, 3, 0, 2 , 0, 1);
+  Z1  [0] = VSET(0, 6, 0, 5, 0, 6 , 0, 5);
+  Z1Y2[0] = VSET(0, 6, 0, 5, 0, 10, 0, 9);
+  X2  [0] = VSET(0, 8, 0, 7, 0, 8 , 0, 7);
 
   for (i = 1; i < VWORDS; i++) {
     X1Y1[i] = VZERO;
     Z1  [i] = VZERO;
+    Z1Y2[i] = VZERO;
+    X2  [i] = VZERO;
   }
 
-  line_dbl_scalar(line, T, Q);
-  mpi_print("* line_dbl_scalar line00 = 0x", line[0][0], SWORDS);
-  mpi_print("* line_dbl_scalar line01 = 0x", line[0][1], SWORDS);
-  mpi_print("* line_dbl_scalar line10 = 0x", line[1][0], SWORDS);
-  mpi_print("* line_dbl_scalar line11 = 0x", line[1][1], SWORDS);
-  mpi_print("* line_dbl_scalar line20 = 0x", line[2][0], SWORDS);
-  mpi_print("* line_dbl_scalar line21 = 0x", line[2][1], SWORDS);
-  mpi_print("* line_dbl_scalar X30    = 0x", T[0].X[0] , SWORDS);
-  mpi_print("* line_dbl_scalar X31    = 0x", T[0].X[1] , SWORDS);
-  mpi_print("* line_dbl_scalar Y30    = 0x", T[0].Y[0] , SWORDS);
-  mpi_print("* line_dbl_scalar Y31    = 0x", T[0].Y[1] , SWORDS);
-  mpi_print("* line_dbl_scalar Z30    = 0x", T[0].Z[0] , SWORDS);
-  mpi_print("* line_dbl_scalar Z31    = 0x", T[0].Z[1] , SWORDS);
+  // line_dbl_scalar(line, T, Q);
+  // mpi_print("* line_dbl_scalar line00 = 0x", line[0][0], SWORDS);
+  // mpi_print("* line_dbl_scalar line01 = 0x", line[0][1], SWORDS);
+  // mpi_print("* line_dbl_scalar line10 = 0x", line[1][0], SWORDS);
+  // mpi_print("* line_dbl_scalar line11 = 0x", line[1][1], SWORDS);
+  // mpi_print("* line_dbl_scalar line20 = 0x", line[2][0], SWORDS);
+  // mpi_print("* line_dbl_scalar line21 = 0x", line[2][1], SWORDS);
+  // mpi_print("* line_dbl_scalar X30    = 0x", T[0].X[0] , SWORDS);
+  // mpi_print("* line_dbl_scalar X31    = 0x", T[0].X[1] , SWORDS);
+  // mpi_print("* line_dbl_scalar Y30    = 0x", T[0].Y[0] , SWORDS);
+  // mpi_print("* line_dbl_scalar Y31    = 0x", T[0].Y[1] , SWORDS);
+  // mpi_print("* line_dbl_scalar Z30    = 0x", T[0].Z[0] , SWORDS);
+  // mpi_print("* line_dbl_scalar Z31    = 0x", T[0].Z[1] , SWORDS);
 
-  line_dbl_vec_v1(l0Y3, l1, l2, X3, Z3, X1Y1, Z1);
+  // line_dbl_vec_v1(l0Y3, l1, l2, X3, Z3, X1Y1, Z1);
+  // get_channel_4x2w(r48, l0Y3, 0);
+  // carryp_mpi48(r48);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* line_dbl_vec_v1 line00 = 0x", r64, SWORDS);
+  // get_channel_4x2w(r48, l0Y3, 2);
+  // carryp_mpi48(r48);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* line_dbl_vec_v1 line01 = 0x", r64, SWORDS);
+  // get_channel_4x2w(r48, l1, 0);
+  // carryp_mpi48(r48);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* line_dbl_vec_v1 line10 = 0x", r64, SWORDS);
+  // get_channel_4x2w(r48, l1, 2);
+  // carryp_mpi48(r48);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* line_dbl_vec_v1 line11 = 0x", r64, SWORDS);
+  // get_channel_4x2w(r48, l2, 4);
+  // carryp_mpi48(r48);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* line_dbl_vec_v1 line20 = 0x", r64, SWORDS);
+  // get_channel_4x2w(r48, l2, 6);
+  // carryp_mpi48(r48);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* line_dbl_vec_v1 line21 = 0x", r64, SWORDS);
+  // get_channel_4x2w(r48, X3, 4);
+  // carryp_mpi48(r48);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* line_dbl_vec_v1 X30    = 0x", r64, SWORDS);
+  // get_channel_4x2w(r48, X3, 6);
+  // carryp_mpi48(r48);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* line_dbl_vec_v1 X31    = 0x", r64, SWORDS);
+  // get_channel_4x2w(r48, l0Y3, 4);
+  // carryp_mpi48(r48);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* line_dbl_vec_v1 Y30    = 0x", r64, SWORDS);
+  // get_channel_4x2w(r48, l0Y3, 6);
+  // carryp_mpi48(r48);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* line_dbl_vec_v1 Y31    = 0x", r64, SWORDS);
+  // get_channel_4x2w(r48, Z3, 4);
+  // carryp_mpi48(r48);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* line_dbl_vec_v1 Z30    = 0x", r64, SWORDS);
+  // get_channel_4x2w(r48, Z3, 6);
+  // carryp_mpi48(r48);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* line_dbl_vec_v1 Z31    = 0x", r64, SWORDS);
+
+  line_add_scalar(line, T, Q, R);
+  mpi_print("* line_add_scalar line00 = 0x", line[0][0], SWORDS);
+  mpi_print("* line_add_scalar line01 = 0x", line[0][1], SWORDS);
+  mpi_print("* line_add_scalar line10 = 0x", line[1][0], SWORDS);
+  mpi_print("* line_add_scalar line11 = 0x", line[1][1], SWORDS);
+  mpi_print("* line_add_scalar line20 = 0x", line[2][0], SWORDS);
+  mpi_print("* line_add_scalar line21 = 0x", line[2][1], SWORDS);
+  mpi_print("* line_add_scalar X30    = 0x", T[0].X[0] , SWORDS);
+  mpi_print("* line_add_scalar X31    = 0x", T[0].X[1] , SWORDS);
+  mpi_print("* line_add_scalar Y30    = 0x", T[0].Y[0] , SWORDS);
+  mpi_print("* line_add_scalar Y31    = 0x", T[0].Y[1] , SWORDS);
+  mpi_print("* line_add_scalar Z30    = 0x", T[0].Z[0] , SWORDS);
+  mpi_print("* line_add_scalar Z31    = 0x", T[0].Z[1] , SWORDS);
+
+  line_add_vec_v1(l0Y3, l1, X3, Z3, X1Y1, Z1Y2, X2);
   get_channel_4x2w(r48, l0Y3, 0);
   carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* line_dbl_vector line00 = 0x", r64, SWORDS);
+  mpi_print("* line_add_vec_v1 line00 = 0x", r64, SWORDS);
   get_channel_4x2w(r48, l0Y3, 2);
   carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* line_dbl_vector line01 = 0x", r64, SWORDS);
+  mpi_print("* line_add_vec_v1 line01 = 0x", r64, SWORDS);
   get_channel_4x2w(r48, l1, 0);
   carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* line_dbl_vector line10 = 0x", r64, SWORDS);
+  mpi_print("* line_add_vec_v1 line10 = 0x", r64, SWORDS);
   get_channel_4x2w(r48, l1, 2);
   carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* line_dbl_vector line11 = 0x", r64, SWORDS);
-  get_channel_4x2w(r48, l2, 4);
-  carryp_mpi48(r48);
-  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* line_dbl_vector line20 = 0x", r64, SWORDS);
-  get_channel_4x2w(r48, l2, 6);
-  carryp_mpi48(r48);
-  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* line_dbl_vector line21 = 0x", r64, SWORDS);
-  get_channel_4x2w(r48, X3, 4);
-  carryp_mpi48(r48);
-  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* line_dbl_vector X30    = 0x", r64, SWORDS);
-  get_channel_4x2w(r48, X3, 6);
-  carryp_mpi48(r48);
-  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* line_dbl_vector X31    = 0x", r64, SWORDS);
-  get_channel_4x2w(r48, l0Y3, 4);
-  carryp_mpi48(r48);
-  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* line_dbl_vector Y30    = 0x", r64, SWORDS);
-  get_channel_4x2w(r48, l0Y3, 6);
-  carryp_mpi48(r48);
-  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* line_dbl_vector Y31    = 0x", r64, SWORDS);
+  mpi_print("* line_add_vec_v1 line11 = 0x", r64, SWORDS);
   get_channel_4x2w(r48, Z3, 4);
   carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* line_dbl_vector Z30    = 0x", r64, SWORDS);
+  mpi_print("* line_add_vec_v1 line20 = 0x", r64, SWORDS);
   get_channel_4x2w(r48, Z3, 6);
   carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* line_dbl_vector Z31    = 0x", r64, SWORDS);
+  mpi_print("* line_add_vec_v1 line21 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, X3, 4);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* line_add_vec_v1 X30    = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, X3, 6);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* line_add_vec_v1 X31    = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, l0Y3, 4);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* line_add_vec_v1 Y30    = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, l0Y3, 6);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* line_add_vec_v1 Y31    = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, Z3, 4);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* line_add_vec_v1 Z30    = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, Z3, 6);
+  carryp_mpi48(r48);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* line_add_vec_v1 Z31    = 0x", r64, SWORDS);
+
 #endif
 
   puts("\nLINE TIMING\n");
@@ -1264,6 +1340,16 @@ void test_line()
   printf("- line_dbl_vec_v1: ");
   LOAD_CACHE(line_dbl_vec_v1(l0Y3, l1, l2, X3, Z3, X1Y1, Z1), 10000);
   MEASURE_CYCLES(line_dbl_vec_v1(l0Y3, l1, l2, X3, Z3, X1Y1, Z1), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- line_add_scalar: ");
+  LOAD_CACHE(line_add_scalar(line, T, Q, R), 10000);
+  MEASURE_CYCLES(line_add_scalar(line, T, Q, R), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- line_add_vec_v1: ");
+  LOAD_CACHE(line_add_vec_v1(l0Y3, l1, X3, Z3, X1Y1, Z1Y2, X2), 10000);
+  MEASURE_CYCLES(line_add_vec_v1(l0Y3, l1, X3, Z3, X1Y1, Z1Y2, X2), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 }
 
