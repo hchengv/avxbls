@@ -3334,7 +3334,7 @@ static void mul_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b)
   perm_1010_hl(t0, a);                  //          A0 |          A0
   mul_fpx2_4x2w(tt0, t0, b);            //       A0*B1 |       A0*B0
   perm_3232_hl(t0, a);                  //          A1 |          A1
-  perm_1032(t1, b);                     //          B0 |          B1
+  perm_1032_hl(t1, b);                  //          B0 |          B1
   mul_fpx2_4x2w(tt1, t0, t1);           //       A1*B0 |       A1*B1
   asx2_fpx2_4x2w(tt0, tt0, tt1);        // A0*B1+A1*B0 | A0*B0-A1*B1
   redc_fpx2_4x2w(r, tt0);               // A0*B1+A1*B0 | A0*B0-A1*B1
@@ -4435,11 +4435,10 @@ void line_dbl_vec_v1(fp2_2x2x2w l0, fp2_2x2x2w l1, fp2_2x2x2w l2, fp2_2x2x2w X3,
 
   //  Y1 |  X1 at Fp2 layer
   //  Z1 |  Z1 at Fp2 layer
-
   sqr_fp2_2x2x2w(AB, X1Y1);             //             B = Y1^2 |            A = X1^2
   perm_var_hl(t3, X1Y1, m0);            //                   X1 |                  Y1
   blend_0x0F_hl(t0, t3, AB);            //                   X1 |                   A
-  add_fp2_2x2x2w(t0, t0, X1Y1);         //                 X1+B |                 A+A
+  add_fp2_2x2x2w(t0, t0, AB);           //                 X1+B |                 A+A
   perm_var_hl(t1, AB, m0);              //                    A |                   B
   blend_0x0F_hl(t2, t0, t1);            //                 X1+B |                   B
   sqr_fp2_2x2x2w(C, t2);                //             (X1+B)^2 |             C = B^2
@@ -4456,7 +4455,7 @@ void line_dbl_vec_v1(fp2_2x2x2w l0, fp2_2x2x2w l1, fp2_2x2x2w l2, fp2_2x2x2w X3,
   add_fp2_2x2x2w(D, t3, t2);            // D = 2*((X1+B)^2-A-C) |               Y1+Z1
   perm_var_hl(t0, t0, m0);              //                3A+X1 |                 ...
   blend_0x0F_hl(t0, t0, D);             //                3A+X1 |               Y1+Z1
-  sqr_fp2x2_2x2x2w(t0, t0);             //            (3A+X1)^2 |           (Y1+Z1)^2
+  sqr_fp2_2x2x2w(t0, t0);               //            (3A+X1)^2 |           (Y1+Z1)^2
   perm_var_hl(t2, FZZ, m0);             //                    F |                  ZZ
   blend_0x0F_hl(t3, t2, t0);            //                    F |           (Y1+Z1)^2
   blend_0x0F_hl(t1, D, t1);             //                    D |                   B

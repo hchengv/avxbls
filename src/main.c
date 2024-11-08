@@ -1184,16 +1184,16 @@ void test_line()
   X1Y1[0] = VSET(0, 4, 0, 3, 0, 2, 0, 1);
   Z1  [0] = VSET(0, 6, 0, 5, 0, 6, 0, 5);
 
-  for (i = 1; i < VWORDS/2; i++) {
-    X1Y1[0] = VZERO;
-    Z1  [0] = VZERO;
+  for (i = 1; i < VWORDS; i++) {
+    X1Y1[i] = VZERO;
+    Z1  [i] = VZERO;
   }
 
   line_dbl_scalar(line, T, Q);
   mpi_print("* line_dbl_scalar line00 = 0x", line[0][0], SWORDS);
   mpi_print("* line_dbl_scalar line01 = 0x", line[0][1], SWORDS);
   mpi_print("* line_dbl_scalar line10 = 0x", line[1][0], SWORDS);
-  mpi_print("* line_dbl_scalar line10 = 0x", line[1][1], SWORDS);
+  mpi_print("* line_dbl_scalar line11 = 0x", line[1][1], SWORDS);
   mpi_print("* line_dbl_scalar line20 = 0x", line[2][0], SWORDS);
   mpi_print("* line_dbl_scalar line21 = 0x", line[2][1], SWORDS);
   mpi_print("* line_dbl_scalar X30    = 0x", T[0].X[0] , SWORDS);
