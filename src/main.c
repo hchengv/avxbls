@@ -1262,8 +1262,8 @@ void test_line()
   printf("#cycle = %ld\n", diff_cycles);
 
   printf("- line_dbl_vec_v1: ");
-  LOAD_CACHE(line_dbl_vec_v1(l0, l1, l2, X3, Y3, Z3, X1Y1, Z1), 10000);
-  MEASURE_CYCLES(line_dbl_vec_v1(l0, l1, l2, X3, Y3, Z3, X1Y1, Z1), 100000);
+  LOAD_CACHE(line_dbl_vec_v1(l0Y3, l1, l2, X3, Z3, X1Y1, Z1), 10000);
+  MEASURE_CYCLES(line_dbl_vec_v1(l0Y3, l1, l2, X3, Z3, X1Y1, Z1), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 }
 

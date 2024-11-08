@@ -182,30 +182,30 @@ void line_dbl_vector(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q)
   conv_48to64_fp_4x2w(t[4], Z3);
 
   for(i = 0; i < SWORDS/2; i++) {
-    line   [0][0][i         ] = ((uint64_t *)&l0Y3[i])[0];
-    line   [0][0][i+SWORDS/2] = ((uint64_t *)&l0Y3[i])[1];
-    line   [0][1][i         ] = ((uint64_t *)&l0Y3[i])[2];
-    line   [0][1][i+SWORDS/2] = ((uint64_t *)&l0Y3[i])[3];
-    line   [1][0][i         ] = ((uint64_t *)&l1  [i])[0];
-    line   [1][0][i+SWORDS/2] = ((uint64_t *)&l1  [i])[1];
-    line   [1][1][i         ] = ((uint64_t *)&l1  [i])[2];
-    line   [1][1][i+SWORDS/2] = ((uint64_t *)&l1  [i])[3];
-    line   [2][0][i         ] = ((uint64_t *)&l2  [i])[4];
-    line   [2][0][i+SWORDS/2] = ((uint64_t *)&l2  [i])[5];
-    line   [2][1][i         ] = ((uint64_t *)&l2  [i])[6];
-    line   [2][1][i+SWORDS/2] = ((uint64_t *)&l2  [i])[7];
-    T   ->X[0][   i         ] = ((uint64_t *)&X3  [i])[4];
-    T   ->X[0][   i+SWORDS/2] = ((uint64_t *)&X3  [i])[5];
-    T   ->X[1][   i         ] = ((uint64_t *)&X3  [i])[6];
-    T   ->X[1][   i+SWORDS/2] = ((uint64_t *)&X3  [i])[7];
-    T   ->Y[0][   i         ] = ((uint64_t *)&l0Y3[i])[4];
-    T   ->Y[0][   i+SWORDS/2] = ((uint64_t *)&l0Y3[i])[5];
-    T   ->Y[1][   i         ] = ((uint64_t *)&l0Y3[i])[6];
-    T   ->Y[1][   i+SWORDS/2] = ((uint64_t *)&l0Y3[i])[7];
-    T   ->Z[0][   i         ] = ((uint64_t *)&Z3  [i])[4];
-    T   ->Z[0][   i+SWORDS/2] = ((uint64_t *)&Z3  [i])[5];
-    T   ->Z[1][   i         ] = ((uint64_t *)&Z3  [i])[6];
-    T   ->Z[1][   i+SWORDS/2] = ((uint64_t *)&Z3  [i])[7];
+    line   [0][0][i         ] = ((uint64_t *)&t[0][i])[0];
+    line   [0][0][i+SWORDS/2] = ((uint64_t *)&t[0][i])[1];
+    line   [0][1][i         ] = ((uint64_t *)&t[0][i])[2];
+    line   [0][1][i+SWORDS/2] = ((uint64_t *)&t[0][i])[3];
+    line   [1][0][i         ] = ((uint64_t *)&t[1][i])[0];
+    line   [1][0][i+SWORDS/2] = ((uint64_t *)&t[1][i])[1];
+    line   [1][1][i         ] = ((uint64_t *)&t[1][i])[2];
+    line   [1][1][i+SWORDS/2] = ((uint64_t *)&t[1][i])[3];
+    line   [2][0][i         ] = ((uint64_t *)&t[2][i])[4];
+    line   [2][0][i+SWORDS/2] = ((uint64_t *)&t[2][i])[5];
+    line   [2][1][i         ] = ((uint64_t *)&t[2][i])[6];
+    line   [2][1][i+SWORDS/2] = ((uint64_t *)&t[2][i])[7];
+    T   ->X[0][   i         ] = ((uint64_t *)&t[3][i])[4];
+    T   ->X[0][   i+SWORDS/2] = ((uint64_t *)&t[3][i])[5];
+    T   ->X[1][   i         ] = ((uint64_t *)&t[3][i])[6];
+    T   ->X[1][   i+SWORDS/2] = ((uint64_t *)&t[3][i])[7];
+    T   ->Y[0][   i         ] = ((uint64_t *)&t[0][i])[4];
+    T   ->Y[0][   i+SWORDS/2] = ((uint64_t *)&t[0][i])[5];
+    T   ->Y[1][   i         ] = ((uint64_t *)&t[0][i])[6];
+    T   ->Y[1][   i+SWORDS/2] = ((uint64_t *)&t[0][i])[7];
+    T   ->Z[0][   i         ] = ((uint64_t *)&t[4][i])[4];
+    T   ->Z[0][   i+SWORDS/2] = ((uint64_t *)&t[4][i])[5];
+    T   ->Z[1][   i         ] = ((uint64_t *)&t[4][i])[6];
+    T   ->Z[1][   i+SWORDS/2] = ((uint64_t *)&t[4][i])[7];
   }
 
   #ifdef PROFILING

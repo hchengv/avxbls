@@ -4418,7 +4418,6 @@ void line_dbl_vec_v1(fp2_2x2x2w l0Y3, fp2_2x2x2w l1, fp2_2x2x2w l2, fp2_2x2x2w X
   blend_0x0F_hl(t4, D, AB);             //                    D |                   A
   sub_fp2_2x2x2w(X3, t0, t4);           //            X3 = F-2D |      (3A+X1)^2-X1^2
   perm_var_hl(t3, t3, m0);              //          (Y1+Z1)^2-B |                 ...
-
   blend_0x0F_hl(t3, t3, C);             //          (Y1+Z1)^2-B |                   C
   blend_0x0F_hl(t4, FZZ, C);            //                   ZZ |                   C
   sa_fp2_2x2x2w(Z3, t3, t4);            //  Z3 = (Y1+Z1)^2-B-ZZ |                  2C
@@ -4430,8 +4429,8 @@ void line_dbl_vec_v1(fp2_2x2x2w l0Y3, fp2_2x2x2w l1, fp2_2x2x2w l2, fp2_2x2x2w X
   blend_0x0F_hl(t3, X3, FZZ);           //                   X3 |                   F
   sub_fp2_2x2x2w(t0, t0, t3);           //                 D-X3 | (3A+X1)^2-X1^2-9A^2
   blend_0x0F_hl(t2, t0, t2);            //                 D-X3 |                  ZZ
-  perm_var_hl(t0, E, m1);               //                    E |                   E
-  mul_fp2_2x2x2w(l1, t2, t0);           //              E(D-X3) |    l1 = 3 X1^2 Z1^2
+  perm_var_hl(t3, E, m1);               //                    E |                   E
+  mul_fp2_2x2x2w(l1, t2, t3);           //              E(D-X3) |    l1 = 3 X1^2 Z1^2
   blend_0x0F_hl(t0, l1, t0);            //              E(D-X3) | (3A+X1)^2-X1^2-9A^2
   sub_fp2_2x2x2w(l0Y3, t0, t1);         //      Y3 = E(D-X3)-8C |    l0 = 6X1^3-4Y1^2
   mul_fp2_2x2x2w(l2, Z3, FZZ);          //          l2 = Z3Z1^2 |                 ...
