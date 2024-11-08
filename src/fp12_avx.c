@@ -1205,7 +1205,6 @@ static void assx6_fp_8x1w(fp_8x1w r, const fp_8x1w a, const fp_8x1w b)
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
 
-
 static void add_fp_4x2w(fp_4x2w r, const fp_4x2w a, const fp_4x2w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
@@ -1264,6 +1263,47 @@ static void sub_fp_4x2w(fp_4x2w r, const fp_4x2w a, const fp_4x2w b)
 
   // r = a - b
   r0 = VSUB(a0, b0); r1 = VSUB(a1, b1); r2 = VSUB(a2, b2); r3 = VSUB(a3, b3);
+
+  // get sign mask
+  t0 = VMADD(r1, 0x55, r1, VSRA(r0, BRADIX));
+  t0 = VMADD(r2, 0x55, r2, VSRA(t0, BRADIX));
+  t0 = VMADD(r3, 0x55, r3, VSRA(t0, BRADIX));
+  t0 = VMADD(r0, 0xAA, r0, VZSHUF(0xCCCC, VSRA(t0, BRADIX), 0x4E));
+  t0 = VMADD(r1, 0xAA, r1, VSRA(t0, BRADIX));
+  t0 = VMADD(r2, 0xAA, r2, VSRA(t0, BRADIX));
+  t0 = VMADD(r3, 0xAA, r3, VSRA(t0, BRADIX));
+
+  // if r is non-negative, smask = all-0 
+  // if r is     negative, smask = all-1
+  smask = VSRA(t0, 63);
+  smask = VSHUF(smask, 0xEE);
+
+  // r = r + (p & smask)
+  r0 = VADD(r0, VAND(p0, smask)); r1 = VADD(r1, VAND(p1, smask)); 
+  r2 = VADD(r2, VAND(p2, smask)); r3 = VADD(r3, VAND(p3, smask)); 
+
+  // carry propagation 
+  // r0 is finally 49-bit not 48-bit
+  r1 = VADD(r1, VSRA(r0, BRADIX)); r0 = VAND(r0, bmask);
+  r2 = VADD(r2, VSRA(r1, BRADIX)); r1 = VAND(r1, bmask);
+  r3 = VADD(r3, VSRA(r2, BRADIX)); r2 = VAND(r2, bmask);
+  r0 = VMADD(r0, 0xAA, r0, VSHUF(VSRA(r3, BRADIX), 0x4E)); r3 = VAND(r3, bmask);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3; 
+}
+
+static void shl_fp_4x2w(fp_4x2w r, const fp_4x2w a, const __m512i m)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i p0 = VSET(P48[4], P48[0], P48[4], P48[0], P48[4], P48[0], P48[4], P48[0]);
+  const __m512i p1 = VSET(P48[5], P48[1], P48[5], P48[1], P48[5], P48[1], P48[5], P48[1]);
+  const __m512i p2 = VSET(P48[6], P48[2], P48[6], P48[2], P48[6], P48[2], P48[6], P48[2]);
+  const __m512i p3 = VSET(P48[7], P48[3], P48[7], P48[3], P48[7], P48[3], P48[7], P48[3]);
+  const __m512i bmask = VSET1(BMASK); 
+  __m512i r0, r1, r2, r3, smask, t0;
+
+  // r = a << m
+  r0 = VSLLV(a0, m); r1 = VSLLV(a1, m); r2 = VSLLV(a2, m); r3 = VSLLV(a3, m);
 
   // get sign mask
   t0 = VMADD(r1, 0x55, r1, VSRA(r0, BRADIX));
@@ -2817,7 +2857,6 @@ static void aass_fpx2_4x2w(fpx2_4x2w r, const fpx2_4x2w a, const fpx2_4x2w b)
   r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
 }
 
-
 // operand-scanning (excl. carry prop.)
 static void mul_fpx2_4x2w_v1(fpx2_4x2w r, const fp_4x2w a, const fp_4x2w b)
 {
@@ -3153,6 +3192,11 @@ static void add_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b)
   add_fp_4x2w(r, a, b);
 }
 
+static void sub_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b)
+{
+  sub_fp_4x2w(r, a, b);
+}
+
 // a = < B1' | B1 | B0' | B0 | A1' | A1 | A0' | A0 >
 // b = < D1' | D1 | D0' | D0 | C1' | C1 | C0' | C0 >
 // r = < B1'+D1' | B1+D1 | B0'+D0' | B0+D0 | A1'-C1' | A1-C1 | A0'-C0' | A0-C0 >
@@ -3207,6 +3251,65 @@ static void as_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b)
   r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3; 
 }
 
+// a = < B1' | B1 | B0' | B0 | A1' | A1 | A0' | A0 >
+// b = < D1' | D1 | D0' | D0 | C1' | C1 | C0' | C0 >
+// r = < B1'-D1' | B1-D1 | B0'-D0' | B0-D0 | A1'+C1' | A1+C1 | A0'+C0' | A0+C0 >
+static void sa_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+  const __m512i p0 = VSET(P48[4], P48[0], P48[4], P48[0], P48[4], P48[0], P48[4], P48[0]);
+  const __m512i p1 = VSET(P48[5], P48[1], P48[5], P48[1], P48[5], P48[1], P48[5], P48[1]);
+  const __m512i p2 = VSET(P48[6], P48[2], P48[6], P48[2], P48[6], P48[2], P48[6], P48[2]);
+  const __m512i p3 = VSET(P48[7], P48[3], P48[7], P48[3], P48[7], P48[3], P48[7], P48[3]);
+  const __m512i bmask = VSET1(BMASK); 
+  __m512i r0, r1, r2, r3, smask;
+  __m512i t0, t1, t2, t3;
+
+  // r =  B1' | B1 | B0' | B0 | A1'+C1' | A1+C1 | A0'+C0' | A0+C0 
+  r0 = VMADD(a0, 0x0F, a0, b0); r1 = VMADD(a1, 0x0F, a1, b1);
+  r2 = VMADD(a2, 0x0F, a2, b2); r3 = VMADD(a3, 0x0F, a3, b3);
+
+  // t = D1' | D1 | D0' | D0 | p' | p | p' | p
+  t0 = VMBLEND(0x0F, b0, p0); t1 = VMBLEND(0x0F, b1, p1);
+  t2 = VMBLEND(0x0F, b2, p2); t3 = VMBLEND(0x0F, b3, p3);
+
+  // r = B1'-D1' | B1-D1 | B0'-D0' | B0-D0 | A1'+C1'-p' | A1+C1-p' | A0'+C0'-p' | A0+C0-p'
+  r0 = VSUB(r0, t0); r1 = VSUB(r1, t1); r2 = VSUB(r2, t2); r3 = VSUB(r3, t3);
+
+  // get sign mask
+  t0 = VMADD(r1, 0x55, r1, VSRA(r0, BRADIX));
+  t0 = VMADD(r2, 0x55, r2, VSRA(t0, BRADIX));
+  t0 = VMADD(r3, 0x55, r3, VSRA(t0, BRADIX));
+  t0 = VMADD(r0, 0xAA, r0, VZSHUF(0xCCCC, VSRA(t0, BRADIX), 0x4E));
+  t0 = VMADD(r1, 0xAA, r1, VSRA(t0, BRADIX));
+  t0 = VMADD(r2, 0xAA, r2, VSRA(t0, BRADIX));
+  t0 = VMADD(r3, 0xAA, r3, VSRA(t0, BRADIX));
+
+  // if r is non-negative, smask = all-0 
+  // if r is     negative, smask = all-1
+  smask = VSRA(t0, 63);
+  smask = VSHUF(smask, 0xEE);
+
+  // r = r + (p & smask)
+  r0 = VADD(r0, VAND(p0, smask)); r1 = VADD(r1, VAND(p1, smask)); 
+  r2 = VADD(r2, VAND(p2, smask)); r3 = VADD(r3, VAND(p3, smask)); 
+
+  // carry propagation 
+  // r0 is finally 49-bit not 48-bit
+  r1 = VADD(r1, VSRA(r0, BRADIX)); r0 = VAND(r0, bmask);
+  r2 = VADD(r2, VSRA(r1, BRADIX)); r1 = VAND(r1, bmask);
+  r3 = VADD(r3, VSRA(r2, BRADIX)); r2 = VAND(r2, bmask);
+  r0 = VMADD(r0, 0xAA, r0, VSHUF(VSRA(r3, BRADIX), 0x4E)); r3 = VAND(r3, bmask);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3; 
+}
+
+static void shl_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a, const __m512i m)
+{
+  shl_fp_4x2w(r, a, m);
+}
+
 // r0 = a0 - a1
 // r1 = a0 + a1
 static void mul_by_u_plus_1_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a)
@@ -3218,12 +3321,31 @@ static void mul_by_u_plus_1_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a)
   asx2_fp_4x2w(r, a, t0);               //  A0+A1 | A0-A1
 }
 
+// r0 = a0*b0 - a1*b1
+// r1 = a0*b1 + a1*b0
+// schoolbook
+static void mul_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b)
+{
+  fp2_2x2x2w t0, t1;
+  fp2x2_2x2x2w tt0, tt1;
+
+  // a = A1 | A0 at Fp layer
+  // b = B1 | B0 at Fp layer
+  perm_1010_hl(t0, a);                  //          A0 |          A0
+  mul_fpx2_4x2w(tt0, t0, b);            //       A0*B1 |       A0*B0
+  perm_3232_hl(t0, a);                  //          A1 |          A1
+  perm_1032(t1, b);                     //          B0 |          B1
+  mul_fpx2_4x2w(tt1, t0, t1);           //       A1*B0 |       A1*B1
+  asx2_fpx2_4x2w(tt0, tt0, tt1);        // A0*B1+A1*B0 | A0*B0-A1*B1
+  redc_fpx2_4x2w(r, tt0);               // A0*B1+A1*B0 | A0*B0-A1*B1
+}
+
 // r0 = (a0 + a1)*(a0 - a1)
 // r1 = 2*a0*a1
 static void sqr_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a)
 {
   fp2_2x2x2w t0, t1, t2;
-  fp2x2_2x2x2w t3;
+  fp2x2_2x2x2w tt0;
 
   // a = A1 | A0 at Fp layer
   perm_1010_hl(t0, a);                  //      A0 |              A0
@@ -3231,8 +3353,8 @@ static void sqr_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a)
   perm_zz32_hl(t2, a);                  //       0 |              A1
   add_fp_4x2w(t0, t0, t1);              //    2*A0 |           A0+A1
   sub_fp_4x2w(t2, a, t2);               //      A1 |           A0-A1
-  mul_fpx2_4x2w(t3, t0, t2);            // 2*A0*A1 | (A0+A1)*(A0-A1)
-  redc_fpx2_4x2w(r, t3);                // 2*A0*A1 | (A0+A1)*(A0-A1)
+  mul_fpx2_4x2w(tt0, t0, t2);           // 2*A0*A1 | (A0+A1)*(A0-A1)
+  redc_fpx2_4x2w(r, tt0);               // 2*A0*A1 | (A0+A1)*(A0-A1)
 }
 
 // r0 = a0*b0 - a1*b1
@@ -4301,6 +4423,62 @@ void sqr_fp12_vec_v1(fp2_4x2x1w r0, fp2_4x2x1w r1, const fp2_4x2x1w a0, const fp
   perm_var(t4, t4, m0);
   // r0 = t3 - t4
   sub_fp2_4x2x1w(r0, t3, t4);
+}
+
+void line_dbl_vec_v1(fp2_2x2x2w l0, fp2_2x2x2w l1, fp2_2x2x2w l2, fp2_2x2x2w X3, fp2_2x2x2w Y3, fp2_2x2x2w Z3, const fp2_2x2x2w X1Y1, const fp2_2x2x2w Z1)
+{
+  fp2_2x2x2w AB, C, D, E, FZZ;
+  fp2_2x2x2w t0, t1, t2, t3, t4, t5;
+  const __m512i m0 = VSET(3, 2, 1, 0, 7, 6, 5, 4);
+  const __m512i m1 = VSET(3, 3, 3, 3, 2, 2, 2, 2);
+  const __m512i m2 = VSET(3, 2, 1, 0, 3, 2, 1, 0);
+
+  //  Y1 |  X1 at Fp2 layer
+  //  Z1 | ... at Fp2 layer
+
+  sqr_fp2_2x2x2w(AB, X1Y1);             //             B = Y1^2 |            A = X1^2
+  perm_var_hl(t3, X1Y1, m0);            //                   X1 |                  Y1
+  blend_0x0F_hl(t0, t3, AB);            //                   X1 |                   A
+  add_fp2_2x2x2w(t0, t0, X1Y1);         //                 X1+B |                 A+A
+  perm_var_hl(t1, AB, m0);              //                    A |                   B
+  blend_0x0F_hl(t2, t0, t1);            //                 X1+B |                   B
+  sqr_fp2_2x2x2w(C, t2);                //             (X1+B)^2 |             C = B^2
+  blend_0x0F_hl(t2, C, t0);             //             (X1+B)^2 |                  2A
+  blend_0x0F_hl(t0, t1, AB);            //                    A |                   A
+  sa_fp2_2x2x2w(E, t2, t0);             //           (X1+B)^2-A |              E = 3A
+  perm_var_hl(t5, C, m0);               //                    C |            (X1+B)^2
+  blend_0x0F_hl(t2, t5, X1Y1);          //                    C |                  X1
+  sa_fp2_2x2x2w(t0, E, t2);             //         (X1+B)^2-A-C |               3A+X1
+  blend_0x0F_hl(t2, Z1, E);             //                   Z1 |                   E
+  sqr_fp2_2x2x2w(FZZ, t2);              //            ZZ = Z1^2 |             F = E^2
+  blend_0x0F_hl(t3, t0, t3);            //         (X1+B)^2-A-C |                  Y1
+  perm_var_hl(t2, Z1, m0);              //                  ... |                  Z1
+  blend_0x0F_hl(t2, t0, t2);            //         (X1+B)^2-A-C |                  Z1
+  add_fp2_2x2x2w(D, t3, t2);            // D = 2*((X1+B)^2-A-C) |               Y1+Z1
+  perm_var_hl(t0, t0, m0);              //                3A+X1 |                 ...
+  blend_0x0F_hl(t0, t0, D);             //                3A+X1 |               Y1+Z1
+  sqr_fp2x2_2x2x2w(t0, t0);             //            (3A+X1)^2 |           (Y1+Z1)^2
+  perm_var_hl(t2, FZZ, m0);             //                    F |                  ZZ
+  blend_0x0F_hl(t3, t2, t0);            //                    F |           (Y1+Z1)^2
+  blend_0x0F_hl(t1, D, t1);             //                    D |                   B
+  sub_fp2_2x2x2w(t3, t3, t1);           //                  F-D |         (Y1+Z1)^2-B
+  perm_var_hl(t0, t0, m0);              //                  ... |           (3A+X1)^2 
+  blend_0x0F_hl(t0, t3, t0);            //                  F-D |           (3A+X1)^2
+  blend_0x0F_hl(t4, D, AB);             //                    D |                   A
+  sub_fp2_2x2x2w(X3, t0, t4);           //            X3 = F-2D |      (3A+X1)^2-X1^2
+  perm_var_hl(t3, t3, m0);              //          (Y1+Z1)^2-B |                 ...
+  blend_0x0F(t3, t3, X3);               //          (Y1+Z1)^2-B |      (3A+X1)^2-X1^2
+  sub_fp2_2x2x2w(Z3, t3, FZZ);          //  Z3 = (Y1+Z1)^2-B-ZZ | (3A+X1)^2-X1^2-9A^2
+  blend_0x0F_hl(t1, t5, t1);            //                    C |                   B 
+  shl_fp2_2x2x2w(t1, t1, m1);           //                   8C |               4Y1^2
+  blend_0x0F_hl(t0, D, Z3);             //                    D | (3A+X1)^2-X1^2-9A^2
+  blend_0x0F_hl(t3, X3, t1);            //                   X3 |               4Y1^2
+  sub_fp2_2x2x2w(l0, t0, t3);           //                 D-X3 |    l0 = 6X1^3-4Y1^2
+  blend_0x0F_hl(t2, l0, t2);            //                 D-X3 |                  ZZ
+  perm_var_hl(t0, E, m2);               //                    E |                   E
+  mul_fp2_2x2x2w(l1, t2, t0);           //              E(D-X3) |    l1 = 3 X1^2 Z1^2
+  sub_fp2_2x2x2w(Y3, l1, t1);           //      Y3 = E(D-X3)-8C |                 ...
+  mul_fp2_2x2x2w(l2, Z3, FZZ);          //          l2 = Z3Z1^2 |                 ...
 }
 
 // ----------------------------------------------------------------------------

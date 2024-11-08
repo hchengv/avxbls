@@ -18,6 +18,7 @@
 #define VXOR(X, Y)            _mm512_xor_si512 (X, Y)
 #define VSHR(X, Y)            _mm512_srli_epi64(X, Y)
 #define VSHL(X, Y)            _mm512_slli_epi64(X, Y)
+#define VSLLV(X, Y)           _mm512_sllv_epi64(X, Y)
 #define VSRA(X, Y)            _mm512_srai_epi64(X, Y)
 
 // broadcast
