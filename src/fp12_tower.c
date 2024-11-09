@@ -23,6 +23,8 @@ static inline void mul_by_u_plus_1_fp2(vec384x ret, const vec384x a)
  * addition is double-width... To be more specific this gives ~7-10%
  * faster pairing depending on platform...
  */
+typedef vec768 vec768x[2];
+
 static inline void add_fp2x2(vec768x ret, const vec768x a, const vec768x b)
 {
     add_mod_384x384(ret[0], a[0], b[0], BLS12_381_P);
@@ -42,13 +44,13 @@ static inline void mul_by_u_plus_1_fp2x2(vec768x ret, const vec768x a)
     add_mod_384x384(ret[1], a[0], a[1], BLS12_381_P);
 }
 
-void redc_fp2x2(vec384x ret, const vec768x a)
+static inline void redc_fp2x2(vec384x ret, const vec768x a)
 {
     redc_mont_384(ret[0], a[0], BLS12_381_P, p0);
     redc_mont_384(ret[1], a[1], BLS12_381_P, p0);
 }
 
-void mul_fp2x2(vec768x ret, const vec384x a, const vec384x b)
+static void mul_fp2x2(vec768x ret, const vec384x a, const vec384x b)
 {
 #if 1
     mul_382x(ret, a, b, BLS12_381_P);   /* +~6% in Miller loop */
@@ -69,7 +71,7 @@ void mul_fp2x2(vec768x ret, const vec384x a, const vec384x b)
 #endif
 }
 
-void sqr_fp2x2(vec768x ret, const vec384x a)
+static void sqr_fp2x2(vec768x ret, const vec384x a)
 {
 #if 1
     sqr_382x(ret, a, BLS12_381_P);      /* +~5% in final exponentiation */
@@ -89,6 +91,8 @@ void sqr_fp2x2(vec768x ret, const vec384x a)
 /*
  * Fp6 extension
  */
+typedef vec768x vec768fp6[3];
+
 static inline void sub_fp6x2(vec768fp6 ret, const vec768fp6 a,
                                             const vec768fp6 b)
 {
@@ -97,7 +101,7 @@ static inline void sub_fp6x2(vec768fp6 ret, const vec768fp6 a,
     sub_fp2x2(ret[2], a[2], b[2]);
 }
 
-void mul_fp6x2(vec768fp6 ret, const vec384fp6 a, const vec384fp6 b)
+static void mul_fp6x2(vec768fp6 ret, const vec384fp6 a, const vec384fp6 b)
 {
     vec768x t0, t1, t2;
     vec384x aa, bb;
@@ -136,14 +140,14 @@ void mul_fp6x2(vec768fp6 ret, const vec384fp6 a, const vec384fp6 b)
     add_fp2x2(ret[2], ret[2], t1);
 }
 
-void redc_fp6x2(vec384fp6 ret, const vec768fp6 a)
+static inline void redc_fp6x2(vec384fp6 ret, const vec768fp6 a)
 {
     redc_fp2x2(ret[0], a[0]);
     redc_fp2x2(ret[1], a[1]);
     redc_fp2x2(ret[2], a[2]);
 }
 
-void mul_fp6(vec384fp6 ret, const vec384fp6 a, const vec384fp6 b)
+static void mul_fp6(vec384fp6 ret, const vec384fp6 a, const vec384fp6 b)
 {
     vec768fp6 r;
 
@@ -151,7 +155,7 @@ void mul_fp6(vec384fp6 ret, const vec384fp6 a, const vec384fp6 b)
     redc_fp6x2(ret, r); /* narrow to normal width */
 }
 
-void sqr_fp6(vec384fp6 ret, const vec384fp6 a)
+static void sqr_fp6(vec384fp6 ret, const vec384fp6 a)
 {
     vec768x s0, m01, m12, s2, rx;
 
@@ -213,10 +217,10 @@ static void neg_fp6(vec384fp6 ret, const vec384fp6 a)
  */
 void mul_fp12_scalar(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b)
 {
-  #ifdef PROFILING
-    uint64_t start_cycles = read_tsc();
-  #endif
-  
+#ifdef PROFILING
+  uint64_t start_cycles = read_tsc();
+#endif
+
     vec768fp6 t0, t1, rx;
     vec384fp6 t2;
 
@@ -239,10 +243,10 @@ void mul_fp12_scalar(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b)
     add_fp2x2(rx[2], t0[2], t1[1]);
     redc_fp6x2(ret[0], rx);
 
-  #ifdef PROFILING
-    uint64_t end_cycles = read_tsc();
-    mul_fp12_cycles += end_cycles - start_cycles;
-  #endif    
+#ifdef PROFILING
+  uint64_t end_cycles = read_tsc();
+  mul_fp12_cycles += end_cycles - start_cycles;
+#endif   
 }
 
 void mul_fp12_vector(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b)
@@ -432,9 +436,9 @@ static void mul_by_xy0_fp6x2(vec768fp6 ret, const vec384fp6 a,
 void mul_by_xy00z0_fp12_scalar(vec384fp12 ret, const vec384fp12 a,
                                                const vec384fp6 xy00z0)
 {
-  #ifdef PROFILING
-    uint64_t start_cycles = read_tsc();
-  #endif
+#ifdef PROFILING
+  uint64_t start_cycles = read_tsc();
+#endif
 
     vec768fp6 t0, t1, rr;
     vec384fp6 t2;
@@ -459,18 +463,18 @@ void mul_by_xy00z0_fp12_scalar(vec384fp12 ret, const vec384fp12 a,
     add_fp2x2(rr[2], t0[2], t1[1]);
     redc_fp6x2(ret[0], rr);
 
-  #ifdef PROFILING
-    uint64_t end_cycles = read_tsc();
-    mul_by_xy00z0_fp12_cycles += end_cycles - start_cycles;
-  #endif
+#ifdef PROFILING
+  uint64_t end_cycles = read_tsc();
+  mul_by_xy00z0_fp12_cycles += end_cycles - start_cycles;
+#endif
 }
 
 void mul_by_xy00z0_fp12_vector(vec384fp12 ret, const vec384fp12 a,
                                                       const vec384fp6 xy00z0)
 {
-  #ifdef PROFILING
-    uint64_t start_cycles = read_tsc();
-  #endif
+#ifdef PROFILING
+  uint64_t start_cycles = read_tsc();
+#endif
 
   fp2_4x2x1w r0, a01, a2, b01, b4;
   fp2_2x2x2w r1;
@@ -528,10 +532,10 @@ void mul_by_xy00z0_fp12_vector(vec384fp12 ret, const vec384fp12 a,
     ret[1][2][1][i+SWORDS/2] = ((uint64_t *)&t[1][i])[7];
   }
 
-  #ifdef PROFILING
-    uint64_t end_cycles = read_tsc();
-    mul_by_xy00z0_fp12_cycles += end_cycles - start_cycles;
-  #endif
+#ifdef PROFILING
+  uint64_t end_cycles = read_tsc();
+  mul_by_xy00z0_fp12_cycles += end_cycles - start_cycles;
+#endif
 }
 
 void sqr_fp12_scalar(vec384fp12 ret, const vec384fp12 a)
@@ -561,17 +565,17 @@ void sqr_fp12_scalar(vec384fp12 ret, const vec384fp12 a)
     sub_fp2(ret[0][1], ret[0][1], t1[0]);
     sub_fp2(ret[0][2], ret[0][2], t1[1]);
 
-  #ifdef PROFILING
-    uint64_t end_cycles = read_tsc();
-    sqr_fp12_cycles += end_cycles - start_cycles;
-  #endif
+#ifdef PROFILING
+  uint64_t end_cycles = read_tsc();
+  sqr_fp12_cycles += end_cycles - start_cycles;
+#endif
 }
 
 void sqr_fp12_vector(vec384fp12 ret, const vec384fp12 a)
 {
-  #ifdef PROFILING
-    uint64_t start_cycles = read_tsc();
-  #endif
+#ifdef PROFILING
+  uint64_t start_cycles = read_tsc();
+#endif
 
   fp2_4x2x1w r0, r1, a0, a1;
   __m512i t[2][SWORDS];
@@ -610,11 +614,10 @@ void sqr_fp12_vector(vec384fp12 ret, const vec384fp12 a)
     ret[1][2][1][i] = ((uint64_t *)&t[1][i])[5];
   }
 
-  #ifdef PROFILING
-    uint64_t end_cycles = read_tsc();
-    sqr_fp12_cycles += end_cycles - start_cycles;
-  #endif
-
+#ifdef PROFILING
+  uint64_t end_cycles = read_tsc();
+  sqr_fp12_cycles += end_cycles - start_cycles;
+#endif
 }
 
 void conjugate_fp12(vec384fp12 a)
@@ -658,9 +661,9 @@ static void inverse_fp6(vec384fp6 ret, const vec384fp6 a)
 
 void inverse_fp12(vec384fp12 ret, const vec384fp12 a)
 {
-  #ifdef PROFILING
-    uint64_t start_cycles = read_tsc();
-  #endif
+#ifdef PROFILING
+  uint64_t start_cycles = read_tsc();
+#endif
 
     vec384fp6 t0, t1;
 
@@ -677,15 +680,15 @@ void inverse_fp12(vec384fp12 ret, const vec384fp12 a)
     mul_fp6(ret[1], a[1], t1);
     neg_fp6(ret[1], ret[1]);
 
-  #ifdef PROFILING
-    uint64_t end_cycles = read_tsc();
-    inverse_fp12_cycles += end_cycles - start_cycles;
-  #endif
+#ifdef PROFILING
+  uint64_t end_cycles = read_tsc();
+  inverse_fp12_cycles += end_cycles - start_cycles;
+#endif
 }
 
 typedef vec384x vec384fp4[2];
 
-void sqr_fp4(vec384fp4 ret, const vec384x a0, const vec384x a1)
+static void sqr_fp4(vec384fp4 ret, const vec384x a0, const vec384x a1)
 {
     vec768x t0, t1, t2;
 
@@ -705,9 +708,9 @@ void sqr_fp4(vec384fp4 ret, const vec384x a0, const vec384x a1)
 
 void cyclotomic_sqr_fp12_scalar(vec384fp12 ret, const vec384fp12 a)
 {
-  #ifdef PROFILING
-    uint64_t start_cycles = read_tsc();
-  #endif
+#ifdef PROFILING
+  uint64_t start_cycles = read_tsc();
+#endif
 
     vec384fp4 t0, t1, t2;
 
@@ -748,9 +751,9 @@ void cyclotomic_sqr_fp12_scalar(vec384fp12 ret, const vec384fp12 a)
 
 void cyclotomic_sqr_fp12_vector(vec384fp12 ret, const vec384fp12 a)
 {
-  #ifdef PROFILING
-    uint64_t start_cycles = read_tsc();
-  #endif
+#ifdef PROFILING
+  uint64_t start_cycles = read_tsc();
+#endif
 
   fp4_1x2x2x2w ra_1x2x2x2w, a_1x2x2x2w;
   fp4_2x2x2x1w rbc_2x2x2x1w, bc_2x2x2x1w;
@@ -804,10 +807,10 @@ void cyclotomic_sqr_fp12_vector(vec384fp12 ret, const vec384fp12 a)
     ret[1][2][1][i] = ((uint64_t *)&t_2x2x2x1w[i])[7];
   }
 
-  #ifdef PROFILING
-    uint64_t end_cycles = read_tsc();
-    cyclotomic_sqr_fp12_cycles += end_cycles - start_cycles;
-  #endif
+#ifdef PROFILING
+  uint64_t end_cycles = read_tsc();
+  cyclotomic_sqr_fp12_cycles += end_cycles - start_cycles;
+#endif
 }
 
 /*
@@ -854,9 +857,9 @@ static void frobenius_map_fp6(vec384fp6 ret, const vec384fp6 a, size_t n)
 
 void frobenius_map_fp12(vec384fp12 ret, const vec384fp12 a, size_t n)
 {
-  #ifdef PROFILING
-    uint64_t start_cycles = read_tsc();
-  #endif
+#ifdef PROFILING
+  uint64_t start_cycles = read_tsc();
+#endif
 
     static const vec384x coeffs[] = {  /* (u + 1)^((P^n - 1) / 6) */
       { { TO_LIMB_T(0x07089552b319d465), TO_LIMB_T(0xc6695f92b50a8313),
@@ -883,8 +886,8 @@ void frobenius_map_fp12(vec384fp12 ret, const vec384fp12 a, size_t n)
     mul_fp2(ret[1][1], ret[1][1], coeffs[n]);
     mul_fp2(ret[1][2], ret[1][2], coeffs[n]);
 
-  #ifdef PROFILING
-    uint64_t end_cycles = read_tsc();
-    frobenius_map_fp12_cycles += end_cycles - start_cycles;
-  #endif
+#ifdef PROFILING
+  uint64_t end_cycles = read_tsc();
+  frobenius_map_fp12_cycles += end_cycles - start_cycles;
+#endif
 }

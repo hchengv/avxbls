@@ -152,15 +152,6 @@ static void perm_var(__m512i *r, const __m512i *a, const __m512i mask)
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
 
-static void mpi_print(const char *c, const uint64_t *a, int len)
-{
-  int i;
-
-  printf("%s", c);
-  for (i = len-1; i > 0; i--) printf("%016lX", a[i]);
-  printf("%016lX\n", a[0]);
-}
-
 static void conv_64to48_fp(uint64_t *r, const uint64_t *a)
 {
   r[0] =                  a[0]         & BMASK;

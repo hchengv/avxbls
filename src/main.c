@@ -70,9 +70,21 @@ extern uint64_t read_tsc();
   diff_cycles = (end_cycles-start_cycles)/(ITER)
 
 // ----------------------------------------------------------------------------
+// for printing mpi
 
-// only for generating a random point used for the correctness test,
-// which means the constant time is not required
+static void mpi_print(const char *c, const uint64_t *a, int len)
+{
+  int i;
+
+  printf("%s", c);
+  for (i = len-1; i > 0; i--) printf("%016lX", a[i]);
+  printf("%016lX\n", a[0]);
+}
+
+// ----------------------------------------------------------------------------
+
+// Only for generating a random point used for the correctness test,
+// meaning the constant time is not required.
 
 static void POINTonE1_scalarmul(POINTonE1 *R, const POINTonE1 *P, uint64_t *k)
 {
@@ -112,6 +124,8 @@ static void POINTonE2_scalarmul(POINTonE2 *R, const POINTonE2 *Q, uint64_t *k)
   vec_copy(R, _R, sizeof(POINTonE2));
 }
 
+// ----------------------------------------------------------------------------
+
 void test_pairing()
 {
   POINTonE2_affine Q[1];
@@ -126,7 +140,6 @@ void test_pairing()
 
   // scalar k can be modified to be any non-0 value
   // uint64_t k[4] = { rand(), rand(), rand(), rand(), };
-  // uint64_t k[4] = { 3 };
   uint64_t k[4] = {
     0x0123456789ABCDEF, 0x89ABCDEF01234567, 
     0x0123456789ABCDEF, 0x89ABCDEF01234567, };
@@ -155,10 +168,22 @@ void test_pairing()
   else 
     printf("\x1b[32m  e1 == e2 \x1b[0m \n");
 
-  // print out parts of the result
-  printf("e1[0][0][0] = ");
-  for (int i = 6; i > 0; i-- ) printf("%016lX", e1[0][0][0][i]);
-  printf("\n");
+#if 1
+  // print out the result
+  mpi_print("e1[0][0][0] = ",  e1[0][0][0], 6);
+  mpi_print("e1[0][0][1] = ",  e1[0][0][1], 6);
+  mpi_print("e1[0][1][0] = ",  e1[0][1][0], 6);
+  mpi_print("e1[0][1][1] = ",  e1[0][1][1], 6);
+  mpi_print("e1[0][2][0] = ",  e1[0][2][0], 6);
+  mpi_print("e1[0][2][1] = ",  e1[0][2][1], 6);
+  mpi_print("e1[1][0][0] = ",  e1[1][0][0], 6);
+  mpi_print("e1[1][0][1] = ",  e1[1][0][1], 6);
+  mpi_print("e1[1][1][0] = ",  e1[1][1][0], 6);
+  mpi_print("e1[1][1][1] = ",  e1[1][1][1], 6);
+  mpi_print("e1[1][2][0] = ",  e1[1][2][0], 6);
+  mpi_print("e1[1][2][1] = ",  e1[1][2][1], 6);
+  puts("");
+#endif 
 
   printf("- (e(P, [k]Q))^2 == e([2k]P, Q) \n");
   // compute [2k]P 
@@ -175,6 +200,23 @@ void test_pairing()
   else 
     printf("\x1b[32m  e1 == e2 \x1b[0m \n");
 
+#if 1
+  // print out the result
+  mpi_print("e1[0][0][0] = ",  e1[0][0][0], 6);
+  mpi_print("e1[0][0][1] = ",  e1[0][0][1], 6);
+  mpi_print("e1[0][1][0] = ",  e1[0][1][0], 6);
+  mpi_print("e1[0][1][1] = ",  e1[0][1][1], 6);
+  mpi_print("e1[0][2][0] = ",  e1[0][2][0], 6);
+  mpi_print("e1[0][2][1] = ",  e1[0][2][1], 6);
+  mpi_print("e1[1][0][0] = ",  e1[1][0][0], 6);
+  mpi_print("e1[1][0][1] = ",  e1[1][0][1], 6);
+  mpi_print("e1[1][1][0] = ",  e1[1][1][0], 6);
+  mpi_print("e1[1][1][1] = ",  e1[1][1][1], 6);
+  mpi_print("e1[1][2][0] = ",  e1[1][2][0], 6);
+  mpi_print("e1[1][2][1] = ",  e1[1][2][1], 6);
+  puts("");
+#endif 
+
   printf("- (e(P, [k]Q))^4 == e([2k]P, [2]Q) \n");
   // compute [2]Q 
   POINTonE2_double(_Q, &BLS12_381_G2);
@@ -189,6 +231,23 @@ void test_pairing()
     printf("\x1b[31m  e1 != e2 \x1b[0m \n");
   else 
     printf("\x1b[32m  e1 == e2 \x1b[0m \n");
+
+#if 1
+  // print out the result
+  mpi_print("e1[0][0][0] = ",  e1[0][0][0], 6);
+  mpi_print("e1[0][0][1] = ",  e1[0][0][1], 6);
+  mpi_print("e1[0][1][0] = ",  e1[0][1][0], 6);
+  mpi_print("e1[0][1][1] = ",  e1[0][1][1], 6);
+  mpi_print("e1[0][2][0] = ",  e1[0][2][0], 6);
+  mpi_print("e1[0][2][1] = ",  e1[0][2][1], 6);
+  mpi_print("e1[1][0][0] = ",  e1[1][0][0], 6);
+  mpi_print("e1[1][0][1] = ",  e1[1][0][1], 6);
+  mpi_print("e1[1][1][0] = ",  e1[1][1][0], 6);
+  mpi_print("e1[1][1][1] = ",  e1[1][1][1], 6);
+  mpi_print("e1[1][2][0] = ",  e1[1][2][0], 6);
+  mpi_print("e1[1][2][1] = ",  e1[1][2][1], 6);
+  puts("");
+#endif 
 
   printf("=============================================================\n");
 }
@@ -721,7 +780,7 @@ void test_fp6()
 
 // ----------------------------------------------------------------------------
 
-void test_fp12()
+void test_timing_fp12()
 {
   vec384fp12 r;
   vec384fp12 a = {
@@ -742,7 +801,7 @@ void test_fp12()
   fp2_4x2x1w r0_4x2x1w, r1_4x2x1w, a01_4x2x1w, b01_4x2x1w, b4_4x2x1w;
   fp2_2x2x2w r1_2x2x2w; 
 
-#if 1
+#if 0
   puts("\nFP12 TEST\n");
 
   a0_4x2x1w[0] = VSET(11, 11, 6  , 5  , 4 , 3, 2, 1);
@@ -1158,7 +1217,7 @@ void test_fp12()
 
 // ----------------------------------------------------------------------------
 
-void test_line()
+void test_timing_line()
 {
   vec384fp6 line;
   POINTonE2 T[1], Q[1];
@@ -1170,7 +1229,7 @@ void test_line()
   uint64_t start_cycles, end_cycles, diff_cycles;
   int i;
 
-#if 1
+#if 0
   puts("\nLINE TEST\n");
 
   Q[0].X[0][0] = 1; Q[0].X[1][0] = 2;
@@ -1355,6 +1414,7 @@ void test_line()
   printf("#cycle = %ld\n", diff_cycles);
 }
 
+
 // ----------------------------------------------------------------------------
 
 int main()
@@ -1366,10 +1426,9 @@ int main()
   // test_fp2();
   // test_fp4();
   // test_fp6();
-  // test_fp12();
-  test_line();
+
+  test_timing_fp12();
+  test_timing_line();
 
   return 0;
 }
-
-// ----------------------------------------------------------------------------
