@@ -9,42 +9,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#if defined(__x86_64__) || defined(__aarch64__)
-/* These are available even in ILP32 flavours, but even then they are
- * capable of performing 64-bit operations as efficiently as in *P64. */
-typedef unsigned long long limb_t;
-# define LIMB_T_BITS    64
+typedef uint64_t limb_t;
 
-#elif defined(_WIN64)   /* Win64 is P64 */
-typedef unsigned __int64 limb_t;
-# define LIMB_T_BITS    64
-
-#elif defined(__BLST_NO_ASM__) || defined(__wasm64__)
-typedef unsigned int limb_t;
-# define LIMB_T_BITS    32
-# ifndef __BLST_NO_ASM__
-#  define __BLST_NO_ASM__
-# endif
-
-#else                   /* 32 bits on 32-bit platforms, 64 - on 64-bit */
-typedef unsigned long limb_t;
-#  ifdef _LP64
-#   define LIMB_T_BITS   64
-#  else
-#   define LIMB_T_BITS   32
-#   define __BLST_NO_ASM__
-#  endif
-#endif
-
-/*
- * Why isn't LIMB_T_BITS defined as 8*sizeof(limb_t)? Because pre-processor
- * knows nothing about sizeof(anything)...
- */
-#if LIMB_T_BITS == 64
-# define TO_LIMB_T(limb64)     limb64
-#else
-# define TO_LIMB_T(limb64)     (limb_t)limb64,(limb_t)(limb64>>32)
-#endif
+#define LIMB_T_BITS   64
 
 #define NLIMBS(bits)   (bits/LIMB_T_BITS)
 

@@ -17,7 +17,7 @@
  * Line evaluations from  https://eprint.iacr.org/2010/354.pdf
  * with a twist moving common expression to line_by_Px2.
  */
-static void line_add_scalar(vec384fp6 line, POINTonE2 *T, const POINTonE2 *R,
+void line_add_scalar(vec384fp6 line, POINTonE2 *T, const POINTonE2 *R,
                                                    const POINTonE2_affine *Q)
 {
 
@@ -166,7 +166,7 @@ void line_add_vector(vec384fp6 line, POINTonE2 *T, const POINTonE2 *R,
 #endif    
 }
 
-static void line_dbl_scalar(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q)
+void line_dbl_scalar(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q)
 {
 #ifdef PROFILING
   uint64_t start_cycles = read_tsc();
