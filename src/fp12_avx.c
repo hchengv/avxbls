@@ -4454,7 +4454,7 @@ void line_add_vec_v1(fp2_2x2x2w l0Y3, fp2_2x2x2w l1, fp2_2x2x2w X3, fp2_2x2x2w Z
   perm_var_hl(t1, ZZ, m1);              //                  ZZ |                  ZZ
   mul_fp2_2x2x2w(US, t0, t1);           //           U = X2*ZZ |        S = Y2*Z1*ZZ
   sub_fp2_2x2x2w(H, US, X1Y1);          //            H = U-X1 |                S-Y1
-  blend_0x0F(t0, Z1Y2, H);              //                  Z1 |                S-Y1
+  blend_0x0F_hl(t0, Z1Y2, H);           //                  Z1 |                S-Y1
   add_fp2_2x2x2w(l1, H, t0);            //                Z1+H |   l1 = r = 2*(S-Y1)
   perm_var_hl(t0, H, m0);               //                 ... |                   H
   blend_0x0F_hl(t0, l1, t0);            //                Z1+H |                   H
@@ -4470,7 +4470,7 @@ void line_add_vec_v1(fp2_2x2x2w l0Y3, fp2_2x2x2w l1, fp2_2x2x2w X3, fp2_2x2x2w Z
   mul_fp2_2x2x2w(J, t0, t1);            //             J = H*I |                r*X2
   perm_var_hl(t1, l1, m0);              //                   r |                 ...
   blend_0x0F_hl(t2, t1, Z1Y2);          //                   r |                  Y2
-  blend_0x0F_hl(t0, t0, t3);            //                   r |                  Z3 
+  blend_0x0F_hl(t0, t1, t3);            //                   r |                  Z3 
   mul_fp2_2x2x2w(t0, t0, t2);           //                 r^2 |               Y2*Z3
   perm_var_hl(t2, J, m0);               //                 ... |                   J
   blend_0x0F_hl(t2, t3, t2);            //                   I |                   J
@@ -4490,7 +4490,7 @@ void line_add_vec_v1(fp2_2x2x2w l0Y3, fp2_2x2x2w l1, fp2_2x2x2w X3, fp2_2x2x2w Z
   blend_0x0F_hl(t0, t2, t0);            //             r(V-X3) |          r*X2-Y2*Z3
   perm_var_hl(t1, X3, m0);              //              2*Y1*J |                 ...
   blend_0x0F_hl(t1, t1, t0);            //              2*Y1*J |          r*X2-Y2*Z3
-  add_fp2_2x2x2w(l0Y3, t0, t1);         // Y3 = r(V-X3)-2*Y1*J | l0 = 2*(r*X2-Y2*Z3)
+  sa_fp2_2x2x2w(l0Y3, t0, t1);          // Y3 = r(V-X3)-2*Y1*J | l0 = 2*(r*X2-Y2*Z3)
 }
 
 // ----------------------------------------------------------------------------

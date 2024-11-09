@@ -1264,6 +1264,8 @@ void test_line()
   // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   // mpi_print("* line_dbl_vec_v1 Z31    = 0x", r64, SWORDS);
 
+  X1Y1[0] = VSET(0, 2 , 0, 1, 0, 4, 0, 3);
+
   line_add_scalar(line, T, Q, R);
   mpi_print("* line_add_scalar line00 = 0x", line[0][0], SWORDS);
   mpi_print("* line_add_scalar line01 = 0x", line[0][1], SWORDS);
