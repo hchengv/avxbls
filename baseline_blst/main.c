@@ -71,13 +71,13 @@ extern uint64_t read_tsc();
 // ----------------------------------------------------------------------------
 // for printing mpi
 
-static void mpi_print(const char *c, const uint64_t *a, int len)
+static void mpi_print(const char *c, const unsigned long long *a, int len)
 {
   int i;
 
   printf("%s", c);
-  for (i = len-1; i > 0; i--) printf("%016lX", a[i]);
-  printf("%016lX\n", a[0]);
+  for (i = len-1; i > 0; i--) printf("%016llX", a[i]);
+  printf("%016llX\n", a[0]);
 }
 
 // ----------------------------------------------------------------------------
