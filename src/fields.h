@@ -113,4 +113,8 @@ void frobenius_map_fp12(vec384fp12 ret, const vec384fp12 a, size_t n);
 #define neg_fp(r,a) cneg_fp((r),(a),1)
 #define neg_fp2(r,a) cneg_fp2((r),(a),1)
 
+typedef vec768 vec768x[2];
+typedef vec768x vec768fp6[3];
+typedef vec384x vec384fp4[2];
+
 #endif /* __BLS12_381_ASM_FIELDS_H__ */

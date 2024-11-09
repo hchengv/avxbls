@@ -13,6 +13,8 @@ typedef uint64_t limb_t;
 
 #define LIMB_T_BITS   64
 
+#define TO_LIMB_T(limb64)     limb64
+
 #define NLIMBS(bits)   (bits/LIMB_T_BITS)
 
 typedef limb_t vec384[NLIMBS(384)];

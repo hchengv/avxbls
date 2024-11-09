@@ -23,7 +23,6 @@ static inline void mul_by_u_plus_1_fp2(vec384x ret, const vec384x a)
  * addition is double-width... To be more specific this gives ~7-10%
  * faster pairing depending on platform...
  */
-typedef vec768 vec768x[2];
 
 static inline void add_fp2x2(vec768x ret, const vec768x a, const vec768x b)
 {
@@ -91,7 +90,6 @@ static void sqr_fp2x2(vec768x ret, const vec384x a)
 /*
  * Fp6 extension
  */
-typedef vec768x vec768fp6[3];
 
 static inline void sub_fp6x2(vec768fp6 ret, const vec768fp6 a,
                                             const vec768fp6 b)
@@ -685,8 +683,6 @@ void inverse_fp12(vec384fp12 ret, const vec384fp12 a)
   inverse_fp12_cycles += end_cycles - start_cycles;
 #endif
 }
-
-typedef vec384x vec384fp4[2];
 
 static void sqr_fp4(vec384fp4 ret, const vec384x a0, const vec384x a1)
 {
