@@ -270,30 +270,30 @@ void timing_pairing()
   POINTonE2_to_affine(Q, _Q);
 
   printf("- miller_loop:        ");
-  LOAD_CACHE(miller_loop_n(f, Q, P, 1), 10);
+  LOAD_CACHE(miller_loop_n(f, Q, P, 1), 1000);
   #ifdef PROFILING
   profiling_reset();
   #endif
-  MEASURE_CYCLES(miller_loop_n(f, Q, P, 1), 100);
+  MEASURE_CYCLES(miller_loop_n(f, Q, P, 1), 10000);
   printf("  #cycle = %ld\n", diff_cycles);
   #ifdef PROFILING
-  profiling_dump(diff_cycles, 100);
+  profiling_dump(diff_cycles, 10000);
   #endif
 
   printf("- final_exp:          ");
-  LOAD_CACHE(final_exp(e1, f), 10);
+  LOAD_CACHE(final_exp(e1, f), 1000);
   #ifdef PROFILING
   profiling_reset();
   #endif
-  MEASURE_CYCLES(final_exp(e1, f), 100);
+  MEASURE_CYCLES(final_exp(e1, f), 10000);
   printf("  #cycle = %ld\n", diff_cycles);
   #ifdef PROFILING
-  profiling_dump(diff_cycles, 100);
+  profiling_dump(diff_cycles, 10000);
   #endif
 
   printf("- optimal_ate_pairing:");
-  LOAD_CACHE(optimal_ate_pairing(e1, Q, P, 1), 10);
-  MEASURE_CYCLES(optimal_ate_pairing(e1, Q, P, 1), 100);
+  LOAD_CACHE(optimal_ate_pairing(e1, Q, P, 1), 1000);
+  MEASURE_CYCLES(optimal_ate_pairing(e1, Q, P, 1), 10000);
   printf("  #cycle = %ld\n", diff_cycles);
 
   printf("=============================================================\n");
