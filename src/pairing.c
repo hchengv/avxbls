@@ -323,10 +323,12 @@ static void start_dbl_n(vec384fp12 ret, POINTonE2 T[],
     }
 }
 
-static void add_n_dbl_n(vec384fp12 ret, POINTonE2 T[],
-                                        const POINTonE2_affine Q[],
-                                        const POINTonE1_affine Px2[],
-                                        size_t n, size_t k)
+#define add_n_dbl_n add_n_dbl_n_scalar
+
+static void add_n_dbl_n_scalar(vec384fp12 ret, POINTonE2 T[],
+                                               const POINTonE2_affine Q[],
+                                               const POINTonE1_affine Px2[],
+                                               size_t n, size_t k)
 {
     size_t i;
     vec384fp6 line; /* it's not actual fp6, but 3 packed fp2, "xy00z0"  */
@@ -342,6 +344,256 @@ static void add_n_dbl_n(vec384fp12 ret, POINTonE2 T[],
             mul_by_xy00z0_fp12(ret, ret, line);
         }
     }
+}
+
+static void add_n_dbl_n_vector(vec384fp12 ret, POINTonE2 T[],
+                                               const POINTonE2_affine Q[],
+                                               const POINTonE1_affine Px2[],
+                                               size_t n, size_t k)
+{
+  __m512i t[3][SWORDS], s[4][SWORDS/2];
+  int i;
+
+  // Step 1: line_add
+  fp2_2x2x2w X1Y1, Z1Y2, X2, l0Y3, l1, X3, Z3;
+  const __m512i hh = VSET(7, 6, 5, 4, 7, 6, 5, 4);
+
+  // X1Y1 = X1 | Y1 at Fp2 layer
+  // Z1Y2 = Z1 | Y2 at Fp2 layer
+  //   X2 = X2 | X2 at Fp2 layer
+  for (i = 0; i < SWORDS/2; i++) {
+    s[0][i] = VSET(T->X[1][i+SWORDS/2], T->X[1][i],
+                   T->X[0][i+SWORDS/2], T->X[0][i],
+                   T->Y[1][i+SWORDS/2], T->Y[1][i],
+                   T->Y[0][i+SWORDS/2], T->Y[0][i]);
+    s[1][i] = VSET(T->Z[1][i+SWORDS/2], T->Z[1][i],
+                   T->Z[0][i+SWORDS/2], T->Z[0][i],
+                   Q->Y[1][i+SWORDS/2], Q->Y[1][i],
+                   Q->Y[0][i+SWORDS/2], Q->Y[0][i]);
+    s[2][i] = VSET(Q->X[1][i+SWORDS/2], Q->X[1][i],
+                   Q->X[0][i+SWORDS/2], Q->X[0][i],
+                   Q->X[1][i+SWORDS/2], Q->X[1][i],
+                   Q->X[0][i+SWORDS/2], Q->X[0][i]);
+  }
+  
+  conv_64to48_fp_4x2w(X1Y1, s[0]);
+  conv_64to48_fp_4x2w(Z1Y2, s[1]);
+  conv_64to48_fp_4x2w(X2  , s[2]);
+
+  line_add_vec_v1(l0Y3, l1, X3, Z3, X1Y1, Z1Y2, X2);
+
+  perm_var_hl(X3, X3, hh);
+  perm_var_hl(Z3, Z3, hh);
+
+  // l0Y3 = Y3 | l0 at Fp2 layer
+  // l1   = .. | l1 at Fp2 layer
+  // l2   = Z3 | Z3 at Fp2 layer
+  // Z3   = Z3 | Z3 at Fp2 layer
+  // X3   = X3 | X3 at Fp2 layer   
+
+  // Step 2: line_by_Px2
+  fp2_2x2x2w l12, _Px2;
+
+  // l12  = l2 | l1 at Fp2 layer 
+  // _Px2 = Px2->Y | Px2->X at Fp2 layer
+  blend_0x0F_hl(l12, Z3, l1);
+  for (i = 0; i < SWORDS/2; i++) {
+      s[0][i] = VSET(Px2->Y[i+SWORDS/2], Px2->Y[i],
+                     Px2->Y[i+SWORDS/2], Px2->Y[i],
+                     Px2->X[i+SWORDS/2], Px2->X[i],
+                     Px2->X[i+SWORDS/2], Px2->X[i]);
+  }
+  conv_64to48_fp_4x2w(_Px2, s[0]);
+
+  line_by_Px2_vec_v1(l12, l12, _Px2);
+
+  // l12  = l2 | l1 at Fp2 layer 
+
+  // Step 3:  mul_by_xy00z0_fp12
+  fp2_4x2x1w a01, a2, b01, b4, r0;
+  fp2_2x2x2w r1;
+  const __m512i m0 = VSET(6, 4, 6, 4, 6, 4, 6, 4);
+  const __m512i m1 = VSET(7, 5, 7, 5, 7, 5, 7, 5);
+  const __m512i m2 = VSET(3, 2, 1, 0, 7, 6, 5, 4);
+  const __m512i m3 = VSET(6, 4, 2, 0, 6, 4, 2, 0);
+  const __m512i m4 = VSET(7, 5, 3, 1, 7, 5, 3, 1);
+
+  // a01 = ret[1][1] | ret[1][0] | ret[0][1] | ret[0][0] at Fp2 layer
+  // a2  = ret[1][2] | ret[1][2] | ret[0][2] | ret[0][2] at Fp2 layer
+  // b01 =   line[1] |   line[0] |   line[1] |   line[0] at Fp2 layer
+  // b4  =   line[2] |   line[2] |   line[2] |   line[2] at Fp2 layer
+  for (i = 0; i < SWORDS; i++) {
+    t[0][i] = VSET(ret[1][1][1][i], ret[1][1][0][i],
+                   ret[1][0][1][i], ret[1][0][0][i],
+                   ret[0][1][1][i], ret[0][1][0][i],
+                   ret[0][0][1][i], ret[0][0][0][i]);
+    t[1][i] = VSET(ret[1][2][1][i], ret[1][2][0][i],
+                   ret[1][2][1][i], ret[1][2][0][i],
+                   ret[0][2][1][i], ret[0][2][0][i],
+                   ret[0][2][1][i], ret[0][2][0][i]);
+  }
+  conv_64to48_fp_8x1w(a01, t[0]);
+  conv_64to48_fp_8x1w(a2 , t[1]);
+
+  carryp_fp_4x2w(l12);
+  carryp_fp_4x2w(l0Y3);
+
+  for (i = 0; i < VWORDS; i++) {
+    b4[i]        = VPERMV(m0, l12[i]);
+    b4[i+VWORDS] = VPERMV(m1, l12[i]);
+  }
+  perm_var_hl(l12, l12, m2);
+  blend_0x0F_hl(l12, l12, l0Y3);
+  for (i = 0; i < VWORDS; i++) {
+    b01[i]        = VPERMV(m3, l12[i]);
+    b01[i+VWORDS] = VPERMV(m4, l12[i]);
+  }
+
+  mul_by_xy00z0_fp12_vec_v1(r0, r1, a01, a2, b01, b4);
+
+  // r0 = ret[1][1] | ret[1][0] | ret[0][1] | ret[0][2] at Fp2 layer
+  // r1 =             ret[1][2] |             ret[0][0] at Fp2 layer
+
+  while (k--) {
+
+    // Step 4: sqr_fp12 
+    fp2_4x2x1w a0, a1, _r0, _r1;
+    const __m512i m5 = VSET(0, 0, 1, 0, 3, 2, 0, 0); 
+    const __m512i m6 = VSET(4, 4, 0, 0, 0, 0, 0, 0);
+    const __m512i m7 = VSET(5, 5, 0, 0, 0, 0, 1, 1);
+    const __m512i m8 = VSET(6, 6, 6, 4, 0, 0, 0, 0);
+    const __m512i m9 = VSET(7, 7, 7, 5, 0, 0, 0, 0);
+
+    //  a0 = ret[1][2]00 | ret[0][2] | ret[0][1] | ret[0][0] at Fp2 layer
+    //  a1 = ret[1][2]11 | ret[1][2] | ret[1][1] | ret[1][0] at Fp2 layer
+
+    //  a0 =         ... | ret[0][2] | ret[0][1] |       ... at Fp2 layer
+    perm_var(a0, r0, m5);
+    //  a1 =         ... |       ... | ret[1][1] | ret[1][0] at Fp2 layer
+    perm_var(a1, r0, m2);
+    // _r0 = ret[1][2]00 |       ... |       ... | ret[0][0] at Fp2 layer
+    // _r1 = ret[1][2]11 | ret[1][2] |       ... |       ... at Fp2 layer
+    for (i = 0; i < VWORDS; i++) {
+      _r0[i       ] = VPERMV(m6, r1[i]);
+      _r0[i+VWORDS] = VPERMV(m7, r1[i]);
+      _r1[i       ] = VPERMV(m8, r1[i]);
+      _r1[i+VWORDS] = VPERMV(m9, r1[i]);
+    }
+    //  a0 =         ... | ret[0][2] | ret[0][1] |       ... at Fp2 layer
+    blend_0xC3(a0, a0, _r0); 
+    //  a1 = ret[1][2]11 | ret[1][2] | ret[1][1] | ret[1][0] at Fp2 layer
+    blend_0x0F(a1, _r1, a1);
+
+    sqr_fp12_vec_v1(_r0, _r1, a0, a1);
+
+    // _r0 =  ... | ret[0][2] | ret[0][1] | ret[0][0] at Fp2 layer 
+    // _r1 =  ... | ret[1][2] | ret[1][1] | ret[1][0] at Fp2 layer
+
+    // Step 5: line_dbl
+    fp2_2x2x2w l2, _Z3;
+
+    // X1Y1 = Y1 | X1 at Fp2 layer
+    // Z1   = Z1 | Z1 at Fp2 layer
+    blend_0x0F(X1Y1, l0Y3, X3);
+
+    line_dbl_vec_v1(l0Y3, l1, l2, X3, _Z3, X1Y1, Z3);
+
+    // l0Y3 = Y3 | l0 at Fp2 layer
+    // l1   = .. | l1 at Fp2 layer 
+    // l2   = l2 | .. at Fp2 layer 
+    // X3   = X3 | .. at Fp2 layer 
+    // _Z3  = Z3 | .. at FP2 layer
+
+    // Step 6: line_by_Px2
+    blend_0x0F_hl(l12, l2, l1);
+    line_by_Px2_vec_v1(l12, l12, _Px2);
+
+    // l12  = l2 | l1 at Fp2 layer 
+
+    // Step 7: mul_by_xy00z0_fp12
+    const __m512i m10 = VSET(5, 4, 5, 4, 5, 4, 5, 4);
+
+    // a01 = ret[1][1] | ret[1][0] | ret[0][1] | ret[0][0] at Fp2 layer
+    // a2  = ret[1][2] | ret[1][2] | ret[0][2] | ret[0][2] at Fp2 layer
+    // b01 =   line[1] |   line[0] |   line[1] |   line[0] at Fp2 layer
+    // b4  =   line[2] |   line[2] |   line[2] |   line[2] at Fp2 layer
+
+    // a01 = ret[1][1] | ret[1][0] |       ... |       ... at Fp2 layer
+    perm_var(a01, _r1, m2);
+    // a01 = ret[1][1] | ret[1][0] | ret[0][1] | ret[0][0] at Fp2 layer
+    blend_0x0F(a01, a01, _r0);
+    // a2  = ret[1][2] | ret[1][2] | ret[0][2] | ret[0][2] at Fp2 layer
+    perm_var(_r0, _r0, m10);
+    perm_var(_r1, _r1, m10);
+    blend_0x0F(a2, _r1, _r0);
+
+    carryp_fp_4x2w(l12);
+    carryp_fp_4x2w(l0Y3);
+
+    for (i = 0; i < VWORDS; i++) {
+      b4[i]        = VPERMV(m0, l12[i]);
+      b4[i+VWORDS] = VPERMV(m1, l12[i]);
+    }
+    perm_var_hl(l12, l12, m2);
+    blend_0x0F_hl(l12, l12, l0Y3);
+    for (i = 0; i < VWORDS; i++) {
+      b01[i]        = VPERMV(m3, l12[i]);
+      b01[i+VWORDS] = VPERMV(m4, l12[i]);
+    }
+
+    mul_by_xy00z0_fp12_vec_v1(r0, r1, a01, a2, b01, b4);
+
+    // r0 = ret[1][1] | ret[1][0] | ret[0][1] | ret[0][2] at Fp2 layer
+    // r1 =             ret[1][2] |             ret[0][0] at Fp2 layer
+  }
+
+  carryp_fp_4x2w(r1);
+  conv_48to64_fp_8x1w(t[0], r0);
+  conv_48to64_fp_4x2w(s[0], r1);
+
+  for (i = 0; i < SWORDS; i++) {
+    ret[0][2][0][i] = ((uint64_t *)&t[0][i])[0];
+    ret[0][2][1][i] = ((uint64_t *)&t[0][i])[1];
+    ret[0][1][0][i] = ((uint64_t *)&t[0][i])[2];
+    ret[0][1][1][i] = ((uint64_t *)&t[0][i])[3];
+    ret[1][0][0][i] = ((uint64_t *)&t[0][i])[4];
+    ret[1][0][1][i] = ((uint64_t *)&t[0][i])[5];
+    ret[1][1][0][i] = ((uint64_t *)&t[0][i])[6];
+    ret[1][1][1][i] = ((uint64_t *)&t[0][i])[7];
+  }
+
+  for (i = 0; i < SWORDS/2; i++) {
+    ret[0][0][0][i         ] = ((uint64_t *)&s[0][i])[0];
+    ret[0][0][0][i+SWORDS/2] = ((uint64_t *)&s[0][i])[1];
+    ret[0][0][1][i         ] = ((uint64_t *)&s[0][i])[2];
+    ret[0][0][1][i+SWORDS/2] = ((uint64_t *)&s[0][i])[3];
+    ret[1][2][0][i         ] = ((uint64_t *)&s[0][i])[4];
+    ret[1][2][0][i+SWORDS/2] = ((uint64_t *)&s[0][i])[5];
+    ret[1][2][1][i         ] = ((uint64_t *)&s[0][i])[6];
+    ret[1][2][1][i+SWORDS/2] = ((uint64_t *)&s[0][i])[7];
+  }
+
+  carryp_fp_4x2w(X3);
+  carryp_fp_4x2w(Z3);
+
+  conv_48to64_fp_4x2w(s[0], l0Y3);
+  conv_48to64_fp_4x2w(s[1], X3);
+  conv_48to64_fp_4x2w(s[2], Z3);
+
+  for (i = 0; i < SWORDS/2; i++) {
+    T   ->X[0][   i         ] = ((uint64_t *)&s[1][i])[4];
+    T   ->X[0][   i+SWORDS/2] = ((uint64_t *)&s[1][i])[5];
+    T   ->X[1][   i         ] = ((uint64_t *)&s[1][i])[6];
+    T   ->X[1][   i+SWORDS/2] = ((uint64_t *)&s[1][i])[7];
+    T   ->Y[0][   i         ] = ((uint64_t *)&s[0][i])[4];
+    T   ->Y[0][   i+SWORDS/2] = ((uint64_t *)&s[0][i])[5];
+    T   ->Y[1][   i         ] = ((uint64_t *)&s[0][i])[6];
+    T   ->Y[1][   i+SWORDS/2] = ((uint64_t *)&s[0][i])[7];
+    T   ->Z[0][   i         ] = ((uint64_t *)&s[2][i])[4];
+    T   ->Z[0][   i+SWORDS/2] = ((uint64_t *)&s[2][i])[5];
+    T   ->Z[1][   i         ] = ((uint64_t *)&s[2][i])[6];
+    T   ->Z[1][   i+SWORDS/2] = ((uint64_t *)&s[2][i])[7];
+  }
 }
 
 void miller_loop_n(vec384fp12 ret, const POINTonE2_affine Q[],
