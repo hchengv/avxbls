@@ -4707,8 +4707,7 @@ void line_dbl_vec_v2(fp2_4x2x1w l0, fp2_4x2x1w l12, fp2_4x2x1w X3, fp2_4x2x1w Y3
   //                   8C |       ... |                   ... |                 ...
   perm_1010(t0, l0);
   //     Y3 = E*(3D-F)-8C |       ... |                   ... |                 ... 
-  mul_fp2x2_4x2x1w(tt0, l12, t0);
-  redc_fp2x2_4x2x1w(Y3, tt0);
+  sub_fp2_4x2x1w(Y3, l12, t0);
 }
 
 // madd-2007-bl formula

@@ -1261,7 +1261,7 @@ void test_timing_line()
     X2  [i] = VZERO;
   }
 
-  for (i = 0; i < NWORDS; i++) X1Y1Z1[i] = VZERO;
+  for (i = 1; i < NWORDS; i++) X1Y1Z1[i] = VZERO;
 
   line_dbl_scalar(line, T, Q);
   mpi_print("* line_dbl_scalar line00 = 0x", line[0][0], SWORDS);
@@ -1346,10 +1346,10 @@ void test_timing_line()
   get_channel_8x1w(r48, l12, 3);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* line_dbl_vec_v2 line21 = 0x", r64, SWORDS);
-  get_channel_8x1w(r48, _X3, 4);
+  get_channel_8x1w(r48, _X3, 6);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* line_dbl_vec_v2 X30    = 0x", r64, SWORDS);
-  get_channel_8x1w(r48, _X3, 5);
+  get_channel_8x1w(r48, _X3, 7);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* line_dbl_vec_v2 X31    = 0x", r64, SWORDS);
   get_channel_8x1w(r48, _Y3, 6);
@@ -1475,7 +1475,7 @@ int main()
   // test_fp6();
 
   // test_timing_fp12();
-  test_timing_line();
+  // test_timing_line();
 
   return 0;
 }
