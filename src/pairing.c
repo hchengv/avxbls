@@ -231,6 +231,9 @@ void line_dbl_vector(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q)
   uint64_t start_cycles = read_tsc();
 #endif
 
+#if 0
+  // 2-way line_dbl
+
   fp2_2x2x2w X1Y1, Z1, l0Y3, l1, l2, X3, Z3;
   __m512i t[5][SWORDS/2];
   int i;
@@ -289,6 +292,42 @@ void line_dbl_vector(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q)
     T   ->Z[1][   i         ] = ((uint64_t *)&t[4][i])[6];
     T   ->Z[1][   i+SWORDS/2] = ((uint64_t *)&t[4][i])[7];
   }
+#else 
+  // 4-way line_dbl
+  fp2_4x2x1w X1Y1Z1, l0, l12, X3, Y3, Z3;
+  __m512i t[5][SWORDS];
+  int i;
+
+  for (i = 0; i < SWORDS; i++) {
+    t[0][i] = VSET(Q->Y[1][i], Q->Y[0][i], Q->X[1][i], Q->X[0][i],
+                   Q->Z[1][i], Q->Z[0][i], Q->Y[1][i], Q->Y[1][i]);
+  }
+  conv_64to48_fp_8x1w(X1Y1Z1, t[0]);
+
+  line_dbl_vec_v2(l0, l12, X3, Y3, Z3, X1Y1Z1);
+
+  conv_48to64_fp_8x1w(t[0], l0);
+  conv_48to64_fp_8x1w(t[1], l12);
+  conv_48to64_fp_8x1w(t[2], X3);
+  conv_48to64_fp_8x1w(t[3], Y3);
+  conv_48to64_fp_8x1w(t[4], Z3);
+
+  for (i = 0; i < SWORDS; i++) {
+    line   [0][0][i] = ((uint64_t *)&t[0][i])[2];
+    line   [0][1][i] = ((uint64_t *)&t[0][i])[3];
+    line   [1][0][i] = ((uint64_t *)&t[1][i])[4];
+    line   [1][1][i] = ((uint64_t *)&t[1][i])[5];
+    line   [2][0][i] = ((uint64_t *)&t[1][i])[2];
+    line   [2][1][i] = ((uint64_t *)&t[1][i])[3];
+    T   ->X[0][   i] = ((uint64_t *)&t[2][i])[6];
+    T   ->X[1][   i] = ((uint64_t *)&t[2][i])[7];
+    T   ->Y[0][   i] = ((uint64_t *)&t[3][i])[6];
+    T   ->Y[1][   i] = ((uint64_t *)&t[3][i])[7];
+    T   ->Z[0][   i] = ((uint64_t *)&t[4][i])[0];
+    T   ->Z[1][   i] = ((uint64_t *)&t[4][i])[1];
+  }
+
+#endif
 
 #ifdef PROFILING
   uint64_t end_cycles = read_tsc();
