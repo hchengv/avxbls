@@ -116,7 +116,8 @@ void line_add_vec_v1(fp2_2x2x2w l0Y3, fp2_2x2x2w l1,
                      const fp2_2x2x2w X1Y1, const fp2_2x2x2w Z1Y2, 
                      const fp2_2x2x2w X2);
 
-void line_by_Px2_vec_v1(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w Px2);
+void line_by_Px2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a, const fp2_4x2x1w Px2);
+void line_by_Px2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w Px2);
 
 // ----------------------------------------------------------------------------
 // vector transformation 
@@ -140,6 +141,27 @@ static void blend_0x0F(__m512i *r, const __m512i *a, const __m512i *b)
   r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
+
+// a = < H | G | F | E | D | C | B | A >
+// b = < P | O | N | M | L | K | J | I >
+// r = < H | G | N | M | D | C | J | I >
+static void blend_0x33(__m512i *r, const __m512i *a, const __m512i *b)
+{
+  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
+  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
+  const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+  const __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
+  __m512i r0, r1, r2, r3, r4, r5, r6, r7;
+
+  r0 = VMBLEND(0x33, a0, b0); r1 = VMBLEND(0x33, a1, b1);
+  r2 = VMBLEND(0x33, a2, b2); r3 = VMBLEND(0x33, a3, b3);
+  r4 = VMBLEND(0x33, a4, b4); r5 = VMBLEND(0x33, a5, b5);
+  r6 = VMBLEND(0x33, a6, b6); r7 = VMBLEND(0x33, a7, b7);
+
+  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
+  r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
+}
+
 
 // a = < H | G | F | E | D | C | B | A >
 // b = < P | O | N | M | L | K | J | I >

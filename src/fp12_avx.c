@@ -222,26 +222,6 @@ static void blend_0x30(__m512i *r, const __m512i *a, const __m512i *b)
 
 // a = < H | G | F | E | D | C | B | A >
 // b = < P | O | N | M | L | K | J | I >
-// r = < H | G | N | M | D | C | J | I >
-static void blend_0x33(__m512i *r, const __m512i *a, const __m512i *b)
-{
-  const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
-  const __m512i a4 = a[4], a5 = a[5], a6 = a[6], a7 = a[7];
-  const __m512i b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
-  const __m512i b4 = b[4], b5 = b[5], b6 = b[6], b7 = b[7];
-  __m512i r0, r1, r2, r3, r4, r5, r6, r7;
-
-  r0 = VMBLEND(0x33, a0, b0); r1 = VMBLEND(0x33, a1, b1);
-  r2 = VMBLEND(0x33, a2, b2); r3 = VMBLEND(0x33, a3, b3);
-  r4 = VMBLEND(0x33, a4, b4); r5 = VMBLEND(0x33, a5, b5);
-  r6 = VMBLEND(0x33, a6, b6); r7 = VMBLEND(0x33, a7, b7);
-
-  r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
-  r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
-}
-
-// a = < H | G | F | E | D | C | B | A >
-// b = < P | O | N | M | L | K | J | I >
 // r = < H | O | F | M | D | K | B | I >
 static void blend_0x55(__m512i *r, const __m512i *a, const __m512i *b)
 {
@@ -4766,14 +4746,24 @@ void line_add_vec_v1(fp2_2x2x2w l0Y3, fp2_2x2x2w l1, fp2_2x2x2w X3, fp2_2x2x2w Z
   sa_fp2_2x2x2w(l0Y3, t0, t1);          // Y3 = r(V-X3)-2*Y1*J | l0 = 2*(r*X2-Y2*Z3)
 }
 
-void line_by_Px2_vec_v1(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w Px2)
+void line_by_Px2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a, const fp2_4x2x1w Px2)
+{
+  fp2x2_4x2x1w tt0;
+
+  // a   = .. | l1 | l2 | .. at Fp2 layer
+  // t0  = .. |  X |  Y | .. at Fp2 layer
+  mul_fpx2_8x1w(tt0, a, Px2);
+  redc_fpx2_8x1w(r, tt0);
+}
+
+void line_by_Px2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w Px2)
 {
   fp2x2_2x2x2w tt0;
 
   // a   = l2 | l1 at Fp2 layer
   // t0  =  Y |  X at Fp2 layer
   mul_fpx2_4x2w(tt0, a, Px2);
-  redc_fp2x2_2x2x2w(r, tt0);
+  redc_fpx2_4x2w(r, tt0);
 }
 
 // ----------------------------------------------------------------------------

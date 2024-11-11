@@ -294,13 +294,14 @@ void line_dbl_vector(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q)
   }
 #else 
   // 4-way line_dbl
+
   fp2_4x2x1w X1Y1Z1, l0, l12, X3, Y3, Z3;
   __m512i t[5][SWORDS];
   int i;
 
   for (i = 0; i < SWORDS; i++) {
     t[0][i] = VSET(Q->Y[1][i], Q->Y[0][i], Q->X[1][i], Q->X[0][i],
-                   Q->Z[1][i], Q->Z[0][i], Q->Y[1][i], Q->Y[1][i]);
+                   Q->Z[1][i], Q->Z[0][i], Q->Y[1][i], Q->Y[0][i]);
   }
   conv_64to48_fp_8x1w(X1Y1Z1, t[0]);
 
@@ -326,7 +327,6 @@ void line_dbl_vector(vec384fp6 line, POINTonE2 *T, const POINTonE2 *Q)
     T   ->Z[0][   i] = ((uint64_t *)&t[4][i])[0];
     T   ->Z[1][   i] = ((uint64_t *)&t[4][i])[1];
   }
-
 #endif
 
 #ifdef PROFILING
@@ -432,7 +432,7 @@ static void add_n_dbl_n_vector(vec384fp12 ret, POINTonE2 T[],
   // l1   = .. | l1 at Fp2 layer
   // l2   = Z3 | Z3 at Fp2 layer
   // Z3   = Z3 | Z3 at Fp2 layer
-  // X3   = X3 | X3 at Fp2 layer   
+  // X3   = X3 | X3 at Fp2 layer
 
 #ifdef PROFILING
   uint64_t end_cycles = read_tsc();
@@ -455,7 +455,7 @@ static void add_n_dbl_n_vector(vec384fp12 ret, POINTonE2 T[],
   }
   conv_64to48_fp_4x2w(_Px2, s[0]);
 
-  line_by_Px2_vec_v1(l12, l12, _Px2);
+  line_by_Px2_2x2x2w(l12, l12, _Px2);
 
   // l12  = l2 | l1 at Fp2 layer 
 
@@ -513,13 +513,29 @@ static void add_n_dbl_n_vector(vec384fp12 ret, POINTonE2 T[],
 
   // while-loop
   fp2_4x2x1w a0, a1, _r0, _r1;
-  fp2_2x2x2w l2, _Z3;
+  // fp2_2x2x2w l2, _Z3;
+  fp2_4x2x1w X1Y1Z1, _l0, _l12, _X3, _Y3, _Z3, __Px2;
+  fp2_2x2x2w t0;
   const __m512i m5 = VSET(0, 0, 1, 0, 3, 2, 0, 0); 
   const __m512i m6 = VSET(4, 4, 0, 0, 0, 0, 2, 0);
   const __m512i m7 = VSET(5, 5, 0, 0, 0, 0, 3, 1);
   const __m512i m8 = VSET(6, 6, 6, 4, 0, 0, 0, 0);
   const __m512i m9 = VSET(7, 7, 7, 5, 0, 0, 0, 0);
   const __m512i m10 = VSET(5, 4, 5, 4, 5, 4, 5, 4);
+  const __m512i m11 = VSET(6, 4, 6, 4, 2, 0, 2, 0);
+  const __m512i m12 = VSET(7, 5, 7, 5, 3, 1, 3, 1);
+  const __m512i m13 = VSET(3, 2, 3, 2, 3, 2, 3, 2);
+  const __m512i m14 = VSET(5, 4, 5, 4, 5, 4, 5, 4);
+  const __m512i m15 = VSET(0, 0, 7, 6, 1, 0, 0, 0);
+  const __m512i m16 = VSET(7, 6, 7, 6, 7, 6, 7, 6);
+  int first_iteration = 1;
+
+  for (i = 0; i < SWORDS; i++) {
+      t[0][i] = VSET(Px2->X[i], Px2->X[i], Px2->X[i], Px2->X[i],
+                     Px2->Y[i], Px2->Y[i], Px2->Y[i], Px2->Y[i]);
+  }
+
+  conv_64to48_fp_8x1w(__Px2, t[0]);
 
   while (k--) {
 
@@ -531,7 +547,6 @@ static void add_n_dbl_n_vector(vec384fp12 ret, POINTonE2 T[],
 #endif
   
     // Step 4: sqr_fp12 
-
 
     //  a0 = ret[1][2]00 | ret[0][2] | ret[0][1] | ret[0][0] at Fp2 layer
     //  a1 = ret[1][2]11 | ret[1][2] | ret[1][1] | ret[1][0] at Fp2 layer
@@ -564,6 +579,9 @@ static void add_n_dbl_n_vector(vec384fp12 ret, POINTonE2 T[],
 
   start_cycles = read_tsc();
 #endif
+
+#if 0
+    // 2-way dbl
 
     // Step 5: line_dbl
 
@@ -598,19 +616,8 @@ static void add_n_dbl_n_vector(vec384fp12 ret, POINTonE2 T[],
 
     // Step 7: mul_by_xy00z0_fp12
 
-    // a01 = ret[1][1] | ret[1][0] | ret[0][1] | ret[0][0] at Fp2 layer
-    // a2  = ret[1][2] | ret[1][2] | ret[0][2] | ret[0][2] at Fp2 layer
     // b01 =   line[1] |   line[0] |   line[1] |   line[0] at Fp2 layer
     // b4  =   line[2] |   line[2] |   line[2] |   line[2] at Fp2 layer
-
-    // a01 = ret[1][1] | ret[1][0] |       ... |       ... at Fp2 layer
-    perm_var(a01, _r1, m2);
-    // a01 = ret[1][1] | ret[1][0] | ret[0][1] | ret[0][0] at Fp2 layer
-    blend_0x0F(a01, a01, _r0);
-    // a2  = ret[1][2] | ret[1][2] | ret[0][2] | ret[0][2] at Fp2 layer
-    perm_var(_r0, _r0, m10);
-    perm_var(_r1, _r1, m10);
-    blend_0x0F(a2, _r1, _r0);
 
     carryp_fp_4x2w(l12);
     carryp_fp_4x2w(l0Y3);
@@ -625,6 +632,81 @@ static void add_n_dbl_n_vector(vec384fp12 ret, POINTonE2 T[],
       b01[i]        = VPERMV(m3, l12[i]);
       b01[i+VWORDS] = VPERMV(m4, l12[i]);
     }
+
+#else 
+    // 4-way dbl
+
+    // Step 5: line_dbl
+    // X1Y1Z1 = Y1 | X1 | Z1 | Y1 at Fp2 layer
+
+    if (first_iteration) {
+      // t0 = X1 | Z1 at Fp2 layer
+      blend_0x0F_hl(t0, X3, Z3);
+      // X1Y1Z1 = X1 | X1 | Z1 | Z1 at Fp2 layer 
+      for (i = 0; i < VWORDS; i++) {
+        X1Y1Z1[i]        = VPERMV(m11, t0[i]);
+        X1Y1Z1[i+VWORDS] = VPERMV(m12, t0[i]);
+      }
+      // _Y3 =  Y1 | Y1 | Y1 | Y1 at Fp2 layer
+      for (i = 0; i < VWORDS; i++) {
+        _Y3[i]        = VPERMV(m0, l0Y3[i]);
+        _Y3[i+VWORDS] = VPERMV(m1, l0Y3[i]);
+      }
+      // X1Y1Z1 = Y1 | X1 | Z1 | Y1 at Fp2 layer
+      blend_0xC3(X1Y1Z1, X1Y1Z1, _Y3);
+    }
+    else {
+      // X1Y1Z1 = X1 | .. | .. | Z1 at Fp2 layer
+      blend_0x0F(X1Y1Z1, _X3, _Z3);
+      // X1Y1Z1 = .. | X1 | Z1 | .. at Fp2 layer
+      perm_var(X1Y1Z1, X1Y1Z1, m15);
+      //    _Y3 = Y1 | Y1 | Y1 | Y1 at Fp2 layer 
+      perm_var(_Y3, _Y3, m16);
+      // X1Y1Z1 = Y1 | X1 | Z1 | Y1 at Fp2 layer
+      blend_0xC3(X1Y1Z1, X1Y1Z1, _Y3);
+    }
+
+    line_dbl_vec_v2(_l0, _l12, _X3, _Y3, _Z3, X1Y1Z1);
+
+    // _l0  = .. | .. | l0 | .. at Fp2 layer
+    // _l12 = .. | l1 | l2 | .. at Fp2 layer
+    // _X3  = X3 | .. | .. | .. at Fp2 layer
+    // _Y3  = Y3 | .. | .. | .. at Fp2 layer
+    // _Z3  = .. | .. | .. | Z3 at Fp2 layer 
+
+    // Step 6: line_by_Px2
+
+    line_by_Px2_4x2x1w(_l12, _l12, __Px2);
+
+    // _l12  = .. | l1 | l2 | .. at Fp2 layer 
+
+    // Step 7: mul_by_xy00z0_fp12_vec_v1
+
+    // b01 =   line[1] |   line[0] |   line[1] |   line[0] at Fp2 layer
+    // b4  =   line[2] |   line[2] |   line[2] |   line[2] at Fp2 layer
+
+    // b01 =   line[1] |   line[1] |   line[1] |   line[1] at Fp2 layer
+    perm_var(b01, _l12, m14);
+    // b4  =   line[0] |   line[0] |   line[0] |   line[0] at Fp2 layer
+    perm_var(b4, _l0, m13);
+    // b01 =   line[1] |   line[0] |   line[1] |   line[0] at Fp2 layer
+    blend_0x33(b01, b01, b4);
+    // b4  =   line[2] |   line[2] |   line[2] |   line[2] at Fp2 layer
+    perm_var(b4, _l12, m13);
+
+#endif
+
+    // a01 = ret[1][1] | ret[1][0] | ret[0][1] | ret[0][0] at Fp2 layer
+    // a2  = ret[1][2] | ret[1][2] | ret[0][2] | ret[0][2] at Fp2 layer
+
+    // a01 = ret[1][1] | ret[1][0] |       ... |       ... at Fp2 layer
+    perm_var(a01, _r1, m2);
+    // a01 = ret[1][1] | ret[1][0] | ret[0][1] | ret[0][0] at Fp2 layer
+    blend_0x0F(a01, a01, _r0);
+    // a2  = ret[1][2] | ret[1][2] | ret[0][2] | ret[0][2] at Fp2 layer
+    perm_var(_r0, _r0, m10);
+    perm_var(_r1, _r1, m10);
+    blend_0x0F(a2, _r1, _r0);
 
     mul_by_xy00z0_fp12_vec_v1(r0, r1, a01, a2, b01, b4);
 
@@ -658,6 +740,7 @@ static void add_n_dbl_n_vector(vec384fp12 ret, POINTonE2 T[],
     ret[1][2][1][i+SWORDS/2] = ((uint64_t *)&s[0][i])[7];
   }
 
+#if 0
   carryp_fp_4x2w(X3);
   carryp_fp_4x2w(Z3);
 
@@ -679,6 +762,20 @@ static void add_n_dbl_n_vector(vec384fp12 ret, POINTonE2 T[],
     T   ->Z[1][   i         ] = ((uint64_t *)&s[2][i])[6];
     T   ->Z[1][   i+SWORDS/2] = ((uint64_t *)&s[2][i])[7];
   }
+#else 
+    conv_48to64_fp_8x1w(t[0], _X3);
+    conv_48to64_fp_8x1w(t[1], _Y3);
+    conv_48to64_fp_8x1w(t[2], _Z3);
+
+  for (i = 0; i < SWORDS; i++) {
+    T   ->X[0][i] = ((uint64_t *)&t[0][i])[6];
+    T   ->X[1][i] = ((uint64_t *)&t[0][i])[7];
+    T   ->Y[0][i] = ((uint64_t *)&t[1][i])[6];
+    T   ->Y[1][i] = ((uint64_t *)&t[1][i])[7];
+    T   ->Z[0][i] = ((uint64_t *)&t[2][i])[0];
+    T   ->Z[1][i] = ((uint64_t *)&t[2][i])[1];
+  }
+#endif
 
 #ifdef PROFILING
   end_cycles = read_tsc();
