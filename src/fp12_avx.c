@@ -4605,7 +4605,7 @@ void line_dbl_vec_v1(fp2_2x2x2w l0Y3, fp2_2x2x2w l1, fp2_2x2x2w l2, fp2_2x2x2w X
 // 4-way
 void line_dbl_vec_v2(fp2_4x2x1w l0, fp2_4x2x1w l12, fp2_4x2x1w X3, fp2_4x2x1w Y3, fp2_4x2x1w Z3, const fp2_4x2x1w X1Y1Z1)
 {
-  fp2_4x2x1w ABZZ, CF, D, E;
+  fp2_4x2x1w ABZZ, CF, E;
   fp2_4x2x1w t0, t1, t2, t3;
   fp2x2_4x2x1w tt0;
   const __m512i m0 = VSET(7, 6, 5, 4, 7, 6, 5, 4);
@@ -4676,9 +4676,9 @@ void line_dbl_vec_v2(fp2_4x2x1w l0, fp2_4x2x1w l12, fp2_4x2x1w X3, fp2_4x2x1w Y3
   //                   2A |        4C |                    4B |                 ...
   blend_0x0F(t1, t1, E);
   // D = 2*((X1+B)^2-C-A) |        8C | l0 = (3A+X1)^2-A-F-4B |                 ...
-  sass_fp2_4x2x1w(D, Z3, t1);
+  sass_fp2_4x2x1w(l0, Z3, t1);
   //                    D |       ... |                   ... |                   F
-  blend_0x0F(t0, D, CF);
+  blend_0x0F(t0, l0, CF);
   //                    F |         D |                     D |                 ...
   perm_var(t1, t0, m5);
   //                    D |         F |                     D |                 ...
@@ -4686,7 +4686,7 @@ void line_dbl_vec_v2(fp2_4x2x1w l0, fp2_4x2x1w l12, fp2_4x2x1w X3, fp2_4x2x1w Y3
   //                  F-D |       D-F |                    2D |                 ...
   ssaa_fp2_4x2x1w(t0, t1, t0);
   //                    D |       ... |                    2D |                 ...
-  blend_0x0F(t1, D, t0);
+  blend_0x0F(t1, l0, t0);
   //                    D |        2D |                   ... |                 ...
   perm_var(t1, t1, m7);
   //            X3 = F-2D |      3D-F |                   ... |                 ...
@@ -4705,7 +4705,7 @@ void line_dbl_vec_v2(fp2_4x2x1w l0, fp2_4x2x1w l12, fp2_4x2x1w X3, fp2_4x2x1w Y3
   mul_fp2x2_4x2x1w(tt0, t0, t1);
   redc_fp2x2_4x2x1w(l12, tt0);
   //                   8C |       ... |                   ... |                 ...
-  perm_1010(t0, D);
+  perm_1010(t0, l0);
   //     Y3 = E*(3D-F)-8C |       ... |                   ... |                 ... 
   mul_fp2x2_4x2x1w(tt0, l12, t0);
   redc_fp2x2_4x2x1w(Y3, tt0);

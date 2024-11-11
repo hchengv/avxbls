@@ -107,6 +107,9 @@ void sqr_fp12_vec_v1(fp2_4x2x1w r0, fp2_4x2x1w r1,
 void line_dbl_vec_v1(fp2_2x2x2w l0Y3, fp2_2x2x2w l1, fp2_2x2x2w l2, 
                      fp2_2x2x2w X3,   fp2_2x2x2w Z3, 
                      const fp2_2x2x2w X1Y1, const fp2_2x2x2w Z1);
+void line_dbl_vec_v2(fp2_4x2x1w l0, fp2_4x2x1w l12, 
+                     fp2_4x2x1w X3, fp2_4x2x1w Y3, fp2_4x2x1w Z3, 
+                     const fp2_4x2x1w X1Y1Z1);
 
 void line_add_vec_v1(fp2_2x2x2w l0Y3, fp2_2x2x2w l1, 
                      fp2_2x2x2w X3, fp2_2x2x2w Z3, 
