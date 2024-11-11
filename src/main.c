@@ -1199,7 +1199,7 @@ void test_timing_fp12()
   MEASURE_CYCLES(mul_by_xy00z0_fp12_scalar(r, a, b), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- mul_by_xy00z0_fp12_vector: ");
+  printf("- mul_by_xy00z0_fp12_vec_v1: ");
   LOAD_CACHE(mul_by_xy00z0_fp12_vec_v1(r0_4x2x1w, r1_2x2x2w, a01_4x2x1w, a2_4x2x1w, b01_4x2x1w, b4_4x2x1w), 10000);
   MEASURE_CYCLES(mul_by_xy00z0_fp12_vec_v1(r0_4x2x1w, r1_2x2x2w, a01_4x2x1w, a2_4x2x1w, b01_4x2x1w, b4_4x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
@@ -1230,7 +1230,7 @@ void test_timing_line()
   uint64_t start_cycles, end_cycles, diff_cycles;
   int i;
 
-#if 1
+#if 0
   puts("\nLINE TEST\n");
 
   Q[0].X[0][0] = 1; Q[0].X[1][0] = 2;
@@ -1474,8 +1474,8 @@ int main()
   // test_fp4();
   // test_fp6();
 
-  // test_timing_fp12();
-  // test_timing_line();
+  test_timing_fp12();
+  test_timing_line();
 
   return 0;
 }

@@ -4,7 +4,7 @@ FLAGS  = -O2 -fomit-frame-pointer -m64 -mbmi2 -march=native -fwrapv -mtune=nativ
 OUTPUT = test 
 
 all:
-	$(CC) $(SRCS) -o $(OUTPUT) $(FLAGS) -DPROFILING
+	$(CC) $(SRCS) -o $(OUTPUT) $(FLAGS)
 
 clean:
 	rm -r pairing 
