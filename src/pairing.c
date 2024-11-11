@@ -601,6 +601,13 @@ static void add_n_dbl_n_vector(vec384fp12 ret, POINTonE2 T[],
     // X3   = X3 | X3 at Fp2 layer 
     // Z3   = Z3 | Z3 at FP2 layer
 
+#ifdef PROFILING
+  end_cycles = read_tsc();
+  line_dbl_cycles += end_cycles - start_cycles;
+
+  start_cycles = read_tsc();
+#endif
+
     // Step 6: line_by_Px2
     blend_0x0F_hl(l12, l2, l1);
     line_by_Px2_vec_v1(l12, l12, _Px2);
@@ -654,6 +661,8 @@ static void add_n_dbl_n_vector(vec384fp12 ret, POINTonE2 T[],
       }
       // X1Y1Z1 = Y1 | X1 | Z1 | Y1 at Fp2 layer
       blend_0xC3(X1Y1Z1, X1Y1Z1, _Y3);
+
+      first_iteration = 0;
     }
     else {
       // X1Y1Z1 = X1 | .. | .. | Z1 at Fp2 layer
@@ -674,11 +683,25 @@ static void add_n_dbl_n_vector(vec384fp12 ret, POINTonE2 T[],
     // _Y3  = Y3 | .. | .. | .. at Fp2 layer
     // _Z3  = .. | .. | .. | Z3 at Fp2 layer 
 
+#ifdef PROFILING
+  end_cycles = read_tsc();
+  line_dbl_cycles += end_cycles - start_cycles;
+
+  start_cycles = read_tsc();
+#endif
+
     // Step 6: line_by_Px2
 
     line_by_Px2_4x2x1w(_l12, _l12, __Px2);
 
     // _l12  = .. | l1 | l2 | .. at Fp2 layer 
+
+#ifdef PROFILING
+  end_cycles = read_tsc();
+  line_by_Px2_cycles += end_cycles - start_cycles;
+
+  start_cycles = read_tsc();
+#endif
 
     // Step 7: mul_by_xy00z0_fp12_vec_v1
 
