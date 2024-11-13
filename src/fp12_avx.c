@@ -606,6 +606,38 @@ static void perm_10zz_dl(__m512i *r, const __m512i *a)
 }
 
 // a = < H | G | F | E | D | C | B | A >
+// r = < G | H | G | H | C | D | C | D >
+static void perm_2323_dl(__m512i *r, const __m512i *a)
+{
+  const __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
+  const __m512i a4  = a[4 ], a5  = a[5 ], a6  = a[6 ], a7  = a[7 ];
+  const __m512i a8  = a[8 ], a9  = a[9 ], a10 = a[10], a11 = a[11];
+  const __m512i a12 = a[12], a13 = a[13], a14 = a[14], a15 = a[15];
+  __m512i r0, r1, r2 , r3 , r4 , r5 , r6 , r7 ;
+  __m512i r8, r9, r10, r11, r12, r13, r14, r15;
+
+  r0  = VPERM(a0 , 0xBB); r1  = VPERM(a1 , 0xBB);
+  r2  = VPERM(a2 , 0xBB); r3  = VPERM(a3 , 0xBB);
+  r4  = VPERM(a4 , 0xBB); r5  = VPERM(a5 , 0xBB);
+  r6  = VPERM(a6 , 0xBB); r7  = VPERM(a7 , 0xBB);
+  r8  = VPERM(a8 , 0xBB); r9  = VPERM(a9 , 0xBB);
+  r10 = VPERM(a10, 0xBB); r11 = VPERM(a11, 0xBB);
+  r12 = VPERM(a12, 0xBB); r13 = VPERM(a13, 0xBB);
+  r14 = VPERM(a14, 0xBB); r15 = VPERM(a15, 0xBB);
+
+  r[0 ] = r0 ; r[1 ] = r1 ; r[2 ] = r2 ; r[3 ] = r3 ;
+  r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
+  r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
+  r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
+}
+
+static void perm_2323_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a)
+{
+  perm_2323_dl(r[0], a[0]);
+  perm_2323_dl(r[1], a[1]);
+}
+
+// a = < H | G | F | E | D | C | B | A >
 // r = < H | E | E | E | D | A | A | A >
 static void perm_3000_dl(__m512i *r, const __m512i *a)
 {
@@ -661,12 +693,6 @@ static void perm_3232_dl(__m512i *r, const __m512i *a)
   r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
   r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
   r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
-}
-
-static void perm_3232_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a)
-{
-  perm_3232_dl(r[0], a[0]);
-  perm_3232_dl(r[1], a[1]);
 }
 
 // a = < H | G | F | E | D | C | B | A >
@@ -4385,7 +4411,7 @@ void mul_by_xy00z0_fp6x2_2x4x1x1w(fp2x2_8x1x1w r01, fp2x2_8x1x1w r23, fp2x2_8x1x
   //       a0+a1 |                 b0+b1 |              ... |                   ...
   add_fp2_8x1x1w(t0, t0, t1);
   //       a0+a1 |                    a2 |               a1 |                    a0
-  blend_0x77_fp2_8x1x1w(t1, a, t0);
+  blend_0x77_fp2_8x1x1w(t1, t0, a);
   //          a0 |                    a1 |               a2 |                 a0+a1
   perm_0123_fp2_8x1x1w(t1, t1);
   //         ... |                   ... |              ... |                 b0+b1
@@ -4397,7 +4423,7 @@ void mul_by_xy00z0_fp6x2_2x4x1x1w(fp2x2_8x1x1w r01, fp2x2_8x1x1w r23, fp2x2_8x1x
   //       a2*b1 |                 a2*b4 |            a2*b0 |       (a0+a1)*(b0+b1)
   blend_0x33_fp2x2_8x1x1w(tt1, r45, tt2);
   //         ... |                   ... |            a1*b1 |                 a0*b0
-  perm_3232_fp2x2_8x1x1w(tt0, tt2);
+  perm_2323_fp2x2_8x1x1w(tt0, tt2);
   //       a2*b1 |                 a2*b4 |            a1*b1 |                 a0*b0
   blend_0x33_fp2x2_8x1x1w(tt0, tt1, tt0);
   //    a2*b1 00 |              a2*b4 00 |            a2*b0 |       (a0+a1)*(b0+b1)
@@ -4406,7 +4432,7 @@ void mul_by_xy00z0_fp6x2_2x4x1x1w(fp2x2_8x1x1w r01, fp2x2_8x1x1w r23, fp2x2_8x1x
   blend_0x33_dl(tt0[0], tt0[1], tt0[0]);
   // a2*b1*(u+1) |      r3 = a2*b4*(u+1) | r2 = a2*b0+a1*b1 | (a0+a1)*(b0+b1)-a0*b0
   ssasx2_fpx2_8x1w(r23[0], tt1[0], tt0[0]);
-  aaasx2_fpx2_8x1w(r23[1], tt1[1], tt0[0]);
+  aaasx2_fpx2_8x1w(r23[1], tt1[1], tt0[1]);
   // a2*b1*(u+1) | (a0+a1)*(b0+b1)-a0*b0 |              ... |                   ...
   perm_3000_fp2x2_8x1x1w(tt0, r23);
   //          r0 |                    r1 |              ... |                   ...

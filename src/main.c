@@ -1515,7 +1515,7 @@ void test_timing_line()
 int main()
 {
   test_pairing();
-  timing_pairing();
+  // timing_pairing();
 
   // test_fp();
   // test_fp2();
