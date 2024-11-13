@@ -584,13 +584,13 @@ void test_fp6()
   }
 
   a_8x1x1w[0][0] = VSET(0, 0, 0, 0, 5, 5, 3, 1);
-  a_8x1x1w[0][1] = VSET(0, 0, 0, 0, 6, 6, 4, 2);
+  a_8x1x1w[1][0] = VSET(0, 0, 0, 0, 6, 6, 4, 2);
   b_8x1x1w[0][0] = VSET(0, 0, 0, 0, 1, 3, 1, 5);
-  b_8x1x1w[0][1] = VSET(0, 0, 0, 0, 2, 4, 2, 6);
+  b_8x1x1w[1][0] = VSET(0, 0, 0, 0, 2, 4, 2, 6);
 
   for (i = 1; i < NWORDS; i++) {
-    a_8x1x1w[i][0] = a_8x1x1w[i][1] = VZERO;
-    b_8x1x1w[i][0] = b_8x1x1w[i][1] = VZERO;
+    a_8x1x1w[0][i] = a_8x1x1w[1][i] = VZERO;
+    b_8x1x1w[0][i] = b_8x1x1w[1][i] = VZERO;
   }
 
   mul_by_xy0_fp6x2(r, a, a);
