@@ -569,6 +569,7 @@ void test_fp6()
   fp2x2_2x2x2w z01_2x2x2w, z2_2x2x2w;
   vec768fp6 r; 
   vec384fp6 a = {{{1}, {2}}, {{3}, {4}}, {{5}, {6}}};
+  uint64_t start_cycles, end_cycles, diff_cycles;
   int i;
 
 #if 0
@@ -824,6 +825,18 @@ void test_fp6()
   // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   // mpi_print("* mul_fp6x2_1x2x2x2w r21 = 0x", r64, SWORDS);
 #endif
+
+  // puts("\nFP6 TIMING\n");
+
+  // printf("- mul_by_xy00z0_fp6x2_2x2x2x1w: ");
+  // LOAD_CACHE(mul_by_xy00z0_fp6x2_2x2x2x1w(z01_4x2x1w, z2_4x2x1w, z3_4x2x1w, z45_4x2x1w, a01_4x2x1w, a2_4x2x1w, a01_4x2x1w, a2_4x2x1w), 10000);
+  // MEASURE_CYCLES(mul_by_xy00z0_fp6x2_2x2x2x1w(z01_4x2x1w, z2_4x2x1w, z3_4x2x1w, z45_4x2x1w, a01_4x2x1w, a2_4x2x1w, a01_4x2x1w, a2_4x2x1w), 100000);
+  // printf("#cycle = %ld\n", diff_cycles);
+
+  // printf("- mul_by_xy00z0_fp6x2_2x4x1x1w: ");
+  // LOAD_CACHE(mul_by_xy00z0_fp6x2_2x4x1x1w(r01_8x1x1w, r23_8x1x1w, r45_8x1x1w, a_8x1x1w, b_8x1x1w), 10000);
+  // MEASURE_CYCLES(mul_by_xy00z0_fp6x2_2x4x1x1w(r01_8x1x1w, r23_8x1x1w, r45_8x1x1w, a_8x1x1w, b_8x1x1w), 100000);
+  // printf("#cycle = %ld\n", diff_cycles);
 }
 
 // ----------------------------------------------------------------------------
@@ -849,7 +862,7 @@ void test_timing_fp12()
   fp2_4x2x1w r0_4x2x1w, r1_4x2x1w, a01_4x2x1w, b01_4x2x1w, b4_4x2x1w;
   fp2_2x2x2w r1_2x2x2w; 
 
-#if 1
+#if 0
   puts("\nFP12 TEST\n");
 
   // a0_4x2x1w[0] = VSET(11, 11, 6  , 5  , 4 , 3, 2, 1);
@@ -927,13 +940,13 @@ void test_timing_fp12()
   mpi_print("* mul_by_xy00z0_fp12_scalar r121 = 0x", r[1][2][1], SWORDS);
 
   a_8x1x1w[0][0] = VSET(11, 11, 9, 7, 5, 5, 3, 1);
-  a_8x1x1w[0][1] = VSET(12, 12, 10, 8, 6, 6, 4, 2);
+  a_8x1x1w[1][0] = VSET(12, 12, 10, 8, 6, 6, 4, 2);
   b_8x1x1w[0][0] = VSET(1, 3, 1, 5, 1, 3, 1, 5);
-  b_8x1x1w[0][1] = VSET(2, 4, 2, 6, 2, 4, 2, 6);
+  b_8x1x1w[1][0] = VSET(2, 4, 2, 6, 2, 4, 2, 6);
 
   for (i = 1; i < NWORDS; i++) {
-    a_8x1x1w[i][0] = a_8x1x1w[i][1] = VZERO;
-    b_8x1x1w[i][0] = b_8x1x1w[i][1] = VZERO;    
+    a_8x1x1w[0][i] = a_8x1x1w[1][i] = VZERO;
+    b_8x1x1w[0][i] = b_8x1x1w[1][i] = VZERO;    
   }
 
   mul_by_xy00z0_fp12_vec_v2(r0_4x2x1w, r1_2x2x2w, a_8x1x1w, b_8x1x1w);
@@ -1572,7 +1585,7 @@ void test_timing_line()
 int main()
 {
   test_pairing();
-  // timing_pairing();
+  timing_pairing();
 
   // test_fp();
   // test_fp2();
@@ -1580,7 +1593,7 @@ int main()
   // test_fp6();
 
   test_timing_fp12();
-  // test_timing_line();
+  test_timing_line();
 
   return 0;
 }

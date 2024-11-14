@@ -4365,7 +4365,7 @@ static void mul_fp6x2_1x2x2x2w(fp2x2_2x2x2w r01, fp2x2_2x2x2w r2, const fp2_2x2x
 // r4 = a0*b4
 // r5 = a1*b4
 // Karatsuba
-void mul_by_xy00z0_fp6x2_2x2x2x1w(fp2x2_4x2x1w r01, fp2x2_4x2x1w r2, fp2x2_4x2x1w r3, fp2x2_4x2x1w r45, const fp2_4x2x1w a01, const fp2_4x2x1w a2, const fp2_4x2x1w b01, const fp2_4x2x1w b4)
+static void mul_by_xy00z0_fp6x2_2x2x2x1w(fp2x2_4x2x1w r01, fp2x2_4x2x1w r2, fp2x2_4x2x1w r3, fp2x2_4x2x1w r45, const fp2_4x2x1w a01, const fp2_4x2x1w a2, const fp2_4x2x1w b01, const fp2_4x2x1w b4)
 {
   fp2_4x2x1w t0, t1;
   fp2x2_4x2x1w tt0, tt1, tt2;
@@ -4402,7 +4402,7 @@ void mul_by_xy00z0_fp6x2_2x2x2x1w(fp2x2_4x2x1w r01, fp2x2_4x2x1w r2, fp2x2_4x2x1
 // r4 = a0*b4
 // r5 = a1*b4
 // Karatsuba
-void mul_by_xy00z0_fp6x2_2x4x1x1w(fp2x2_8x1x1w r01, fp2x2_8x1x1w r23, fp2x2_8x1x1w r45, const fp2_8x1x1w a, const fp2_8x1x1w b)
+static void mul_by_xy00z0_fp6x2_2x4x1x1w(fp2x2_8x1x1w r01, fp2x2_8x1x1w r23, fp2x2_8x1x1w r45, const fp2_8x1x1w a, const fp2_8x1x1w b)
 {
   fp2_8x1x1w t0, t1;
   fp2x2_8x1x1w tt0, tt1, tt2;
@@ -4921,7 +4921,7 @@ void mul_by_xy00z0_fp12_vec_v2(fp2_4x2x1w r0, fp2_2x2x2w r1, const fp2_8x1x1w a,
   const __m512i m0 = VSET(6, 6, 7, 7, 2, 2, 1, 1);
   const __m512i m1 = VSET(0, 0, 2, 2, 6, 6, 4, 4);
   const __m512i m2 = VSET(1, 1, 1, 1, 3, 3, 3, 3);
-  const __m512i m3 = VSET(5, 5, 5, 5, 4, 4, 4, 4);
+  const __m512i m3 = VSET(5, 5, 5, 5, 7, 7, 7, 7);
 
   // a1[2][0] | a1[2][0] | a1[1][0] | a1[0][0] | a0[2][0] | a0[2][0] | a0[1][0] | a0[0][0] at Fp layer
   // a1[2][1] | a1[2][1] | a1[1][1] | a1[0][1] | a0[2][1] | a0[2][1] | a0[1][1] | a0[0][1] at Fp layer
@@ -4955,10 +4955,10 @@ void mul_by_xy00z0_fp12_vec_v2(fp2_4x2x1w r0, fp2_2x2x2w r1, const fp2_8x1x1w a,
   blend_0x33_dl(ss0, tt3[1], tt3[0]);
   // hh0 =                  a0*b1[2] |                  a0*b0[0]
   conv_dltovl(hh0, ss0);
-  // tt3 =      ... |      ... |      ... | a1*b1[2] |      ... |      ... |      ... |      ... at Fp2 layer
+  // tt3 = a1*b1[2] |      ... |      ... |      ... |      ... |      ... |      ... |      ... at Fp2 layer
   perm_1032_fp2x2_8x1x1w(tt3, tt2);
-  // tt3 =      ... |      ... | a1*b0[2] | a1*b1[2] |      ... |      ... |      ... |      ... at Fp2 layer
-  blend_0x55_fp2x2_8x1x1w(tt3, tt1, tt3);
+  // tt3 =  a1*b1[2]|      ... | a1*b0[2] |      ... |      ... |      ... |      ... |      ... at Fp2 layer
+  blend_0x33_fp2x2_8x1x1w(tt3, tt3, tt1);
   // ss0 = a1*b0[2][1] | a1*b0[2][0] | a1*b1[2][1] | a1*b1[2][0]
   perm_var_fp2x2_8x1x1w(tt3, tt3, m3);
   blend_0x33_dl(ss1, tt3[1], tt3[0]);
