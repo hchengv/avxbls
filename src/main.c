@@ -571,7 +571,7 @@ void test_fp6()
   vec384fp6 a = {{{1}, {2}}, {{3}, {4}}, {{5}, {6}}};
   int i;
 
-#if 1
+#if 0
 
   puts("\nFP6 TEST\n");
 
@@ -842,75 +842,141 @@ void test_timing_fp12()
 
   fp4_1x2x2x2w ra_1x2x2x2w, a_1x2x2x2w;
   fp4_2x2x2x1w rbc_2x2x2x1w, bc_2x2x2x1w;
-  fp2_8x1x1w a0_8x1x1w, a1_8x1x1w, a2_8x1x1w;
+  fp2_8x1x1w a0_8x1x1w, a1_8x1x1w, a2_8x1x1w, a_8x1x1w, b_8x1x1w;
   fp2_4x2x1w r01_4x2x1w, r2_4x2x1w;
   fp2_4x2x1w a0_4x2x1w, a1_4x2x1w, a2_4x2x1w;
   fp2_2x2x2w r001_2x2x2w, r101_2x2x2w, r2_2x2x2w, r12_2x2x2w;
   fp2_4x2x1w r0_4x2x1w, r1_4x2x1w, a01_4x2x1w, b01_4x2x1w, b4_4x2x1w;
   fp2_2x2x2w r1_2x2x2w; 
 
-#if 0
+#if 1
   puts("\nFP12 TEST\n");
 
-  a0_4x2x1w[0] = VSET(11, 11, 6  , 5  , 4 , 3, 2, 1);
-  a1_4x2x1w[0] = VSET(12, 12, 12 , 11 , 10, 9, 8, 7);
+  // a0_4x2x1w[0] = VSET(11, 11, 6  , 5  , 4 , 3, 2, 1);
+  // a1_4x2x1w[0] = VSET(12, 12, 12 , 11 , 10, 9, 8, 7);
+
+  // for (i = 1; i < NWORDS; i++) {
+  //   a0_4x2x1w[i] = VZERO;
+  //   a1_4x2x1w[i] = VZERO;
+  // }
+
+  // sqr_fp12_scalar(r, a);
+  // mpi_print("* sqr_fp12_scalar r000 = 0x", r[0][0][0], SWORDS);
+  // mpi_print("* sqr_fp12_scalar r001 = 0x", r[0][0][1], SWORDS);
+  // mpi_print("* sqr_fp12_scalar r010 = 0x", r[0][1][0], SWORDS);
+  // mpi_print("* sqr_fp12_scalar r011 = 0x", r[0][1][1], SWORDS);
+  // mpi_print("* sqr_fp12_scalar r020 = 0x", r[0][2][0], SWORDS);
+  // mpi_print("* sqr_fp12_scalar r021 = 0x", r[0][2][1], SWORDS);
+  // mpi_print("* sqr_fp12_scalar r100 = 0x", r[1][0][0], SWORDS);
+  // mpi_print("* sqr_fp12_scalar r101 = 0x", r[1][0][1], SWORDS);
+  // mpi_print("* sqr_fp12_scalar r110 = 0x", r[1][1][0], SWORDS);
+  // mpi_print("* sqr_fp12_scalar r111 = 0x", r[1][1][1], SWORDS);
+  // mpi_print("* sqr_fp12_scalar r120 = 0x", r[1][2][0], SWORDS);
+  // mpi_print("* sqr_fp12_scalar r121 = 0x", r[1][2][1], SWORDS);
+
+  // sqr_fp12_vec_v1(r0_4x2x1w, r1_4x2x1w, a0_4x2x1w, a1_4x2x1w);
+  // get_channel_8x1w(r48, r0_4x2x1w, 0);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* sqr_fp12_vec_v1 r000 = 0x", r64, SWORDS);
+  // get_channel_8x1w(r48, r0_4x2x1w, 1);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* sqr_fp12_vec_v1 r001 = 0x", r64, SWORDS);
+  // get_channel_8x1w(r48, r0_4x2x1w, 2);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* sqr_fp12_vec_v1 r010 = 0x", r64, SWORDS);
+  // get_channel_8x1w(r48, r0_4x2x1w, 3);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* sqr_fp12_vec_v1 r011 = 0x", r64, SWORDS);
+  // get_channel_8x1w(r48, r0_4x2x1w, 4);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* sqr_fp12_vec_v1 r020 = 0x", r64, SWORDS);
+  // get_channel_8x1w(r48, r0_4x2x1w, 5);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* sqr_fp12_vec_v1 r021 = 0x", r64, SWORDS);
+  // get_channel_8x1w(r48, r1_4x2x1w, 0);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* sqr_fp12_vec_v1 r100 = 0x", r64, SWORDS);
+  // get_channel_8x1w(r48, r1_4x2x1w, 1);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* sqr_fp12_vec_v1 r101 = 0x", r64, SWORDS);
+  // get_channel_8x1w(r48, r1_4x2x1w, 2);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* sqr_fp12_vec_v1 r110 = 0x", r64, SWORDS);
+  // get_channel_8x1w(r48, r1_4x2x1w, 3);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* sqr_fp12_vec_v1 r111 = 0x", r64, SWORDS);
+  // get_channel_8x1w(r48, r1_4x2x1w, 4);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* sqr_fp12_vec_v1 r120 = 0x", r64, SWORDS);
+  // get_channel_8x1w(r48, r1_4x2x1w, 5);
+  // conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  // mpi_print("* sqr_fp12_vec_v1 r121 = 0x", r64, SWORDS);
+
+  mul_by_xy00z0_fp12_scalar(r, a, b);
+  mpi_print("* mul_by_xy00z0_fp12_scalar r000 = 0x", r[0][0][0], SWORDS);
+  mpi_print("* mul_by_xy00z0_fp12_scalar r001 = 0x", r[0][0][1], SWORDS);
+  mpi_print("* mul_by_xy00z0_fp12_scalar r010 = 0x", r[0][1][0], SWORDS);
+  mpi_print("* mul_by_xy00z0_fp12_scalar r011 = 0x", r[0][1][1], SWORDS);
+  mpi_print("* mul_by_xy00z0_fp12_scalar r020 = 0x", r[0][2][0], SWORDS);
+  mpi_print("* mul_by_xy00z0_fp12_scalar r021 = 0x", r[0][2][1], SWORDS);
+  mpi_print("* mul_by_xy00z0_fp12_scalar r100 = 0x", r[1][0][0], SWORDS);
+  mpi_print("* mul_by_xy00z0_fp12_scalar r101 = 0x", r[1][0][1], SWORDS);
+  mpi_print("* mul_by_xy00z0_fp12_scalar r110 = 0x", r[1][1][0], SWORDS);
+  mpi_print("* mul_by_xy00z0_fp12_scalar r111 = 0x", r[1][1][1], SWORDS);
+  mpi_print("* mul_by_xy00z0_fp12_scalar r120 = 0x", r[1][2][0], SWORDS);
+  mpi_print("* mul_by_xy00z0_fp12_scalar r121 = 0x", r[1][2][1], SWORDS);
+
+  a_8x1x1w[0][0] = VSET(11, 11, 9, 7, 5, 5, 3, 1);
+  a_8x1x1w[0][1] = VSET(12, 12, 10, 8, 6, 6, 4, 2);
+  b_8x1x1w[0][0] = VSET(1, 3, 1, 5, 1, 3, 1, 5);
+  b_8x1x1w[0][1] = VSET(2, 4, 2, 6, 2, 4, 2, 6);
 
   for (i = 1; i < NWORDS; i++) {
-    a0_4x2x1w[i] = VZERO;
-    a1_4x2x1w[i] = VZERO;
+    a_8x1x1w[i][0] = a_8x1x1w[i][1] = VZERO;
+    b_8x1x1w[i][0] = b_8x1x1w[i][1] = VZERO;    
   }
 
-  sqr_fp12_scalar(r, a);
-  mpi_print("* sqr_fp12_scalar r000 = 0x", r[0][0][0], SWORDS);
-  mpi_print("* sqr_fp12_scalar r001 = 0x", r[0][0][1], SWORDS);
-  mpi_print("* sqr_fp12_scalar r010 = 0x", r[0][1][0], SWORDS);
-  mpi_print("* sqr_fp12_scalar r011 = 0x", r[0][1][1], SWORDS);
-  mpi_print("* sqr_fp12_scalar r020 = 0x", r[0][2][0], SWORDS);
-  mpi_print("* sqr_fp12_scalar r021 = 0x", r[0][2][1], SWORDS);
-  mpi_print("* sqr_fp12_scalar r100 = 0x", r[1][0][0], SWORDS);
-  mpi_print("* sqr_fp12_scalar r101 = 0x", r[1][0][1], SWORDS);
-  mpi_print("* sqr_fp12_scalar r110 = 0x", r[1][1][0], SWORDS);
-  mpi_print("* sqr_fp12_scalar r111 = 0x", r[1][1][1], SWORDS);
-  mpi_print("* sqr_fp12_scalar r120 = 0x", r[1][2][0], SWORDS);
-  mpi_print("* sqr_fp12_scalar r121 = 0x", r[1][2][1], SWORDS);
-
-  sqr_fp12_vec_v1(r0_4x2x1w, r1_4x2x1w, a0_4x2x1w, a1_4x2x1w);
-  get_channel_8x1w(r48, r0_4x2x1w, 0);
+  mul_by_xy00z0_fp12_vec_v2(r0_4x2x1w, r1_2x2x2w, a_8x1x1w, b_8x1x1w);
+  get_channel_4x2w(r48, r1_2x2x2w, 0);
+  carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp12_vec_v1 r000 = 0x", r64, SWORDS);
-  get_channel_8x1w(r48, r0_4x2x1w, 1);
+  mpi_print("* mul_by_xy00z0_fp12_vec_v2 r000 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, r1_2x2x2w, 2);
+  carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp12_vec_v1 r001 = 0x", r64, SWORDS);
+  mpi_print("* mul_by_xy00z0_fp12_vec_v2 r001 = 0x", r64, SWORDS);
   get_channel_8x1w(r48, r0_4x2x1w, 2);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp12_vec_v1 r010 = 0x", r64, SWORDS);
+  mpi_print("* mul_by_xy00z0_fp12_vec_v2 r010 = 0x", r64, SWORDS);
   get_channel_8x1w(r48, r0_4x2x1w, 3);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp12_vec_v1 r011 = 0x", r64, SWORDS);
+  mpi_print("* mul_by_xy00z0_fp12_vec_v2 r011 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r0_4x2x1w, 0);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_by_xy00z0_fp12_vec_v2 r020 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r0_4x2x1w, 1);
+  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
+  mpi_print("* mul_by_xy00z0_fp12_vec_v2 r021 = 0x", r64, SWORDS);
   get_channel_8x1w(r48, r0_4x2x1w, 4);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp12_vec_v1 r020 = 0x", r64, SWORDS);
+  mpi_print("* mul_by_xy00z0_fp12_vec_v2 r100 = 0x", r64, SWORDS);
   get_channel_8x1w(r48, r0_4x2x1w, 5);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp12_vec_v1 r021 = 0x", r64, SWORDS);
-  get_channel_8x1w(r48, r1_4x2x1w, 0);
+  mpi_print("* mul_by_xy00z0_fp12_vec_v2 r101 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r0_4x2x1w, 6);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp12_vec_v1 r100 = 0x", r64, SWORDS);
-  get_channel_8x1w(r48, r1_4x2x1w, 1);
+  mpi_print("* mul_by_xy00z0_fp12_vec_v2 r110 = 0x", r64, SWORDS);
+  get_channel_8x1w(r48, r0_4x2x1w, 7);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp12_vec_v1 r101 = 0x", r64, SWORDS);
-  get_channel_8x1w(r48, r1_4x2x1w, 2);
+  mpi_print("* mul_by_xy00z0_fp12_vec_v2 r111 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, r1_2x2x2w, 4);
+  carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp12_vec_v1 r110 = 0x", r64, SWORDS);
-  get_channel_8x1w(r48, r1_4x2x1w, 3);
+  mpi_print("* mul_by_xy00z0_fp12_vec_v2 r120 = 0x", r64, SWORDS);
+  get_channel_4x2w(r48, r1_2x2x2w, 6);
+  carryp_mpi48(r48);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp12_vec_v1 r111 = 0x", r64, SWORDS);
-  get_channel_8x1w(r48, r1_4x2x1w, 4);
-  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp12_vec_v1 r120 = 0x", r64, SWORDS);
-  get_channel_8x1w(r48, r1_4x2x1w, 5);
-  conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
-  mpi_print("* sqr_fp12_vec_v1 r121 = 0x", r64, SWORDS);
+  mpi_print("* mul_by_xy00z0_fp12_vec_v2 r121 = 0x", r64, SWORDS);
 
   // a01_4x2x1w[0] = VSET(10, 9 , 8 , 7 , 4, 3, 2, 1);
   // a2_4x2x1w [0] = VSET(12, 11, 12, 11, 6, 5, 6, 5);
@@ -923,20 +989,6 @@ void test_timing_fp12()
   //   b01_4x2x1w[i] = VZERO;
   //   b4_4x2x1w [i] = VZERO;
   // }
-
-  // mul_by_xy00z0_fp12_scalar(r, a, b);
-  // mpi_print("* mul_by_xy00z0_fp12_scalar r000 = 0x", r[0][0][0], SWORDS);
-  // mpi_print("* mul_by_xy00z0_fp12_scalar r001 = 0x", r[0][0][1], SWORDS);
-  // mpi_print("* mul_by_xy00z0_fp12_scalar r010 = 0x", r[0][1][0], SWORDS);
-  // mpi_print("* mul_by_xy00z0_fp12_scalar r011 = 0x", r[0][1][1], SWORDS);
-  // mpi_print("* mul_by_xy00z0_fp12_scalar r020 = 0x", r[0][2][0], SWORDS);
-  // mpi_print("* mul_by_xy00z0_fp12_scalar r021 = 0x", r[0][2][1], SWORDS);
-  // mpi_print("* mul_by_xy00z0_fp12_scalar r100 = 0x", r[1][0][0], SWORDS);
-  // mpi_print("* mul_by_xy00z0_fp12_scalar r101 = 0x", r[1][0][1], SWORDS);
-  // mpi_print("* mul_by_xy00z0_fp12_scalar r110 = 0x", r[1][1][0], SWORDS);
-  // mpi_print("* mul_by_xy00z0_fp12_scalar r111 = 0x", r[1][1][1], SWORDS);
-  // mpi_print("* mul_by_xy00z0_fp12_scalar r120 = 0x", r[1][2][0], SWORDS);
-  // mpi_print("* mul_by_xy00z0_fp12_scalar r121 = 0x", r[1][2][1], SWORDS);
 
   // mul_by_xy00z0_fp12_vec_v1(r0_4x2x1w, r1_2x2x2w, a01_4x2x1w, a2_4x2x1w, b01_4x2x1w, b4_4x2x1w);
   // get_channel_4x2w(r48, r1_2x2x2w, 0);
@@ -1252,6 +1304,11 @@ void test_timing_fp12()
   MEASURE_CYCLES(mul_by_xy00z0_fp12_vec_v1(r0_4x2x1w, r1_2x2x2w, a01_4x2x1w, a2_4x2x1w, b01_4x2x1w, b4_4x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
+  printf("- mul_by_xy00z0_fp12_vec_v2: ");
+  LOAD_CACHE(mul_by_xy00z0_fp12_vec_v2(r0_4x2x1w, r1_2x2x2w, a_8x1x1w, b_8x1x1w), 10000);
+  MEASURE_CYCLES(mul_by_xy00z0_fp12_vec_v2(r0_4x2x1w, r1_2x2x2w, a_8x1x1w, b_8x1x1w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
   printf("- sqr_fp12_scalar: ");
   LOAD_CACHE(sqr_fp12_scalar(r, a), 10000);
   MEASURE_CYCLES(sqr_fp12_scalar(r, a), 100000);
@@ -1520,9 +1577,9 @@ int main()
   // test_fp();
   // test_fp2();
   // test_fp4();
-  test_fp6();
+  // test_fp6();
 
-  // test_timing_fp12();
+  test_timing_fp12();
   // test_timing_line();
 
   return 0;

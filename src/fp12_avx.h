@@ -76,8 +76,6 @@ static uint64_t P48[NWORDS] = {
 // ----------------------------------------------------------------------------
 // prototypes: Fp6 operations
 
-void mul_by_xy00z0_fp6x2_2x4x1x1w(fp2x2_8x1x1w r01, fp2x2_8x1x1w r23, fp2x2_8x1x1w r45, const fp2_8x1x1w a, const fp2_8x1x1w b);
-
 // ----------------------------------------------------------------------------
 // prototypes: Fp12 and line operations
 
@@ -102,6 +100,8 @@ void mul_fp12_vec_v4(fp2_4x2x1w r0, fp2_2x2x2w r101, fp2_2x2x2w r12,
 void mul_by_xy00z0_fp12_vec_v1(fp2_4x2x1w r0, fp2_2x2x2w r1, 
                                const fp2_4x2x1w a01, const fp2_4x2x1w a2, 
                                const fp2_4x2x1w b01, const fp2_4x2x1w b4);
+void mul_by_xy00z0_fp12_vec_v2(fp2_4x2x1w r0, fp2_2x2x2w r1, 
+                               const fp2_8x1x1w a, const fp2_8x1x1w b);
 
 void sqr_fp12_vec_v1(fp2_4x2x1w r0, fp2_4x2x1w r1, 
                      const fp2_4x2x1w a0, const fp2_4x2x1w a1);

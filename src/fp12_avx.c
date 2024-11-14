@@ -553,6 +553,12 @@ static void perm_1032_dl(__m512i *r, const __m512i *a)
   r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
 }
 
+static void perm_1032_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a)
+{
+  perm_1032_dl(r[0], a[0]);
+  perm_1032_dl(r[1], a[1]);
+}
+
 // a = < H | G | F | E | D | C | B | A >
 // r = < F | F | E | E | B | B | A | A >
 static void perm_1100_dl(__m512i *r, const __m512i *a)
@@ -743,6 +749,12 @@ static void perm_var_dl(__m512i *r, const __m512i *a, const __m512i mask)
   r[4 ] = r4 ; r[5 ] = r5 ; r[6 ] = r6 ; r[7 ] = r7 ;
   r[8 ] = r8 ; r[9 ] = r9 ; r[10] = r10; r[11] = r11;
   r[12] = r12; r[13] = r13; r[14] = r14; r[15] = r15;
+}
+
+static void perm_var_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a, const __m512i mask)
+{
+  perm_var_dl(r[0], a[0], mask);
+  perm_var_dl(r[1], a[1], mask);
 }
 
 // a = < H | G | F | E | D | C | B | A >
@@ -4855,7 +4867,7 @@ void mul_by_xy00z0_fp12_vec_v1(fp2_4x2x1w r0, fp2_2x2x2w r1, const fp2_4x2x1w a0
   // a1[1] | a1[0] | a0[1] | a0[0] at Fp2 layer
   // a1[2] | a1[2] | a0[2] | a0[2] at Fp2 layer
   // b0[1] | b0[0] | b0[1] | b0[0] at Fp2 layer
-  // b1[2] | b1[2] | b1[2] | b1[2] at Fp2 layer
+  // b1[1] | b1[1] | b1[1] | b1[1] at Fp2 layer
 
   // tt0 = a1*b0[1] | a1*b0[0] | a0*b0[1] | a0*b0[0]
   // tt1 =      ... | a1*b0[2] |      ... | a0*b0[2]
@@ -4901,9 +4913,64 @@ void mul_by_xy00z0_fp12_vec_v1(fp2_4x2x1w r0, fp2_2x2x2w r1, const fp2_4x2x1w a0
 // schoolbook
 // double-length 
 // 4-way Fp6 sparse mul
-void mul_by_xy00z0_fp12_vec_v2(fp2_4x2x1w r0, fp2_2x2x2w r1, const fp2_4x2x1w a, const fp2_4x2x1w b)
+void mul_by_xy00z0_fp12_vec_v2(fp2_4x2x1w r0, fp2_2x2x2w r1, const fp2_8x1x1w a, const fp2_8x1x1w b)
 {
+  fp2x2_8x1x1w tt0, tt1, tt2, tt3;
+  fp2x2_4x2x1w ss0, ss1;
+  fp2x2_2x2x2w hh0, hh1, hh2;
+  const __m512i m0 = VSET(6, 6, 7, 7, 2, 2, 1, 1);
+  const __m512i m1 = VSET(0, 0, 2, 2, 6, 6, 4, 4);
+  const __m512i m2 = VSET(1, 1, 1, 1, 3, 3, 3, 3);
+  const __m512i m3 = VSET(5, 5, 5, 5, 4, 4, 4, 4);
 
+  // a1[2][0] | a1[2][0] | a1[1][0] | a1[0][0] | a0[2][0] | a0[2][0] | a0[1][0] | a0[0][0] at Fp layer
+  // a1[2][1] | a1[2][1] | a1[1][1] | a1[0][1] | a0[2][1] | a0[2][1] | a0[1][1] | a0[0][1] at Fp layer
+  // b0[0][0] | b0[1][0] | b0[0][0] | b1[1][0] | b0[0][0] | b0[1][0] | b0[0][0] | b1[1][0] at Fp layer
+  // b0[0][1] | b0[1][1] | b0[0][1] | b1[1][1] | b0[0][1] | b0[1][1] | b0[0][1] | b1[1][1] at Fp layer
+
+
+  // tt0 = a1*b0[0] | a1*b0[1] |      ... |      ... | a0*b0[0] | a0*b0[1] |      ... |      ... at Fp2 layer
+  // tt1 =      ... | a1*b1[0] | a1*b0[2] |      ... |      ... | a0*b1[0] | a0*b0[2] |      ... at Fp2 layer
+  // tt2 =      ... |      ... | a1*b1[2] | a1*b1[1] |      ... |      ... | a0*b1[2] | a0*b1[1] at Fp2 layer
+  mul_by_xy00z0_fp6x2_2x4x1x1w(tt0, tt1, tt2, a, b);
+
+  // tt3 = a1*b0[0] | a1*b0[1] |      ... |      ... |      ... | a0*b0[1] | a0*b0[2] |      ... at Fp2 layer
+  blend_0x33_fp2x2_8x1x1w(tt3, tt0, tt1);
+  // ss0 = a1*b0[1] | a1*b0[0] | a0*b0[1] | a0*b0[2] at Fp2 layer
+  perm_var_fp2x2_8x1x1w(tt3, tt3, m0);
+  blend_0x55_dl(ss0, tt3[1], tt3[0]);
+  // tt3 =      ... | a1*b1[0] |      ... | a1*b1[1] |      ... | a0*b1[0] |      ... | a0*b1[1] at Fp2 layer
+  blend_0x33_fp2x2_8x1x1w(tt3, tt1, tt2);
+  // ss1 = a0*b1[1] | a0*b1[0] | a1*b1[0] | a1*b1[1] at Fp2 layer
+  perm_var_fp2x2_8x1x1w(tt3, tt3, m1);
+  blend_0x55_dl(ss1, tt3[1], tt3[0]);
+  //  r0 =    r1[1] |    r1[0] |    r0[1] |    r0[2]
+  add_fp2x2_4x2x1w(ss0, ss0, ss1);
+  redc_fp2x2_4x2x1w(r0, ss0);
+
+  // tt3 =      ... |      ... |     ...  |      ... | a0*b0[0] |      ... | a0*b1[2] |      ... at Fp2 layer
+  blend_0x33_fp2x2_8x1x1w(tt3, tt0, tt2);
+  // ss0 = a0*b1[2][1] | a0*b1[2][0] | a0*b0[0][1] | a0*b0[0][0]
+  perm_var_fp2x2_8x1x1w(tt3, tt3, m2);
+  blend_0x33_dl(ss0, tt3[1], tt3[0]);
+  // hh0 =                  a0*b1[2] |                  a0*b0[0]
+  conv_dltovl(hh0, ss0);
+  // tt3 =      ... |      ... |      ... | a1*b1[2] |      ... |      ... |      ... |      ... at Fp2 layer
+  perm_1032_fp2x2_8x1x1w(tt3, tt2);
+  // tt3 =      ... |      ... | a1*b0[2] | a1*b1[2] |      ... |      ... |      ... |      ... at Fp2 layer
+  blend_0x55_fp2x2_8x1x1w(tt3, tt1, tt3);
+  // ss0 = a1*b0[2][1] | a1*b0[2][0] | a1*b1[2][1] | a1*b1[2][0]
+  perm_var_fp2x2_8x1x1w(tt3, tt3, m3);
+  blend_0x33_dl(ss1, tt3[1], tt3[0]);
+  // hh1 =                  a1*b0[2] |                  a1*b1[2]
+  conv_dltovl(hh1, ss1);
+  // hh2 =                       ... |            a1*b1[2]*(u+1)
+  mul_by_u_plus_1_fp2x2_2x2x2w(hh2, hh1);
+  // hh1 =                  a1*b0[2] |            a1*b1[2]*(u+1)
+  blend_0x0F_vl(hh1, hh1, hh2);
+  //  r1 =                     r1[2] |                    r0[0]
+  add_fp2x2_2x2x2w(hh1, hh1, hh0);
+  redc_fp2x2_2x2x2w(r1, hh1);
 }
 
 // Karatsuba

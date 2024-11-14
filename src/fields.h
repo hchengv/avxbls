@@ -117,10 +117,4 @@ typedef vec768 vec768x[2];
 typedef vec768x vec768fp6[3];
 typedef vec384x vec384fp4[2];
 
-void mul_by_0y0_fp6x2(vec768fp6 ret, const vec384fp6 a,
-                                                   const vec384fp2 b);
-
-void mul_by_xy0_fp6x2(vec768fp6 ret, const vec384fp6 a,
-                                            const vec384fp6 b);
-
 #endif /* __BLS12_381_ASM_FIELDS_H__ */
