@@ -200,7 +200,7 @@ void test_pairing()
   else 
     printf("\x1b[32m  e1 == e2 \x1b[0m \n");
 
-#if 1
+#if 0
   // print out the result
   mpi_print("e1[0][0][0] = ",  e1[0][0][0], 6);
   mpi_print("e1[0][0][1] = ",  e1[0][0][1], 6);
@@ -232,7 +232,7 @@ void test_pairing()
   else 
     printf("\x1b[32m  e1 == e2 \x1b[0m \n");
 
-#if 1
+#if 0
   // print out the result
   mpi_print("e1[0][0][0] = ",  e1[0][0][0], 6);
   mpi_print("e1[0][0][1] = ",  e1[0][0][1], 6);
@@ -1265,11 +1265,6 @@ void test_timing_fp12()
   printf("- cyclotomic_sqr_fp12_scalar: ");
   LOAD_CACHE(cyclotomic_sqr_fp12_scalar(r, a), 10000);
   MEASURE_CYCLES(cyclotomic_sqr_fp12_scalar(r, a), 100000);
-  printf("#cycle = %ld\n", diff_cycles);
-
-  printf("- cyclotomic_sqr_fp12_vector: ");
-  LOAD_CACHE(cyclotomic_sqr_fp12_vector(r, a), 10000);
-  MEASURE_CYCLES(cyclotomic_sqr_fp12_vector(r, a), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
   printf("- cyclotomic_sqr_fp12_vec_v1: ");
