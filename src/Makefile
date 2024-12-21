@@ -7,4 +7,4 @@ all:
 	$(CC) $(SRCS) -o $(OUTPUT) $(FLAGS)
 
 clean:
-	rm -r pairing 
+	rm -r test 

@@ -1277,52 +1277,52 @@ void test_timing_fp12()
   MEASURE_CYCLES(cyclotomic_sqr_fp12_vec_v2(ra_1x2x2x2w, rbc_2x2x2x1w, a_1x2x2x2w, bc_2x2x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- mul_fp12_scalar: ");
+  printf("- mul_fp12_scalar:            ");
   LOAD_CACHE(mul_fp12_scalar(r, a, a), 10000);
   MEASURE_CYCLES(mul_fp12_scalar(r, a, a), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- mul_fp12_vec_v1: ");
+  printf("- mul_fp12_vec_v1:            ");
   LOAD_CACHE(mul_fp12_vec_v1(r01_4x2x1w, r2_4x2x1w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 10000);
   MEASURE_CYCLES(mul_fp12_vec_v1(r01_4x2x1w, r2_4x2x1w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);  
 
-  printf("- mul_fp12_vec_v2: ");
+  printf("- mul_fp12_vec_v2:            ");
   LOAD_CACHE(mul_fp12_vec_v2(r01_4x2x1w, r2_2x2x2w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 10000);
   MEASURE_CYCLES(mul_fp12_vec_v2(r01_4x2x1w, r2_2x2x2w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);  
 
-  printf("- mul_fp12_vec_v3: ");
+  printf("- mul_fp12_vec_v3:            ");
   LOAD_CACHE(mul_fp12_vec_v3(r001_2x2x2w, r101_2x2x2w, r2_2x2x2w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 10000);
   MEASURE_CYCLES(mul_fp12_vec_v3(r001_2x2x2w, r101_2x2x2w, r2_2x2x2w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);  
 
-  printf("- mul_fp12_vec_v4: ");
+  printf("- mul_fp12_vec_v4:            ");
   LOAD_CACHE(mul_fp12_vec_v4(r0_4x2x1w, r101_2x2x2w, r12_2x2x2w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 10000);
   MEASURE_CYCLES(mul_fp12_vec_v4(r0_4x2x1w, r101_2x2x2w, r12_2x2x2w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);  
 
-  printf("- mul_by_xy00z0_fp12_scalar: ");
+  printf("- mul_by_xy00z0_fp12_scalar:  ");
   LOAD_CACHE(mul_by_xy00z0_fp12_scalar(r, a, b), 10000);
   MEASURE_CYCLES(mul_by_xy00z0_fp12_scalar(r, a, b), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- mul_by_xy00z0_fp12_vec_v1: ");
+  printf("- mul_by_xy00z0_fp12_vec_v1:  ");
   LOAD_CACHE(mul_by_xy00z0_fp12_vec_v1(r0_4x2x1w, r1_2x2x2w, a01_4x2x1w, a2_4x2x1w, b01_4x2x1w, b4_4x2x1w), 10000);
   MEASURE_CYCLES(mul_by_xy00z0_fp12_vec_v1(r0_4x2x1w, r1_2x2x2w, a01_4x2x1w, a2_4x2x1w, b01_4x2x1w, b4_4x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- mul_by_xy00z0_fp12_vec_v2: ");
+  printf("- mul_by_xy00z0_fp12_vec_v2:  ");
   LOAD_CACHE(mul_by_xy00z0_fp12_vec_v2(r0_4x2x1w, r1_2x2x2w, a_8x1x1w, b_8x1x1w), 10000);
   MEASURE_CYCLES(mul_by_xy00z0_fp12_vec_v2(r0_4x2x1w, r1_2x2x2w, a_8x1x1w, b_8x1x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- sqr_fp12_scalar: ");
+  printf("- sqr_fp12_scalar:            ");
   LOAD_CACHE(sqr_fp12_scalar(r, a), 10000);
   MEASURE_CYCLES(sqr_fp12_scalar(r, a), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- sqr_fp12_vec_v1: ");
+  printf("- sqr_fp12_vec_v1:            ");
   LOAD_CACHE(sqr_fp12_vec_v1(r0_4x2x1w, r1_4x2x1w, a0_4x2x1w, a1_4x2x1w), 10000);
   MEASURE_CYCLES(sqr_fp12_vec_v1(r0_4x2x1w, r1_4x2x1w, a0_4x2x1w, a1_4x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
