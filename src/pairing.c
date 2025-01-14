@@ -938,6 +938,10 @@ static void mul_n_sqr_vec(vec384fp12 ret, const vec384fp12 a, size_t n)
 
   mul_fp12_vec_v3(r001, r101, r2, ab0, ab1, ab2);
 
+  carryp_fp_4x2w(r001);
+  carryp_fp_4x2w(r101);
+  carryp_fp_4x2w(r2);
+
 #ifdef PROFILING
   uint64_t end_cycles = read_tsc();
   mul_fp12_cycles += end_cycles - start_cycles;
@@ -975,16 +979,16 @@ static void mul_n_sqr_vec(vec384fp12 ret, const vec384fp12 a, size_t n)
                   ((uint64_t *)&r001[i])[4],
                   ((uint64_t *)&r2  [i])[2],
                   ((uint64_t *)&r2  [i])[0],
-                  ((uint64_t *)&r001[i])[2],
-                  ((uint64_t *)&r001[i])[0] );
+                  ((uint64_t *)&r101[i])[2],
+                  ((uint64_t *)&r101[i])[0] );
     _bc[i+VWORDS] = VSET(((uint64_t *)&r2  [i])[7],
                          ((uint64_t *)&r2  [i])[5],
                          ((uint64_t *)&r001[i])[7],
                          ((uint64_t *)&r001[i])[5],
                          ((uint64_t *)&r2  [i])[3],
                          ((uint64_t *)&r2  [i])[1],
-                         ((uint64_t *)&r001[i])[3],
-                         ((uint64_t *)&r001[i])[1] );
+                         ((uint64_t *)&r101[i])[3],
+                         ((uint64_t *)&r101[i])[1] );
   }
 
   while (n--)
