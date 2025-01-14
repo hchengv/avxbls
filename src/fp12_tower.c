@@ -346,7 +346,7 @@ void mul_fp12_vector(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b)
 
   conv_64to48_fp_8x1w(ab0, t[0]);
   conv_64to48_fp_8x1w(ab1, t[1]);
-  conv_64to48_fp_8x1w(ab2, t[2]);  
+  conv_64to48_fp_8x1w(ab2, t[2]);
 
   mul_fp12_vec_v3(r001, r101, r2, ab0, ab1, ab2);
 
