@@ -253,6 +253,7 @@ void mul_fp12_vector(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b)
   uint64_t start_cycles = read_tsc();
 #endif
 
+#if 0
   fp2_8x1x1w ab0, ab1, ab2;
   fp2_4x2x1w r01;
   fp2_2x2x2w r2;
@@ -320,6 +321,70 @@ void mul_fp12_vector(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b)
     ret[1][2][1][i         ] = ((uint64_t *)&t[0][1][i])[6];
     ret[1][2][1][i+SWORDS/2] = ((uint64_t *)&t[0][1][i])[7];
   }
+
+#elif 1
+  fp2_4x2x1w ab0, ab1, ab2;
+  fp2_2x2x2w r001, r101, r2;
+  __m512i t[3][SWORDS];
+  int i;
+
+  // form < b1 | a1 | b0 | a0 >
+  for (i = 0; i < SWORDS; i++) {
+    t[0][i] = VSET( b[1][0][1][i], b[1][0][0][i],
+                    a[1][0][1][i], a[1][0][0][i],
+                    b[0][0][1][i], b[0][0][0][i],
+                    a[0][0][1][i], a[0][0][0][i]);
+    t[1][i] = VSET( b[1][1][1][i], b[1][1][0][i],
+                    a[1][1][1][i], a[1][1][0][i],
+                    b[0][1][1][i], b[0][1][0][i],
+                    a[0][1][1][i], a[0][1][0][i]);
+    t[2][i] = VSET( b[1][2][1][i], b[1][2][0][i],
+                    a[1][2][1][i], a[1][2][0][i],
+                    b[0][2][1][i], b[0][2][0][i],
+                    a[0][2][1][i], a[0][2][0][i]);
+  }
+
+  conv_64to48_fp_8x1w(ab0, t[0]);
+  conv_64to48_fp_8x1w(ab1, t[1]);
+  conv_64to48_fp_8x1w(ab2, t[2]);  
+
+  mul_fp12_vec_v3(r001, r101, r2, ab0, ab1, ab2);
+
+  carryp_fp_4x2w(r001);
+  carryp_fp_4x2w(r101);
+  carryp_fp_4x2w(r2);
+
+  conv_48to64_fp_4x2w(t[0], r001);
+  conv_48to64_fp_4x2w(t[1], r101);
+  conv_48to64_fp_4x2w(t[2], r2);
+
+  for (i = 0; i < SWORDS/2; i++) {
+    ret[0][0][0][i         ] = ((uint64_t *)&t[0][i])[0];
+    ret[0][0][0][i+SWORDS/2] = ((uint64_t *)&t[0][i])[1];
+    ret[0][0][1][i         ] = ((uint64_t *)&t[0][i])[2];
+    ret[0][0][1][i+SWORDS/2] = ((uint64_t *)&t[0][i])[3];
+    ret[0][1][0][i         ] = ((uint64_t *)&t[0][i])[4];
+    ret[0][1][0][i+SWORDS/2] = ((uint64_t *)&t[0][i])[5];
+    ret[0][1][1][i         ] = ((uint64_t *)&t[0][i])[6];
+    ret[0][1][1][i+SWORDS/2] = ((uint64_t *)&t[0][i])[7];
+    ret[1][0][0][i         ] = ((uint64_t *)&t[1][i])[0];
+    ret[1][0][0][i+SWORDS/2] = ((uint64_t *)&t[1][i])[1];
+    ret[1][0][1][i         ] = ((uint64_t *)&t[1][i])[2];
+    ret[1][0][1][i+SWORDS/2] = ((uint64_t *)&t[1][i])[3];
+    ret[1][1][0][i         ] = ((uint64_t *)&t[1][i])[4];
+    ret[1][1][0][i+SWORDS/2] = ((uint64_t *)&t[1][i])[5];
+    ret[1][1][1][i         ] = ((uint64_t *)&t[1][i])[6];
+    ret[1][1][1][i+SWORDS/2] = ((uint64_t *)&t[1][i])[7];
+    ret[0][2][0][i         ] = ((uint64_t *)&t[2][i])[0];
+    ret[0][2][0][i+SWORDS/2] = ((uint64_t *)&t[2][i])[1];
+    ret[0][2][1][i         ] = ((uint64_t *)&t[2][i])[2];
+    ret[0][2][1][i+SWORDS/2] = ((uint64_t *)&t[2][i])[3];
+    ret[1][2][0][i         ] = ((uint64_t *)&t[2][i])[4];
+    ret[1][2][0][i+SWORDS/2] = ((uint64_t *)&t[2][i])[5];
+    ret[1][2][1][i         ] = ((uint64_t *)&t[2][i])[6];
+    ret[1][2][1][i+SWORDS/2] = ((uint64_t *)&t[2][i])[7];
+  }
+#endif
 
 #ifdef PROFILING
   uint64_t end_cycles = read_tsc();
