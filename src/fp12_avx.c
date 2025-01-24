@@ -4456,7 +4456,6 @@ static void mul_by_xy00z0_fp6x2_2x4x1x1w(fp2x2_8x1x1w r01, fp2x2_8x1x1w r23, fp2
 
 // To understand the comments, see Listing 21 in "Guide to Pairing-Based Cryptography". 
 // double-length version
-// TODO: interleave the sub-routines? 
 void cyclotomic_sqr_fp12_vec_v1(fp4_1x2x2x2w ra, fp4_2x2x2x1w rbc, const fp4_1x2x2x2w a, const fp4_2x2x2x1w bc)
 {
   fp4_1x2x2x2w ta; 
