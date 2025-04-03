@@ -3922,7 +3922,7 @@ static void mul_by_u_plus_1_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a)
 // r0 = a0*b0 - a1*b1
 // r1 = (a0 + a1)*(b0 + b1) - a0*b0 - a1*b1 = a0*b1 + a1*b0
 // Karatsuba
-static void mul_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2_8x1x1w a, const fp2_8x1x1w b)
+void mul_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2_8x1x1w a, const fp2_8x1x1w b)
 {
   fp_8x1w t0, t1;
   fpx2_8x1w tt0, tt1, tt2;
@@ -3966,7 +3966,7 @@ static void mul_by_u_plus_1_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2x2_4x2x1w a)
 // r0 = a0*b0 - a1*b1
 // r1 = a0*b1 + a1*b0
 // schoolbook
-static void mul_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2_4x2x1w a, const fp2_4x2x1w b)
+void mul_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2_4x2x1w a, const fp2_4x2x1w b)
 {
   fp2_4x2x1w t0, t1;
   fp2x2_4x2x1w tt0, tt1;
@@ -3983,7 +3983,7 @@ static void mul_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2_4x2x1w a, const fp2_4x2x1
 
 // r0 = (a0 + a1)*(a0 - a1)
 // r1 = 2*a0*a1
-static void sqr_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2_4x2x1w a)
+void sqr_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2_4x2x1w a)
 {
   fp2_4x2x1w t0, t1, t2;
 
@@ -3996,7 +3996,7 @@ static void sqr_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2_4x2x1w a)
   mul_fpx2_8x1w(r, t0, t2);             // 2*A0*A1 | (A0+A1)*(A0-A1) 
 }
 
-static void redc_fp2x2_4x2x1w(fp2_4x2x1w r, const fp2x2_4x2x1w a)
+void redc_fp2x2_4x2x1w(fp2_4x2x1w r, const fp2x2_4x2x1w a)
 {
   redc_fpx2_8x1w(r, a);
 }
@@ -4004,7 +4004,7 @@ static void redc_fp2x2_4x2x1w(fp2_4x2x1w r, const fp2x2_4x2x1w a)
 // r0 = a0*b0 - a1*b1
 // r1 = a0*b1 + a1*b0
 // schoolbook
-static void mul_fp2x2_2x4x1w(fp2x2_2x4x1w r, const fp2_2x4x1w a, const fp2_2x4x1w b)
+void mul_fp2x2_2x4x1w(fp2x2_2x4x1w r, const fp2_2x4x1w a, const fp2_2x4x1w b)
 {
   fp2_2x4x1w t0, t1;
   fp2x2_2x4x1w tt0, tt1;
@@ -4018,7 +4018,7 @@ static void mul_fp2x2_2x4x1w(fp2x2_2x4x1w r, const fp2_2x4x1w a, const fp2_2x4x1
   asx4_fpx2_8x1w(r, tt1, tt0);          // A0*B1+A1*B0 | A0*B0-A1*B1 |  ... |  ...
 }
 
-static void redc_fp2x2_2x2x2w(fp2_2x2x2w r, const fp2x2_2x2x2w a)
+void redc_fp2x2_2x2x2w(fp2_2x2x2w r, const fp2x2_2x2x2w a)
 {
   redc_fpx2_4x2w(r, a);
 }
@@ -4048,7 +4048,7 @@ static void mul_by_u_plus_1_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2x2_2x2x2w a)
 // r0 = a0*b0 - a1*b1
 // r1 = a0*b1 + a1*b0
 // schoolbook
-static void mul_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b)
+void mul_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b)
 {
   fp2_2x2x2w t0, t1;
   fp2x2_2x2x2w tt0, tt1;
@@ -4065,7 +4065,7 @@ static void mul_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2
 
 // r0 = (a0 + a1)*(a0 - a1)
 // r1 = 2*a0*a1
-static void sqr_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2_2x2x2w a)
+void sqr_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2_2x2x2w a)
 {
   fp2_2x2x2w t0, t1, t2;
   fp2x2_2x2x2w t3;
@@ -4082,7 +4082,7 @@ static void sqr_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2_2x2x2w a)
 // r0 = a0*b0 - a1*b1
 // r1 = a0*b1 + a1*b0
 // schoolbook
-static void mul_fp2x2_1x4x2w(fp2x2_1x4x2w r, const fp2_1x4x2w a, const fp2_1x4x2w b)
+void mul_fp2x2_1x4x2w(fp2x2_1x4x2w r, const fp2_1x4x2w a, const fp2_1x4x2w b)
 {
   fp2_1x4x2w t0, t1;
   fp2x2_1x4x2w tt0, tt1;
@@ -4105,7 +4105,7 @@ static void mul_fp2x2_1x4x2w(fp2x2_1x4x2w r, const fp2_1x4x2w a, const fp2_1x4x2
 // r0 = a0^2 + (u+1)*a1^2
 // r1 = 2*a0*a1
 // double-length version
-static void sqr_fp4_2x2x2x1w_v1(fp4_2x2x2x1w r, const fp4_2x2x2x1w a)
+void sqr_fp4_2x2x2x1w_v1(fp4_2x2x2x1w r, const fp4_2x2x2x1w a)
 {
   fp4_2x2x2x1w t0;
   fp4x2_2x2x2x1w tt0, tt1, tt2;
@@ -4171,7 +4171,7 @@ static void sqr_fp4_2x2x2x1w_v3(fp4_2x2x2x1w r, const fp4_2x2x2x1w a)
 // r0 = a0^2 + (u+1)*a1^2
 // r1 = 2*a0*a1
 // double-length version
-static void sqr_fp4_1x2x2x2w_v1(fp4_1x2x2x2w r, const fp4_1x2x2x2w a)
+void sqr_fp4_1x2x2x2w_v1(fp4_1x2x2x2w r, const fp4_1x2x2x2w a)
 {
   fp4x2_1x2x2x2w tt0, tt1, tt2;
   fp4_1x2x2x2w t0;
@@ -4263,7 +4263,7 @@ static void mul_fp6x2_4x2x1x1w(fp2x2_8x1x1w r01, fp2x2_8x1x1w r2, const fp2_8x1x
 // r1 = (a0 + a1)*(b0 + b1) - a0*b0 - a1*b1 + a2*b2*(u+1) = a0*b1 + a1*b0 + a2*b2*(u+1)
 // r2 = (a0 + a2)*(b0 + b2) - a0*b0 - a2*b2 + a1*b1 = a0*b2 + a2*b0 + a1*b1
 // Karatsuba 
-static void mul_fp6x2_2x2x2x1w(fp2x2_4x2x1w r01, fp2x2_4x2x1w r2, const fp2_4x2x1w ab0, const fp2_4x2x1w ab1, const fp2_4x2x1w ab2)
+void mul_fp6x2_2x2x2x1w(fp2x2_4x2x1w r01, fp2x2_4x2x1w r2, const fp2_4x2x1w ab0, const fp2_4x2x1w ab1, const fp2_4x2x1w ab2)
 {
   fp2_4x2x1w t0, t1, t2, t3, t4;
   fp2x2_4x2x1w tt0, tt1, tt2, tt3, tt4, tt5;
@@ -4311,7 +4311,7 @@ static void mul_fp6x2_2x2x2x1w(fp2x2_4x2x1w r01, fp2x2_4x2x1w r2, const fp2_4x2x
 // r1 = (a0 + a1)*(b0 + b1) - a0*b0 - a1*b1 + a2*b2*(u+1) = a0*b1 + a1*b0 + a2*b2*(u+1)
 // r2 = (a0 + a2)*(b0 + b2) - a0*b0 - a2*b2 + a1*b1 = a0*b2 + a2*b0 + a1*b1
 // Karatsuba 
-static void mul_fp6x2_1x2x2x2w(fp2x2_2x2x2w r01, fp2x2_2x2x2w r2, const fp2_2x2x2w ab0, const fp2_2x2x2w ab1, const fp2_2x2x2w ab2)
+void mul_fp6x2_1x2x2x2w(fp2x2_2x2x2w r01, fp2x2_2x2x2w r2, const fp2_2x2x2w ab0, const fp2_2x2x2w ab1, const fp2_2x2x2w ab2)
 {
   fp2_2x2x2w t0, t1, t2, t3, t4;
   fp2x2_2x2x2w tt0, tt1, tt2, tt3, tt4, tt5;
@@ -4365,7 +4365,7 @@ static void mul_fp6x2_1x2x2x2w(fp2x2_2x2x2w r01, fp2x2_2x2x2w r2, const fp2_2x2x
 // r4 = a0*b4
 // r5 = a1*b4
 // Karatsuba
-static void mul_by_xy00z0_fp6x2_2x2x2x1w(fp2x2_4x2x1w r01, fp2x2_4x2x1w r2, fp2x2_4x2x1w r3, fp2x2_4x2x1w r45, const fp2_4x2x1w a01, const fp2_4x2x1w a2, const fp2_4x2x1w b01, const fp2_4x2x1w b4)
+void mul_by_xy00z0_fp6x2_2x2x2x1w(fp2x2_4x2x1w r01, fp2x2_4x2x1w r2, fp2x2_4x2x1w r3, fp2x2_4x2x1w r45, const fp2_4x2x1w a01, const fp2_4x2x1w a2, const fp2_4x2x1w b01, const fp2_4x2x1w b4)
 {
   fp2_4x2x1w t0, t1;
   fp2x2_4x2x1w tt0, tt1, tt2;

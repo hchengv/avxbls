@@ -411,14 +411,14 @@ void test_timing_fp()
   MEASURE_CYCLES(mul_fpx2_8x1w_v4(z_8x1w, a_8x1w, b_8x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- redc_fpx2_8x1w:       ");
-  LOAD_CACHE(redc_fpx2_8x1w(r_8x1w, z_8x1w), 10000);
-  MEASURE_CYCLES(redc_fpx2_8x1w(r_8x1w, z_8x1w), 100000);
-  printf("#cycle = %ld\n", diff_cycles);
-
   printf("- mul_fpx2_4x2w_v1:     ");
   LOAD_CACHE(mul_fpx2_4x2w_v1(z_4x2w, a_4x2w, b_4x2w), 10000);
   MEASURE_CYCLES(mul_fpx2_4x2w_v1(z_4x2w, a_4x2w, b_4x2w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- redc_fpx2_8x1w:       ");
+  LOAD_CACHE(redc_fpx2_8x1w(r_8x1w, z_8x1w), 10000);
+  MEASURE_CYCLES(redc_fpx2_8x1w(r_8x1w, z_8x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
   printf("- redc_fpx2_4x2w:       ");

@@ -66,14 +66,13 @@ static uint64_t P48[NWORDS] = {
 
 void mul_fpx2_8x1w_v1(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b);
 void mul_fpx2_8x1w_v2(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b);
+void mul_fpx2_8x1w_hybrid(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b);
 void mul_fpx2_8x1w_v3(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b);
 void mul_fpx2_8x1w_v4(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b);
-void redc_fpx2_8x1w(fp_8x1w r, const fpx2_8x1w a);
-
 void mul_fpx2_4x2w_v1(fpx2_4x2w r, const fp_4x2w a, const fp_4x2w b);
-void redc_fpx2_4x2w(fp_4x2w r, const fpx2_4x2w a);
 
-void mul_fpx2_8x1w_hybrid(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b);
+void redc_fpx2_8x1w(fp_8x1w r, const fpx2_8x1w a);
+void redc_fpx2_4x2w(fp_4x2w r, const fpx2_4x2w a);
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp2 single-length operations
@@ -81,11 +80,31 @@ void mul_fpx2_8x1w_hybrid(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b);
 // ----------------------------------------------------------------------------
 // prototypes: Fp2 double-length operations
 
+void mul_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2_8x1x1w a, const fp2_8x1x1w b);
+void mul_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2_4x2x1w a, const fp2_4x2x1w b);
+void mul_fp2x2_2x4x1w(fp2x2_2x4x1w r, const fp2_2x4x1w a, const fp2_2x4x1w b);
+void mul_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b);
+void mul_fp2x2_1x4x2w(fp2x2_1x4x2w r, const fp2_1x4x2w a, const fp2_1x4x2w b);
+
+void sqr_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2_4x2x1w a);
+void sqr_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2_2x2x2w a);
+
+void redc_fp2x2_4x2x1w(fp2_4x2x1w r, const fp2x2_4x2x1w a);
+void redc_fp2x2_2x2x2w(fp2_2x2x2w r, const fp2x2_2x2x2w a);
+
 // ----------------------------------------------------------------------------
 // prototypes: Fp4 operations
 
+void sqr_fp4_2x2x2x1w_v1(fp4_2x2x2x1w r, const fp4_2x2x2x1w a);
+void sqr_fp4_1x2x2x2w_v1(fp4_1x2x2x2w r, const fp4_1x2x2x2w a);
+
 // ----------------------------------------------------------------------------
 // prototypes: Fp6 operations
+
+void mul_fp6x2_2x2x2x1w(fp2x2_4x2x1w r01, fp2x2_4x2x1w r2, const fp2_4x2x1w ab0, const fp2_4x2x1w ab1, const fp2_4x2x1w ab2);
+void mul_fp6x2_1x2x2x2w(fp2x2_2x2x2w r01, fp2x2_2x2x2w r2, const fp2_2x2x2w ab0, const fp2_2x2x2w ab1, const fp2_2x2x2w ab2);
+
+void mul_by_xy00z0_fp6x2_2x2x2x1w(fp2x2_4x2x1w r01, fp2x2_4x2x1w r2, fp2x2_4x2x1w r3, fp2x2_4x2x1w r45, const fp2_4x2x1w a01, const fp2_4x2x1w a2, const fp2_4x2x1w b01, const fp2_4x2x1w b4);
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp12 and line operations
