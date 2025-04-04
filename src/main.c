@@ -426,17 +426,18 @@ void test_timing_fp()
 
 // ----------------------------------------------------------------------------
 
-void test_fp2()
+void test_timing_fp2()
 {
   uint64_t a64[SWORDS] = { TV_A }, b64[SWORDS] = { TV_B }, r64[SWORDS], z64[2*SWORDS];
   uint64_t a48[NWORDS], b48[NWORDS], r48[NWORDS], z48[2*NWORDS];
   __m512i a_4x2x1w[NWORDS], b_4x2x1w[NWORDS], r_4x2x1w[NWORDS], z_4x2x1w[2*NWORDS];
-  __m512i a_2x2x2w[VWORDS], b_2x2x2w[VWORDS], r_2x2x2w[VWORDS], z_2x2x2w[2*VWORDS];
+  __m512i a_2x2x2w[VWORDS], b_2x2x2w[VWORDS], r_2x2x2w[VWORDS], z_2x2x2w[3*VWORDS];
   __m512i a_2x4x1w[NWORDS], b_2x4x1w[NWORDS], z_2x4x1w[2*NWORDS];
-  __m512i a_1x4x2w[VWORDS], b_1x4x2w[VWORDS], z_1x4x2w[2*VWORDS];
+  __m512i a_1x4x2w[VWORDS], b_1x4x2w[VWORDS], z_1x4x2w[3*VWORDS];
   fp2x2_2x2x2w aa_2x2x2w, rr_2x2x2w;
   fp2x2_8x1x1w z_8x1x1w;
   fp2_8x1x1w a_8x1x1w, b_8x1x1w;
+  uint64_t start_cycles, end_cycles, diff_cycles;
   int i;
 
   conv_64to48_mpi(a48, a64, NWORDS, SWORDS);
@@ -463,6 +464,7 @@ void test_fp2()
   aa_2x2x2w[VWORDS*3-1] = VSET(0, 0, 0, 0, 0, b48[VWORDS-1], 0, a48[VWORDS-1]);
 
 #if 0
+  puts("\n=============================================================\n");
   puts("\nTEST - FP2\n");
 
   mul_by_u_plus_1_fp2x2_2x2x2w(rr_2x2x2w, aa_2x2x2w);
@@ -544,6 +546,9 @@ void test_fp2()
   mpi_print("* mul_fp2x2_2x4x1w r3 = 0x", z64, 2*SWORDS);
 #endif
 
+  puts("\n=============================================================\n");
+  puts("TIMING - FP2\n");
+
   printf("- mul_fp2x2_8x1x1w:     ");
   LOAD_CACHE(mul_fp2x2_8x1x1w(z_8x1x1w, a_8x1x1w, b_8x1x1w), 10000);
   MEASURE_CYCLES(mul_fp2x2_8x1x1w(z_8x1x1w, a_8x1x1w, b_8x1x1w), 100000);
@@ -577,16 +582,6 @@ void test_fp2()
   printf("- sqr_fp2x2_2x2x2w:     ");
   LOAD_CACHE(sqr_fp2x2_2x2x2w(rr_2x2x2w, a_2x2x2w), 10000);
   MEASURE_CYCLES(sqr_fp2x2_2x2x2w(rr_2x2x2w, a_2x2x2w), 100000);
-  printf("#cycle = %ld\n", diff_cycles);
-
-  printf("- redc_fp2x2_4x2x1w:     ");
-  LOAD_CACHE(redc_fp2x2_4x2x1w(r_4x2x1w, z_4x2x1w), 10000);
-  MEASURE_CYCLES(redc_fp2x2_4x2x1w(r_4x2x1w, z_4x2x1w), 100000);
-  printf("#cycle = %ld\n", diff_cycles);
-
-  printf("- redc_fp2x2_2x2x2w:     ");
-  LOAD_CACHE(redc_fp2x2_2x2x2w(r_2x2x2w, rr_2x2x2w), 10000);
-  MEASURE_CYCLES(redc_fp2x2_2x2x2w(r_2x2x2w, rr_2x2x2w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 }
 
@@ -1672,7 +1667,7 @@ int main()
   timing_pairing();
 
   test_timing_fp();
-  // test_fp2();
+  test_timing_fp2();
   // test_fp4();
   // test_fp6();
   test_timing_fp12();

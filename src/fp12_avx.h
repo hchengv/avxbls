@@ -89,9 +89,6 @@ void mul_fp2x2_1x4x2w(fp2x2_1x4x2w r, const fp2_1x4x2w a, const fp2_1x4x2w b);
 void sqr_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2_4x2x1w a);
 void sqr_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2_2x2x2w a);
 
-void redc_fp2x2_4x2x1w(fp2_4x2x1w r, const fp2x2_4x2x1w a);
-void redc_fp2x2_2x2x2w(fp2_2x2x2w r, const fp2x2_2x2x2w a);
-
 // ----------------------------------------------------------------------------
 // prototypes: Fp4 operations
 
