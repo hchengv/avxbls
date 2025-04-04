@@ -2129,6 +2129,9 @@ static void ssasx2_fpx2_8x1w(fpx2_8x1w r, const fpx2_8x1w a, const fpx2_8x1w b)
 }
 
 // Karatsuba (incl. carry prop.)
+#ifndef BENCHMARK
+static 
+#endif
 void mul_fpx2_8x1w_v1(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
@@ -2304,6 +2307,9 @@ void mul_fpx2_8x1w_v1(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b)
 }
 
 // Karatsuba (excl. carry prop.)
+#ifndef BENCHMARK
+static 
+#endif
 void mul_fpx2_8x1w_v2(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
@@ -2462,6 +2468,9 @@ void mul_fpx2_8x1w_v2(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b)
 }
 
 // product-scanning (incl. carry prop.)
+#ifndef BENCHMARK
+static 
+#endif
 void mul_fpx2_8x1w_v3(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
@@ -2594,6 +2603,9 @@ void mul_fpx2_8x1w_v3(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b)
 }
 
 // product-scanning (excl. carry prop.)
+#ifndef BENCHMARK
+static 
+#endif
 void mul_fpx2_8x1w_v4(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
@@ -2726,6 +2738,9 @@ void mul_fpx2_8x1w_v4(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b)
 }
 
 // Montgomery reduction
+#ifndef BENCHMARK
+static 
+#endif
 void redc_fpx2_8x1w(fp_8x1w r, const fpx2_8x1w a)
 {
   __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
@@ -3186,6 +3201,9 @@ static void aass_fpx2_4x2w(fpx2_4x2w r, const fpx2_4x2w a, const fpx2_4x2w b)
 }
 
 // operand-scanning (excl. carry prop.)
+#ifndef BENCHMARK
+static 
+#endif
 void mul_fpx2_4x2w_v1(fpx2_4x2w r, const fp_4x2w a, const fp_4x2w b)
 {
   const __m512i a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3];
@@ -3262,6 +3280,9 @@ void mul_fpx2_4x2w_v1(fpx2_4x2w r, const fp_4x2w a, const fp_4x2w b)
   r[8 ] = z8 ; r[9 ] = z9 ; r[10] = z10; r[11] = z11;
 }
 
+#ifndef BENCHMARK
+static 
+#endif
 void redc_fpx2_4x2w(fp_4x2w r, const fpx2_4x2w a)
 {
   __m512i a0  = a[0 ], a1  = a[1 ], a2  = a[2 ], a3  = a[3 ];
