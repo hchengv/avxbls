@@ -437,6 +437,7 @@ void test_timing_fp2()
   fp2x2_2x2x2w aa_2x2x2w, rr_2x2x2w;
   fp2x2_8x1x1w z_8x1x1w;
   fp2_8x1x1w a_8x1x1w, b_8x1x1w;
+  vec384 r_scalar, a_scalar, b_scalar;
   uint64_t start_cycles, end_cycles, diff_cycles;
   int i;
 
@@ -548,6 +549,16 @@ void test_timing_fp2()
 
   puts("\n=============================================================\n");
   puts("TIMING - FP2\n");
+
+  printf("- mul_fp2_scalar:        ");
+  LOAD_CACHE(mul_fp2(r_scalar, a_scalar, b_scalar), 10000);
+  MEASURE_CYCLES(mul_fp2(r_scalar, a_scalar, b_scalar), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- sqr_fp2_scalar:        ");
+  LOAD_CACHE(sqr_fp2(r_scalar, a_scalar, b_scalar), 10000);
+  MEASURE_CYCLES(sqr_fp2(r_scalar, a_scalar, b_scalar), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
 
   printf("- mul_fp2x2_8x1x1w:     ");
   LOAD_CACHE(mul_fp2x2_8x1x1w(z_8x1x1w, a_8x1x1w, b_8x1x1w), 10000);
