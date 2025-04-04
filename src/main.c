@@ -138,16 +138,14 @@ void test_pairing()
   seed = (int) time(NULL);
 	srand(seed);
 
-  // scalar k can be modified to be any non-0 value
+  // The scalar k can be modified to be any non-0 value, e.g., 
   // uint64_t k[4] = { rand(), rand(), rand(), rand(), };
   uint64_t k[4] = {
     0x0123456789ABCDEF, 0x89ABCDEF01234567, 
     0x0123456789ABCDEF, 0x89ABCDEF01234567, };
 
-  // currently use _P = BLS12_381_G1 and _Q = BLS12_381_G2 and k = 2 
-  // to conduct a very simple test
   puts("\n=============================================================\n");
-  puts("PAIRING TEST\n");
+  puts("TEST - PAIRING\n");
 
   printf("- e(P, [k]Q) == e([k]P, Q) \n");
   // compute [k]Q
@@ -256,8 +254,7 @@ void timing_pairing()
   int i;
 
   puts("\n=============================================================\n");
-  puts("PAIRING TIMINGS\n");
-
+  puts("TIMING - PAIRING\n");
 
   POINTonE2_affine Q[1];
   POINTonE1_affine P[1];
@@ -342,7 +339,7 @@ void test_timing_fp()
 
 #if 0
   puts("\n=============================================================\n");
-  puts("FP TEST\n");
+  puts("TEST - FP\n");
 
   add_fp_8x1w(r_8x1w, a_8x1w, b_8x1w);
   get_channel_8x1w(r48, r_8x1w, 0);
@@ -384,7 +381,7 @@ void test_timing_fp()
 #endif
 
   puts("\n=============================================================\n");
-  puts("FP TIMINGS\n");
+  puts("TIMING - FP\n");
 
   printf("- mul_fpx2_8x1w_v1:     ");
   LOAD_CACHE(mul_fpx2_8x1w_v1(z_8x1w, a_8x1w, b_8x1w), 10000);
@@ -434,9 +431,12 @@ void test_fp2()
   uint64_t a64[SWORDS] = { TV_A }, b64[SWORDS] = { TV_B }, r64[SWORDS], z64[2*SWORDS];
   uint64_t a48[NWORDS], b48[NWORDS], r48[NWORDS], z48[2*NWORDS];
   __m512i a_4x2x1w[NWORDS], b_4x2x1w[NWORDS], r_4x2x1w[NWORDS], z_4x2x1w[2*NWORDS];
-  __m512i a_2x2x2w[VWORDS], b_2x2x2w[VWORDS], r_2x2x2w[VWORDS];
+  __m512i a_2x2x2w[VWORDS], b_2x2x2w[VWORDS], r_2x2x2w[VWORDS], z_2x2x2w[2*VWORDS];
   __m512i a_2x4x1w[NWORDS], b_2x4x1w[NWORDS], z_2x4x1w[2*NWORDS];
+  __m512i a_1x4x2w[VWORDS], b_1x4x2w[VWORDS], z_1x4x2w[2*VWORDS];
   fp2x2_2x2x2w aa_2x2x2w, rr_2x2x2w;
+  fp2x2_8x1x1w z_8x1x1w;
+  fp2_8x1x1w a_8x1x1w, b_8x1x1w;
   int i;
 
   conv_64to48_mpi(a48, a64, NWORDS, SWORDS);
@@ -462,9 +462,8 @@ void test_fp2()
   }
   aa_2x2x2w[VWORDS*3-1] = VSET(0, 0, 0, 0, 0, b48[VWORDS-1], 0, a48[VWORDS-1]);
 
-  puts("\nFP2 TEST\n");
-
 #if 0
+  puts("\nTEST - FP2\n");
 
   mul_by_u_plus_1_fp2x2_2x2x2w(rr_2x2x2w, aa_2x2x2w);
   for(i = 0; i < 2*VWORDS; i++) z48[i] = ((uint64_t *)&rr_2x2x2w[i])[0];
@@ -544,6 +543,51 @@ void test_fp2()
   conv_48to64_mpi(z64, z48, 2*SWORDS, 2*NWORDS);
   mpi_print("* mul_fp2x2_2x4x1w r3 = 0x", z64, 2*SWORDS);
 #endif
+
+  printf("- mul_fp2x2_8x1x1w:     ");
+  LOAD_CACHE(mul_fp2x2_8x1x1w(z_8x1x1w, a_8x1x1w, b_8x1x1w), 10000);
+  MEASURE_CYCLES(mul_fp2x2_8x1x1w(z_8x1x1w, a_8x1x1w, b_8x1x1w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- mul_fp2x2_4x2x1w:     ");
+  LOAD_CACHE(mul_fp2x2_4x2x1w(z_4x2x1w, a_4x2x1w, b_4x2x1w), 10000);
+  MEASURE_CYCLES(mul_fp2x2_4x2x1w(z_4x2x1w, a_4x2x1w, b_4x2x1w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- mul_fp2x2_2x4x1w:     ");
+  LOAD_CACHE(mul_fp2x2_2x4x1w(z_2x4x1w, a_2x4x1w, b_2x4x1w), 10000);
+  MEASURE_CYCLES(mul_fp2x2_2x4x1w(z_2x4x1w, a_2x4x1w, b_2x4x1w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- mul_fp2x2_2x2x2w:     ");
+  LOAD_CACHE(mul_fp2x2_2x2x2w(rr_2x2x2w, a_2x2x2w, b_2x2x2w), 10000);
+  MEASURE_CYCLES(mul_fp2x2_2x2x2w(rr_2x2x2w, a_2x2x2w, b_2x2x2w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- mul_fp2x2_1x4x2w:     ");
+  LOAD_CACHE(mul_fp2x2_1x4x2w(z_1x4x2w, a_1x4x2w, b_1x4x2w), 10000);
+  MEASURE_CYCLES(mul_fp2x2_1x4x2w(z_1x4x2w, a_1x4x2w, b_1x4x2w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- sqr_fp2x2_4x2x1w:     ");
+  LOAD_CACHE(sqr_fp2x2_4x2x1w(z_4x2x1w, a_4x2x1w), 10000);
+  MEASURE_CYCLES(sqr_fp2x2_4x2x1w(z_4x2x1w, a_4x2x1w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- sqr_fp2x2_2x2x2w:     ");
+  LOAD_CACHE(sqr_fp2x2_2x2x2w(rr_2x2x2w, a_2x2x2w), 10000);
+  MEASURE_CYCLES(sqr_fp2x2_2x2x2w(rr_2x2x2w, a_2x2x2w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- redc_fp2x2_4x2x1w:     ");
+  LOAD_CACHE(redc_fp2x2_4x2x1w(r_4x2x1w, z_4x2x1w), 10000);
+  MEASURE_CYCLES(redc_fp2x2_4x2x1w(r_4x2x1w, z_4x2x1w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- redc_fp2x2_2x2x2w:     ");
+  LOAD_CACHE(redc_fp2x2_2x2x2w(r_2x2x2w, rr_2x2x2w), 10000);
+  MEASURE_CYCLES(redc_fp2x2_2x2x2w(r_2x2x2w, rr_2x2x2w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
 }
 
 // ----------------------------------------------------------------------------
@@ -906,7 +950,7 @@ void test_timing_fp12()
   fp2_2x2x2w r1_2x2x2w; 
 
 #if 0
-  puts("\nFP12 TEST\n");
+  puts("\nTEST - FP12\n");
 
   // a0_4x2x1w[0] = VSET(11, 11, 6  , 5  , 4 , 3, 2, 1);
   // a1_4x2x1w[0] = VSET(12, 12, 12 , 11 , 10, 9, 8, 7);
@@ -1304,7 +1348,7 @@ void test_timing_fp12()
 #endif 
 
   puts("\n=============================================================\n");
-  puts("FP12 TIMINGS\n");
+  puts("TIMING - FP12\n");
 
   printf("- cyclotomic_sqr_fp12_scalar: ");
   LOAD_CACHE(cyclotomic_sqr_fp12_scalar(r, a), 10000);
@@ -1388,7 +1432,7 @@ void test_timing_line()
   int i;
 
 #if 0
-  puts("\nLINE TEST\n");
+  puts("\nTEST - LINE\n");
 
   Q[0].X[0][0] = 1; Q[0].X[1][0] = 2;
   Q[0].Y[0][0] = 3; Q[0].Y[1][0] = 4;
@@ -1591,7 +1635,7 @@ void test_timing_line()
 #endif
 
   puts("\n=============================================================\n");
-  puts("LINE TIMINGS\n");
+  puts("TIMING - LINE\n");
 
   printf("- line_dbl_scalar: ");
   LOAD_CACHE(line_dbl_scalar(line, T, Q), 10000);
