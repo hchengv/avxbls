@@ -101,8 +101,6 @@ void sqr_fp4_1x2x2x2w_v1(fp4_1x2x2x2w r, const fp4_1x2x2x2w a);
 void mul_fp6x2_2x2x2x1w(fp2x2_4x2x1w r01, fp2x2_4x2x1w r2, const fp2_4x2x1w ab0, const fp2_4x2x1w ab1, const fp2_4x2x1w ab2);
 void mul_fp6x2_1x2x2x2w(fp2x2_2x2x2w r01, fp2x2_2x2x2w r2, const fp2_2x2x2w ab0, const fp2_2x2x2w ab1, const fp2_2x2x2w ab2);
 
-void mul_by_xy00z0_fp6x2_2x2x2x1w(fp2x2_4x2x1w r01, fp2x2_4x2x1w r2, fp2x2_4x2x1w r3, fp2x2_4x2x1w r45, const fp2_4x2x1w a01, const fp2_4x2x1w a2, const fp2_4x2x1w b01, const fp2_4x2x1w b4);
-
 // ----------------------------------------------------------------------------
 // prototypes: Fp12 and line operations
 

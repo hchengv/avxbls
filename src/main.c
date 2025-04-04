@@ -324,6 +324,10 @@ void test_timing_fp()
   uint64_t start_cycles, end_cycles, diff_cycles;
   int i;
 
+#if 0
+  puts("\n=============================================================\n");
+  puts("TEST - FP\n");
+
   conv_64to48_mpi(a48, a64, NWORDS, SWORDS);
   conv_64to48_mpi(b48, b64, NWORDS, SWORDS);
 
@@ -336,10 +340,6 @@ void test_timing_fp()
     a_4x2w[i] = VSET(0, 0, 0, 0, 0, 0, a48[i+VWORDS], a48[i]);
     b_4x2w[i] = VSET(0, 0, 0, 0, 0, 0, b48[i+VWORDS], b48[i]);
   }
-
-#if 0
-  puts("\n=============================================================\n");
-  puts("TEST - FP\n");
 
   add_fp_8x1w(r_8x1w, a_8x1w, b_8x1w);
   get_channel_8x1w(r48, r_8x1w, 0);
@@ -441,6 +441,10 @@ void test_timing_fp2()
   uint64_t start_cycles, end_cycles, diff_cycles;
   int i;
 
+#if 0
+  puts("\n=============================================================\n");
+  puts("\nTEST - FP2\n");
+
   conv_64to48_mpi(a48, a64, NWORDS, SWORDS);
   conv_64to48_mpi(b48, b64, NWORDS, SWORDS);
 
@@ -463,10 +467,6 @@ void test_timing_fp2()
     aa_2x2x2w[i] = VSET(0 ,0, 0, 0, b48[i+VWORDS-NWORDS], b48[i-NWORDS], a48[i+VWORDS-NWORDS], a48[i-NWORDS]);
   }
   aa_2x2x2w[VWORDS*3-1] = VSET(0, 0, 0, 0, 0, b48[VWORDS-1], 0, a48[VWORDS-1]);
-
-#if 0
-  puts("\n=============================================================\n");
-  puts("\nTEST - FP2\n");
 
   mul_by_u_plus_1_fp2x2_2x2x2w(rr_2x2x2w, aa_2x2x2w);
   for(i = 0; i < 2*VWORDS; i++) z48[i] = ((uint64_t *)&rr_2x2x2w[i])[0];
@@ -555,11 +555,6 @@ void test_timing_fp2()
   MEASURE_CYCLES(mul_fp2(r_scalar, a_scalar, b_scalar), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- sqr_fp2_scalar:       ");
-  LOAD_CACHE(sqr_fp2(r_scalar, a_scalar), 10000);
-  MEASURE_CYCLES(sqr_fp2(r_scalar, a_scalar), 100000);
-  printf("#cycle = %ld\n", diff_cycles);
-
   printf("- mul_fp2x2_8x1x1w:     ");
   LOAD_CACHE(mul_fp2x2_8x1x1w(z_8x1x1w, a_8x1x1w, b_8x1x1w), 10000);
   MEASURE_CYCLES(mul_fp2x2_8x1x1w(z_8x1x1w, a_8x1x1w, b_8x1x1w), 100000);
@@ -583,6 +578,11 @@ void test_timing_fp2()
   printf("- mul_fp2x2_1x4x2w:     ");
   LOAD_CACHE(mul_fp2x2_1x4x2w(z_1x4x2w, a_1x4x2w, b_1x4x2w), 10000);
   MEASURE_CYCLES(mul_fp2x2_1x4x2w(z_1x4x2w, a_1x4x2w, b_1x4x2w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- sqr_fp2_scalar:       ");
+  LOAD_CACHE(sqr_fp2(r_scalar, a_scalar), 10000);
+  MEASURE_CYCLES(sqr_fp2(r_scalar, a_scalar), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
   printf("- sqr_fp2x2_4x2x1w:     ");
@@ -609,6 +609,9 @@ void test_timing_fp4()
   uint64_t start_cycles, end_cycles, diff_cycles;
   int i;
 
+#if 0
+  puts("\n=============================================================\n");
+  puts("\nTEST - FP4\n");
 
   conv_64to48_mpi(a48, a64, NWORDS, SWORDS);
   conv_64to48_mpi(b48, b64, NWORDS, SWORDS);
@@ -616,10 +619,6 @@ void test_timing_fp4()
   for (i = 0; i < NWORDS; i++) {
     a_2x2x2x1w[i] = VSET(0, 0, 0, 0, b48[i], a48[i], b48[i], a48[i]);
   }
-
-#if 0
-  puts("\n=============================================================\n");
-  puts("\nTEST - FP4\n");
 
   sqr_fp4_2x2x2x1w_v1(r_2x2x2x1w, a_2x2x2x1w);
   get_channel_8x1w(r48, r_2x2x2x1w, 0);
@@ -653,7 +652,7 @@ void test_timing_fp4()
 puts("\n=============================================================\n");
 puts("TIMING - FP4\n");
 
-printf("- sqr_fp4_scalar:     ");
+printf("- sqr_fp4_scalar:          ");
 LOAD_CACHE(sqr_fp4(r_scalar, a0_scalar, a1_scalar), 10000);
 MEASURE_CYCLES(sqr_fp4(r_scalar, a0_scalar, a1_scalar), 100000);
 printf("#cycle = %ld\n", diff_cycles);
@@ -671,7 +670,7 @@ printf("#cycle = %ld\n", diff_cycles);
 
 // ----------------------------------------------------------------------------
 
-void test_fp6()
+void test_timing_fp6()
 {
   uint64_t r64[NWORDS], z64[2*SWORDS];
   uint64_t r48[NWORDS], z48[2*NWORDS];
@@ -683,12 +682,13 @@ void test_fp6()
   fp2_2x2x2w a0_2x2x2w, a1_2x2x2w, a2_2x2x2w, r01_2x2x2w, r2_2x2x2w;
   fp2x2_2x2x2w z01_2x2x2w, z2_2x2x2w;
   vec768fp6 r; 
-  vec384fp6 a = {{{1}, {2}}, {{3}, {4}}, {{5}, {6}}};
+  vec384fp6 a = {{{1}, {2}}, {{3}, {4}}, {{5}, {6}}}, b;
   uint64_t start_cycles, end_cycles, diff_cycles;
   int i;
 
 #if 0
 
+  puts("\n=============================================================\n");
   puts("\nFP6 TEST\n");
 
   a01_4x2x1w[0] = VSET(0, 0, 0, 0, 4, 3, 2, 1);
@@ -941,17 +941,23 @@ void test_fp6()
   // mpi_print("* mul_fp6x2_1x2x2x2w r21 = 0x", r64, SWORDS);
 #endif
 
-  // puts("\nFP6 TIMING\n");
+  puts("\n=============================================================\n");
+  puts("TIMING - FP6\n");
 
-  // printf("- mul_by_xy00z0_fp6x2_2x2x2x1w: ");
-  // LOAD_CACHE(mul_by_xy00z0_fp6x2_2x2x2x1w(z01_4x2x1w, z2_4x2x1w, z3_4x2x1w, z45_4x2x1w, a01_4x2x1w, a2_4x2x1w, a01_4x2x1w, a2_4x2x1w), 10000);
-  // MEASURE_CYCLES(mul_by_xy00z0_fp6x2_2x2x2x1w(z01_4x2x1w, z2_4x2x1w, z3_4x2x1w, z45_4x2x1w, a01_4x2x1w, a2_4x2x1w, a01_4x2x1w, a2_4x2x1w), 100000);
-  // printf("#cycle = %ld\n", diff_cycles);
+  printf("- mul_fp6x2_scalar: ");
+  LOAD_CACHE(mul_fp6x2(r, a, b), 10000);
+  MEASURE_CYCLES(mul_fp6x2(r, a, b), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
 
-  // printf("- mul_by_xy00z0_fp6x2_2x4x1x1w: ");
-  // LOAD_CACHE(mul_by_xy00z0_fp6x2_2x4x1x1w(r01_8x1x1w, r23_8x1x1w, r45_8x1x1w, a_8x1x1w, b_8x1x1w), 10000);
-  // MEASURE_CYCLES(mul_by_xy00z0_fp6x2_2x4x1x1w(r01_8x1x1w, r23_8x1x1w, r45_8x1x1w, a_8x1x1w, b_8x1x1w), 100000);
-  // printf("#cycle = %ld\n", diff_cycles);
+  printf("- mul_fp6x2_2x2x2x1w: ");
+  LOAD_CACHE(mul_fp6x2_2x2x2x1w(z01_4x2x1w, z2_4x2x1w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 10000);
+  MEASURE_CYCLES(mul_fp6x2_2x2x2x1w(z01_4x2x1w, z2_4x2x1w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- mul_fp6x2_1x2x2x2w: ");
+  LOAD_CACHE(mul_fp6x2_1x2x2x2w(z01_2x2x2w, z2_2x2x2w, a0_2x2x2w, a1_2x2x2w, a2_2x2x2w), 10000);
+  MEASURE_CYCLES(mul_fp6x2_1x2x2x2w(z01_2x2x2w, z2_2x2x2w, a0_2x2x2w, a1_2x2x2w, a2_2x2x2w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
 }
 
 // ----------------------------------------------------------------------------
@@ -1702,7 +1708,7 @@ int main()
   test_timing_fp();
   test_timing_fp2();
   test_timing_fp4();
-  // test_fp6();
+  test_timing_fp6();
   test_timing_fp12();
   test_timing_line();
 

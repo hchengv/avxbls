@@ -99,7 +99,7 @@ static inline void sub_fp6x2(vec768fp6 ret, const vec768fp6 a,
     sub_fp2x2(ret[2], a[2], b[2]);
 }
 
-static void mul_fp6x2(vec768fp6 ret, const vec384fp6 a, const vec384fp6 b)
+void mul_fp6x2(vec768fp6 ret, const vec384fp6 a, const vec384fp6 b)
 {
     vec768x t0, t1, t2;
     vec384x aa, bb;
