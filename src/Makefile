@@ -2,14 +2,16 @@ CC     = gcc
 SRCS   = $(wildcard *.c) assembly.S rdtsc64.S
 FLAGS  = -O3 -fomit-frame-pointer -m64 -mbmi2 -march=native -fwrapv -mtune=native -z noexecstack
 
-profiling:
-	$(CC) $(SRCS) -o profiling $(FLAGS) -DPROFILING
+ifeq "${MODE}" "benchmark"
+FLAGS += -DBENCHMARK
+endif 
 
-bench:
-	$(CC) $(SRCS) -o bench $(FLAGS) -DBENCHMARK
+ifeq "${MODE}" "profiling"
+FLAGS += -DPROFILING
+endif 
 
-all:
-	$(CC) $(SRCS) -o test $(FLAGS)
+all: 
+	$(CC) $(SRCS) -o test $(FLAGS) 
 
 clean:
-	rm -r test bench profiling
+	rm -r test

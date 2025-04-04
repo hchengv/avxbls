@@ -657,17 +657,17 @@ void test_timing_fp4()
   puts("\n=============================================================\n");
   puts("TIMING - FP4\n");
 
-  printf("- sqr_fp4_scalar:          ");
+  printf("- sqr_fp4_scalar:       ");
   LOAD_CACHE(sqr_fp4(r_scalar, a0_scalar, a1_scalar), 10000);
   MEASURE_CYCLES(sqr_fp4(r_scalar, a0_scalar, a1_scalar), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- sqr_fp4_2x2x2x1w_v1:     ");
+  printf("- sqr_fp4_2x2x2x1w_v1:  ");
   LOAD_CACHE(sqr_fp4_2x2x2x1w_v1(r_2x2x2x1w, a_2x2x2x1w), 10000);
   MEASURE_CYCLES(sqr_fp4_2x2x2x1w_v1(r_2x2x2x1w, a_2x2x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- sqr_fp4_1x2x2x2w_v1:     ");
+  printf("- sqr_fp4_1x2x2x2w_v1:  ");
   LOAD_CACHE(sqr_fp4_1x2x2x2w_v1(r_1x2x2x2w, a_1x2x2x2w), 10000);
   MEASURE_CYCLES(sqr_fp4_1x2x2x2w_v1(r_1x2x2x2w, a_1x2x2x2w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
