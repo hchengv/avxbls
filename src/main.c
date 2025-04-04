@@ -598,13 +598,16 @@ void test_timing_fp2()
 
 // ----------------------------------------------------------------------------
 
-void test_fp4()
+void test_timing_fp4()
 {
   uint64_t a64[SWORDS] = { TV_A }, b64[SWORDS] = { TV_B }, r64[SWORDS], z64[2*SWORDS];
   uint64_t a48[NWORDS], b48[NWORDS], r48[NWORDS], z48[2*NWORDS];
   __m512i a_2x2x2x1w[NWORDS], b_2x2x2x1w[NWORDS], r_2x2x2x1w[NWORDS], z[2*NWORDS];
-  int i;
+  __m512i a_1x2x2x2w[VWORDS], r_1x2x2x2w[VWORDS];
+  vec384fp4 r_scalar;
+  vec384x a0_scalar, a1_scalar;
   uint64_t start_cycles, end_cycles, diff_cycles;
+  int i;
 
 
   conv_64to48_mpi(a48, a64, NWORDS, SWORDS);
@@ -614,9 +617,10 @@ void test_fp4()
     a_2x2x2x1w[i] = VSET(0, 0, 0, 0, b48[i], a48[i], b48[i], a48[i]);
   }
 
-  puts("\nFP4 TEST\n");
-
 #if 0
+  puts("\n=============================================================\n");
+  puts("\nTEST - FP4\n");
+
   sqr_fp4_2x2x2x1w_v1(r_2x2x2x1w, a_2x2x2x1w);
   get_channel_8x1w(r48, r_2x2x2x1w, 0);
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
@@ -645,6 +649,24 @@ void test_fp4()
   conv_48to64_mpi(r64, r48, SWORDS, NWORDS);
   mpi_print("* sqr_fp4_2x2x2x1w_v2 r11 = 0x", r64, SWORDS);
 #endif
+
+puts("\n=============================================================\n");
+puts("TIMING - FP4\n");
+
+printf("- sqr_fp4_scalar:     ");
+LOAD_CACHE(sqr_fp4(r_scalar, a0_scalar, a1_scalar), 10000);
+MEASURE_CYCLES(sqr_fp4(r_scalar, a0_scalar, a1_scalar), 100000);
+printf("#cycle = %ld\n", diff_cycles);
+
+printf("- sqr_fp4_2x2x2x1w_v1:     ");
+LOAD_CACHE(sqr_fp4_2x2x2x1w_v1(r_2x2x2x1w, a_2x2x2x1w), 10000);
+MEASURE_CYCLES(sqr_fp4_2x2x2x1w_v1(r_2x2x2x1w, a_2x2x2x1w), 100000);
+printf("#cycle = %ld\n", diff_cycles);
+
+printf("- sqr_fp4_1x2x2x2w_v1:     ");
+LOAD_CACHE(sqr_fp4_1x2x2x2w_v1(r_1x2x2x2w, a_1x2x2x2w), 10000);
+MEASURE_CYCLES(sqr_fp4_1x2x2x2w_v1(r_1x2x2x2w, a_1x2x2x2w), 100000);
+printf("#cycle = %ld\n", diff_cycles);
 }
 
 // ----------------------------------------------------------------------------
@@ -1679,7 +1701,7 @@ int main()
 
   test_timing_fp();
   test_timing_fp2();
-  // test_fp4();
+  test_timing_fp4();
   // test_fp6();
   test_timing_fp12();
   test_timing_line();

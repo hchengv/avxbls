@@ -612,7 +612,7 @@ void inverse_fp12(vec384fp12 ret, const vec384fp12 a)
 #endif
 }
 
-static void sqr_fp4(vec384fp4 ret, const vec384x a0, const vec384x a1)
+void sqr_fp4(vec384fp4 ret, const vec384x a0, const vec384x a1)
 {
     vec768x t0, t1, t2;
 
