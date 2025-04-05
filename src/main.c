@@ -166,7 +166,7 @@ void test_pairing()
   else 
     printf("\x1b[32m  e1 == e2 \x1b[0m \n");
 
-#if 1
+#ifdef TEST
   // print out the result
   mpi_print("e1[0][0][0] = ",  e1[0][0][0], 6);
   mpi_print("e1[0][0][1] = ",  e1[0][0][1], 6);
@@ -198,7 +198,7 @@ void test_pairing()
   else 
     printf("\x1b[32m  e1 == e2 \x1b[0m \n");
 
-#if 0
+#ifdef TEST
   // print out the result
   mpi_print("e1[0][0][0] = ",  e1[0][0][0], 6);
   mpi_print("e1[0][0][1] = ",  e1[0][0][1], 6);
@@ -230,7 +230,7 @@ void test_pairing()
   else 
     printf("\x1b[32m  e1 == e2 \x1b[0m \n");
 
-#if 0
+#ifdef TEST
   // print out the result
   mpi_print("e1[0][0][0] = ",  e1[0][0][0], 6);
   mpi_print("e1[0][0][1] = ",  e1[0][0][1], 6);
@@ -951,17 +951,17 @@ void test_timing_fp6()
   puts("\n=============================================================\n");
   puts("TIMING - FP6\n");
 
-  printf("- mul_fp6x2_scalar:   ");
+  printf("- mul_fp6x2_scalar:     ");
   LOAD_CACHE(mul_fp6x2(r, a, b), 10000);
   MEASURE_CYCLES(mul_fp6x2(r, a, b), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- mul_fp6x2_2x2x2x1w: ");
+  printf("- mul_fp6x2_2x2x2x1w:   ");
   LOAD_CACHE(mul_fp6x2_2x2x2x1w(z01_4x2x1w, z2_4x2x1w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 10000);
   MEASURE_CYCLES(mul_fp6x2_2x2x2x1w(z01_4x2x1w, z2_4x2x1w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- mul_fp6x2_1x2x2x2w: ");
+  printf("- mul_fp6x2_1x2x2x2w:   ");
   LOAD_CACHE(mul_fp6x2_1x2x2x2w(z01_2x2x2w, z2_2x2x2w, a0_2x2x2w, a1_2x2x2w, a2_2x2x2w), 10000);
   MEASURE_CYCLES(mul_fp6x2_1x2x2x2w(z01_2x2x2w, z2_2x2x2w, a0_2x2x2w, a1_2x2x2w, a2_2x2x2w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
