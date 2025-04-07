@@ -3943,6 +3943,9 @@ static void mul_by_u_plus_1_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2x2_8x1x1w a)
 // r0 = a0*b0 - a1*b1
 // r1 = (a0 + a1)*(b0 + b1) - a0*b0 - a1*b1 = a0*b1 + a1*b0
 // Karatsuba
+#ifndef BENCHMARK
+static 
+#endif
 void mul_fp2x2_8x1x1w(fp2x2_8x1x1w r, const fp2_8x1x1w a, const fp2_8x1x1w b)
 {
   fp_8x1w t0, t1;
@@ -3987,6 +3990,9 @@ static void mul_by_u_plus_1_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2x2_4x2x1w a)
 // r0 = a0*b0 - a1*b1
 // r1 = a0*b1 + a1*b0
 // schoolbook
+#ifndef BENCHMARK
+static 
+#endif
 void mul_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2_4x2x1w a, const fp2_4x2x1w b)
 {
   fp2_4x2x1w t0, t1;
@@ -4004,6 +4010,9 @@ void mul_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2_4x2x1w a, const fp2_4x2x1w b)
 
 // r0 = (a0 + a1)*(a0 - a1)
 // r1 = 2*a0*a1
+#ifndef BENCHMARK
+static 
+#endif
 void sqr_fp2x2_4x2x1w(fp2x2_4x2x1w r, const fp2_4x2x1w a)
 {
   fp2_4x2x1w t0, t1, t2;
@@ -4025,6 +4034,9 @@ static void redc_fp2x2_4x2x1w(fp2_4x2x1w r, const fp2x2_4x2x1w a)
 // r0 = a0*b0 - a1*b1
 // r1 = a0*b1 + a1*b0
 // schoolbook
+#ifndef BENCHMARK
+static 
+#endif
 void mul_fp2x2_2x4x1w(fp2x2_2x4x1w r, const fp2_2x4x1w a, const fp2_2x4x1w b)
 {
   fp2_2x4x1w t0, t1;
@@ -4069,6 +4081,9 @@ static void mul_by_u_plus_1_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2x2_2x2x2w a)
 // r0 = a0*b0 - a1*b1
 // r1 = a0*b1 + a1*b0
 // schoolbook
+#ifndef BENCHMARK
+static 
+#endif
 void mul_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b)
 {
   fp2_2x2x2w t0, t1;
@@ -4086,6 +4101,9 @@ void mul_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b)
 
 // r0 = (a0 + a1)*(a0 - a1)
 // r1 = 2*a0*a1
+#ifndef BENCHMARK
+static 
+#endif
 void sqr_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2_2x2x2w a)
 {
   fp2_2x2x2w t0, t1, t2;
@@ -4103,6 +4121,9 @@ void sqr_fp2x2_2x2x2w(fp2x2_2x2x2w r, const fp2_2x2x2w a)
 // r0 = a0*b0 - a1*b1
 // r1 = a0*b1 + a1*b0
 // schoolbook
+#ifndef BENCHMARK
+static 
+#endif
 void mul_fp2x2_1x4x2w(fp2x2_1x4x2w r, const fp2_1x4x2w a, const fp2_1x4x2w b)
 {
   fp2_1x4x2w t0, t1;

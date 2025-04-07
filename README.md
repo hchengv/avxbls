@@ -4,8 +4,8 @@
 
 ## Overview 
 
-AVXBLS is on the basis of [BLST](https://github.com/supranational/blst) and
-provides a latency-optimized AVX-512 implementation of optimal ate pairing on
+AVXBLS is based on [BLST](https://github.com/supranational/blst) and provides a
+latency-optimized AVX-512 implementation of the optimal ate pairing on
 BLS12-381. 
 
 <!--- ==================================================================== --->
@@ -22,14 +22,15 @@ BLS12-381.
 - Compile the AVX-512 implementation: 
 
   ```sh
-  cd ./src
-  make  
+  make
   ```
 
-- Test and benchmark: 
+- Execute test, benchmark, and profiling: 
 
   ```sh
-  ./src/test 
+  ./bin/test
+  ./bin/bench
+  ./bin/profiling
   ```
 
 <!--- ==================================================================== --->
