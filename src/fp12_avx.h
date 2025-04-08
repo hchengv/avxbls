@@ -81,6 +81,14 @@ void mul_fpx2_8x1w_hybrid(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b);
 // ----------------------------------------------------------------------------
 // prototypes: Fp2 single-length operations
 
+#ifdef BENCHMARK
+void mul_fp2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a, const fp2_4x2x1w b);
+void mul_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b);
+
+void sqr_fp2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a);
+void sqr_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a);
+#endif
+
 // ----------------------------------------------------------------------------
 // prototypes: Fp2 double-length operations
 

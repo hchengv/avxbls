@@ -118,7 +118,11 @@ typedef vec768x vec768fp6[3];
 typedef vec384x vec384fp4[2];
 
 // for timing measurement
+#ifdef BENCHMARK
+void mul_fp2x2(vec768x ret, const vec384x a, const vec384x b);
+void sqr_fp2x2(vec768x ret, const vec384x a);
 void sqr_fp4(vec384fp4 ret, const vec384x a0, const vec384x a1);
 void mul_fp6x2(vec768fp6 ret, const vec384fp6 a, const vec384fp6 b);
+#endif
 
 #endif /* __BLS12_381_ASM_FIELDS_H__ */

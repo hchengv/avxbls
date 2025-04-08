@@ -3690,9 +3690,34 @@ static void mul_by_u_plus_1_fp2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a)
   asx4_fp_8x1w(r, a, t0);               //  A0+A1 | A0-A1
 }
 
+// r0 = a0*b0 - a1*b1
+// r1 = a0*b1 + a1*b0
+// schoolbook
+#ifndef BENCHMARK
+static 
+#endif
+void mul_fp2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a, const fp2_4x2x1w b)
+{
+  fp2_4x2x1w t0, t1;
+  fp2x2_4x2x1w tt0, tt1;
+
+  // a = A1 | A0 at Fp layer 
+  // b = B1 | B0 at Fp layer
+  shuf_00(t0, a);                       //          A0 |          A0 
+  mul_fpx2_8x1w(tt0, t0, b);            //       A0*B1 |       A0*B0
+  shuf_11(t0, a);                       //          A1 |          A1 
+  shuf_01(t1, b);                       //          B0 |          B1 
+  mul_fpx2_8x1w(tt1, t0, t1);           //       A1*B0 |       A1*B1
+  asx4_fpx2_8x1w(tt0, tt0, tt1);        // A0*B1+A1*B0 | A0*B0-A1*B1
+  redc_fpx2_8x1w(r, tt0);               // A0*B1+A1*B0 | A0*B0-A1*B1
+}
+
 // r0 = (a0 + a1)*(a0 - a1)
 // r1 = 2*a0*a1
-static void sqr_fp2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a)
+#ifndef BENCHMARK
+static 
+#endif
+void sqr_fp2_4x2x1w(fp2_4x2x1w r, const fp2_4x2x1w a)
 {
   fp2_4x2x1w t0, t1, t2;
   fp2x2_4x2x1w tt0;
@@ -3857,7 +3882,10 @@ static void mul_by_u_plus_1_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a)
 // r0 = a0*b0 - a1*b1
 // r1 = a0*b1 + a1*b0
 // schoolbook
-static void mul_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b)
+#ifndef BENCHMARK
+static 
+#endif
+void mul_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b)
 {
   fp2_2x2x2w t0, t1;
   fp2x2_2x2x2w tt0, tt1;
@@ -3875,7 +3903,10 @@ static void mul_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w b)
 
 // r0 = (a0 + a1)*(a0 - a1)
 // r1 = 2*a0*a1
-static void sqr_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a)
+#ifndef BENCHMARK
+static 
+#endif
+void sqr_fp2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a)
 {
   fp2_2x2x2w t0, t1, t2;
   fp2x2_2x2x2w tt0;
@@ -5264,8 +5295,7 @@ void line_dbl_vec_v2(fp2_4x2x1w l0, fp2_4x2x1w l12, fp2_4x2x1w X3, fp2_4x2x1w Y3
   //                    E |        ZZ |                    ZZ |                 ...
   perm_var(t1, t1, m8);
   //             E*(3D-F) | l1 = ZZ*E |            l2 = ZZ*Z3 |                 ...
-  mul_fp2x2_4x2x1w(tt0, t0, t1);
-  redc_fp2x2_4x2x1w(l12, tt0);
+  mul_fp2_4x2x1w(l12, t0, t1);
   //                   8C |       ... |                   ... |                 ...
   perm_1010(t0, l0);
   //     Y3 = E*(3D-F)-8C |       ... |                   ... |                 ... 

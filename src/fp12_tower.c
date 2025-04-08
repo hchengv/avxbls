@@ -49,7 +49,10 @@ static inline void redc_fp2x2(vec384x ret, const vec768x a)
     redc_mont_384(ret[1], a[1], BLS12_381_P, p0);
 }
 
-static void mul_fp2x2(vec768x ret, const vec384x a, const vec384x b)
+#ifndef BENCHMARK
+static 
+#endif
+void mul_fp2x2(vec768x ret, const vec384x a, const vec384x b)
 {
 #if 1
     mul_382x(ret, a, b, BLS12_381_P);   /* +~6% in Miller loop */
@@ -70,7 +73,10 @@ static void mul_fp2x2(vec768x ret, const vec384x a, const vec384x b)
 #endif
 }
 
-static void sqr_fp2x2(vec768x ret, const vec384x a)
+#ifndef BENCHMARK
+static 
+#endif
+void sqr_fp2x2(vec768x ret, const vec384x a)
 {
 #if 1
     sqr_382x(ret, a, BLS12_381_P);      /* +~5% in final exponentiation */
@@ -99,6 +105,9 @@ static inline void sub_fp6x2(vec768fp6 ret, const vec768fp6 a,
     sub_fp2x2(ret[2], a[2], b[2]);
 }
 
+#ifndef BENCHMARK
+static 
+#endif
 void mul_fp6x2(vec768fp6 ret, const vec384fp6 a, const vec384fp6 b)
 {
     vec768x t0, t1, t2;
@@ -612,6 +621,9 @@ void inverse_fp12(vec384fp12 ret, const vec384fp12 a)
 #endif
 }
 
+#ifndef BENCHMARK
+static 
+#endif
 void sqr_fp4(vec384fp4 ret, const vec384x a0, const vec384x a1)
 {
     vec768x t0, t1, t2;

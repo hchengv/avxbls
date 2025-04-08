@@ -440,6 +440,7 @@ void test_timing_fp2()
   fp2x2_8x1x1w z_8x1x1w;
   fp2_8x1x1w a_8x1x1w, b_8x1x1w;
   vec384x r_scalar, a_scalar, b_scalar;
+  vec768x z_scalar;
   uint64_t start_cycles, end_cycles, diff_cycles;
   int i;
 
@@ -558,6 +559,21 @@ void test_timing_fp2()
   MEASURE_CYCLES(mul_fp2(r_scalar, a_scalar, b_scalar), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
+  printf("- mul_fp2_4x2x1w:     ");
+  LOAD_CACHE(mul_fp2_4x2x1w(r_4x2x1w, a_4x2x1w, b_4x2x1w), 10000);
+  MEASURE_CYCLES(mul_fp2_4x2x1w(r_4x2x1w, a_4x2x1w, b_4x2x1w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- mul_fp2_2x2x2w:     ");
+  LOAD_CACHE(mul_fp2_2x2x2w(r_2x2x2w, a_2x2x2w, b_2x2x2w), 10000);
+  MEASURE_CYCLES(mul_fp2_2x2x2w(r_2x2x2w, a_2x2x2w, b_2x2x2w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- mul_fp2x2_scalar:     ");
+  LOAD_CACHE(mul_fp2x2(z_scalar, a_scalar, b_scalar), 10000);
+  MEASURE_CYCLES(mul_fp2x2(z_scalar, a_scalar, b_scalar), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
   printf("- mul_fp2x2_8x1x1w:     ");
   LOAD_CACHE(mul_fp2x2_8x1x1w(z_8x1x1w, a_8x1x1w, b_8x1x1w), 10000);
   MEASURE_CYCLES(mul_fp2x2_8x1x1w(z_8x1x1w, a_8x1x1w, b_8x1x1w), 100000);
@@ -586,6 +602,21 @@ void test_timing_fp2()
   printf("- sqr_fp2_scalar:       ");
   LOAD_CACHE(sqr_fp2(r_scalar, a_scalar), 10000);
   MEASURE_CYCLES(sqr_fp2(r_scalar, a_scalar), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- sqr_fp2_4x2x1w:     ");
+  LOAD_CACHE(sqr_fp2_4x2x1w(r_4x2x1w, a_4x2x1w), 10000);
+  MEASURE_CYCLES(sqr_fp2_4x2x1w(r_4x2x1w, a_4x2x1w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- sqr_fp2_2x2x2w:     ");
+  LOAD_CACHE(sqr_fp2_2x2x2w(r_2x2x2w, a_2x2x2w), 10000);
+  MEASURE_CYCLES(sqr_fp2_2x2x2w(r_2x2x2w, a_2x2x2w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- sqr_fp2x2_scalar:     ");
+  LOAD_CACHE(sqr_fp2x2(z_scalar, a_scalar), 10000);
+  MEASURE_CYCLES(sqr_fp2x2(z_scalar, a_scalar), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
   printf("- sqr_fp2x2_4x2x1w:     ");
