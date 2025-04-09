@@ -559,12 +559,12 @@ void test_timing_fp2()
   MEASURE_CYCLES(mul_fp2(r_scalar, a_scalar, b_scalar), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- mul_fp2_4x2x1w:     ");
+  printf("- mul_fp2_4x2x1w:       ");
   LOAD_CACHE(mul_fp2_4x2x1w(r_4x2x1w, a_4x2x1w, b_4x2x1w), 10000);
   MEASURE_CYCLES(mul_fp2_4x2x1w(r_4x2x1w, a_4x2x1w, b_4x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- mul_fp2_2x2x2w:     ");
+  printf("- mul_fp2_2x2x2w:       ");
   LOAD_CACHE(mul_fp2_2x2x2w(r_2x2x2w, a_2x2x2w, b_2x2x2w), 10000);
   MEASURE_CYCLES(mul_fp2_2x2x2w(r_2x2x2w, a_2x2x2w, b_2x2x2w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
@@ -604,12 +604,12 @@ void test_timing_fp2()
   MEASURE_CYCLES(sqr_fp2(r_scalar, a_scalar), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- sqr_fp2_4x2x1w:     ");
+  printf("- sqr_fp2_4x2x1w:       ");
   LOAD_CACHE(sqr_fp2_4x2x1w(r_4x2x1w, a_4x2x1w), 10000);
   MEASURE_CYCLES(sqr_fp2_4x2x1w(r_4x2x1w, a_4x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- sqr_fp2_2x2x2w:     ");
+  printf("- sqr_fp2_2x2x2w:       ");
   LOAD_CACHE(sqr_fp2_2x2x2w(r_2x2x2w, a_2x2x2w), 10000);
   MEASURE_CYCLES(sqr_fp2_2x2x2w(r_2x2x2w, a_2x2x2w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
@@ -1420,7 +1420,6 @@ void test_timing_fp12()
   // mpi_print("* mul_fp12_vec_v4 r121 = 0x", r64, SWORDS);
 #endif 
 
-#ifdef BENCHMARK
   puts("\n=============================================================\n");
   puts("TIMING - FP12\n");
 
@@ -1488,7 +1487,6 @@ void test_timing_fp12()
   LOAD_CACHE(sqr_fp12_vec_v1(r0_4x2x1w, r1_4x2x1w, a0_4x2x1w, a1_4x2x1w), 10000);
   MEASURE_CYCLES(sqr_fp12_vec_v1(r0_4x2x1w, r1_4x2x1w, a0_4x2x1w, a1_4x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
-#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -1709,7 +1707,6 @@ void test_timing_line()
 
 #endif
 
-#ifdef BENCHMARK
   puts("\n=============================================================\n");
   puts("TIMING - LINE\n");
 
@@ -1737,7 +1734,6 @@ void test_timing_line()
   LOAD_CACHE(line_add_vec_v1(l0Y3, l1, X3, Z3, X1Y1, Z1Y2, X2), 10000);
   MEASURE_CYCLES(line_add_vec_v1(l0Y3, l1, X3, Z3, X1Y1, Z1Y2, X2), 100000);
   printf("#cycle = %ld\n", diff_cycles);
-#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -1752,9 +1748,10 @@ int main()
   test_timing_fp2();
   test_timing_fp4();
   test_timing_fp6();
+#endif
+
   test_timing_fp12();
   test_timing_line();
-#endif
 
   return 0;
 }
