@@ -827,6 +827,51 @@ void frobenius_map_fp12(vec384fp12 ret, const vec384fp12 a, size_t n)
 #endif
 }
 
+// ----------------------------------------------------------
+
+void compressed_cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
+{
+  vec384fp2 t0, t1, t2, t3, t4, t5, t6;
+
+  sqr_fp2(t0, a[0][1]);
+  sqr_fp2(t1, a[1][2]);
+  add_fp2(t5, a[0][1], a[1][2]);
+  sqr_fp2(t2, t5);
+
+  add_fp2(t3, t0, t1);
+  sub_fp2(t5, t2, t3);
+
+  add_fp2(t6, a[1][0], a[0][2]);
+  sqr_fp2(t3, t6);
+  sqr_fp2(t2, a[1][0]);
+
+  mul_by_u_plus_1_fp2(t6, t5);
+  add_fp2(t5, t6, a[1][0]);
+  add_fp2(t5, t5, t5);
+  add_fp2(ret[1][0], t5, t6);
+
+  mul_by_u_plus_1_fp2(t4, t1);
+  add_fp2(t5, t0, t4);
+  sub_fp2(t6, t5, a[0][2]);
+
+  sqr_fp2(t1, a[0][2]);
+
+  add_fp2(t6, t6, t6);
+  add_fp2(ret[0][2], t6, t5);
+
+  mul_by_u_plus_1_fp2(t4, t1);
+  add_fp2(t5, t2, t4);
+  sub_fp2(t6, t5, a[0][1]);
+  add_fp2(t6, t6, t6);
+  add_fp2(ret[0][1], t6, t5);
+
+  add_fp2(t0, t2, t1);
+  sub_fp2(t5, t3, t0);
+  add_fp2(t6, t5, a[1][2]);
+  add_fp2(t6, t6, t6);
+  add_fp2(ret[1][2], t5, t6);
+}
+
 static void reciprocal_sim_fp2(vec384fp2 ret[], const vec384fp2 a[], const int n)
 {
 
