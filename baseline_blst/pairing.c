@@ -250,6 +250,7 @@ static void mul_n_sqr(vec384fp12 ret, const vec384fp12 a, size_t n)
 
 static void raise_to_z_div_by_2(vec384fp12 ret, const vec384fp12 a)
 {
+ #if 0   
     cyclotomic_sqr_fp12(ret, a);                /* 0x2                  */
     mul_n_sqr(ret, a, 2);                       /* ..0xc                */
     mul_n_sqr(ret, a, 3);                       /* ..0x68               */
@@ -257,16 +258,77 @@ static void raise_to_z_div_by_2(vec384fp12 ret, const vec384fp12 a)
     mul_n_sqr(ret, a, 32);                      /* ..0xd20100000000     */
     mul_n_sqr(ret, a, 16-1);                    /* ..0x6900800000008000 */
     conjugate_fp12(ret);                /* account for z being negative */
+#else 
+    vec384fp12 s[6];
+    int i;
+
+    vec_copy(ret, a, sizeof(vec384fp12));
+    for (i = 0; i < 15; i++) compressed_cyclotomic_sqr_fp12(ret, ret);
+    vec_copy(s[0], ret, sizeof(vec384fp12));
+    for (i = 0; i < 32; i++) compressed_cyclotomic_sqr_fp12(ret, ret);
+    vec_copy(s[1], ret, sizeof(vec384fp12));
+    for (i = 0; i < 9; i++) compressed_cyclotomic_sqr_fp12(ret, ret);
+    vec_copy(s[2], ret, sizeof(vec384fp12));
+    for (i = 0; i < 3; i++) compressed_cyclotomic_sqr_fp12(ret, ret);
+    vec_copy(s[3], ret, sizeof(vec384fp12));
+    for (i = 0; i < 2; i++) compressed_cyclotomic_sqr_fp12(ret, ret);
+    vec_copy(s[4], ret, sizeof(vec384fp12));
+    compressed_cyclotomic_sqr_fp12(ret, ret);
+    vec_copy(s[5], ret, sizeof(vec384fp12));
+
+    back_cyclotomic_sim_fp12(s, s, 6);
+
+    mul_fp12(ret, s[0], s[1]);
+    mul_fp12(ret, ret,  s[2]);
+    mul_fp12(ret, ret,  s[3]);
+    mul_fp12(ret, ret,  s[4]);
+    mul_fp12(ret, ret,  s[5]);
+
+    conjugate_fp12(ret);                /* account for z being negative */
+#endif
 }
 
+#if 0
 #define raise_to_z(a, b) (raise_to_z_div_by_2(a, b), cyclotomic_sqr_fp12(a, a))
+#else 
+static void raise_to_z(vec384fp12 ret, const vec384fp12 a)
+{
+    vec384fp12 s[6];
+    int i;
+
+    vec_copy(ret, a, sizeof(vec384fp12));
+    for (i = 0; i < 16; i++) compressed_cyclotomic_sqr_fp12(ret, ret);
+    vec_copy(s[0], ret, sizeof(vec384fp12));
+    for (i = 0; i < 32; i++) compressed_cyclotomic_sqr_fp12(ret, ret);
+    vec_copy(s[1], ret, sizeof(vec384fp12));
+    for (i = 0; i < 9; i++) compressed_cyclotomic_sqr_fp12(ret, ret);
+    vec_copy(s[2], ret, sizeof(vec384fp12));
+    for (i = 0; i < 3; i++) compressed_cyclotomic_sqr_fp12(ret, ret);
+    vec_copy(s[3], ret, sizeof(vec384fp12));
+    for (i = 0; i < 2; i++) compressed_cyclotomic_sqr_fp12(ret, ret);
+    vec_copy(s[4], ret, sizeof(vec384fp12));
+    compressed_cyclotomic_sqr_fp12(ret, ret);
+    vec_copy(s[5], ret, sizeof(vec384fp12));
+
+    back_cyclotomic_sim_fp12(s, s, 6);
+
+    mul_fp12(ret, s[0], s[1]);
+    mul_fp12(ret, ret,  s[2]);
+    mul_fp12(ret, ret,  s[3]);
+    mul_fp12(ret, ret,  s[4]);
+    mul_fp12(ret, ret,  s[5]);
+
+    conjugate_fp12(ret);                /* account for z being negative */
+}
+#endif
+
 
 /*
  * Adaptation from <zkcrypto>/pairing/src/bls12_381/mod.rs
  */
 void final_exp(vec384fp12 ret, const vec384fp12 f)
 {
-    vec384fp12 y0, y1, y2, y3;
+    vec384fp12 y0, y1, y2, y3, y4;
 
     vec_copy(y1, f, sizeof(y1));
     conjugate_fp12(y1);

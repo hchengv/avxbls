@@ -263,13 +263,23 @@ void timing_pairing()
   POINTonE1_affine P[1];
   POINTonE2 _Q[1];
   POINTonE1 _P[1];
-  vec384fp12 e1, f;
+  vec384fp12 e1, f, t[6];
 
   POINTonE2_double(_Q, &BLS12_381_G2);
   POINTonE1_to_affine(P, &BLS12_381_G1);
   POINTonE2_to_affine(Q, _Q);
 
-  printf("- miller_loop:        ");
+  printf("- compressed_cyclotomic_sqr_fp12: ");
+  LOAD_CACHE(compressed_cyclotomic_sqr_fp12(f, f), 1000);
+  MEASURE_CYCLES(compressed_cyclotomic_sqr_fp12(f, f), 10000);
+  printf("  #cycle = %ld\n", diff_cycles);
+
+  printf("- back_cyclotomic_sim_fp12 (6):   ");
+  LOAD_CACHE(back_cyclotomic_sim_fp12(t, t, 6), 1000);
+  MEASURE_CYCLES(back_cyclotomic_sim_fp12(t, t, 6), 10000);
+  printf("  #cycle = %ld\n", diff_cycles);
+
+  printf("- miller_loop:                    ");
   LOAD_CACHE(miller_loop_n(f, Q, P, 1), 1000);
   #ifdef PROFILING
   profiling_reset();
@@ -280,7 +290,7 @@ void timing_pairing()
   profiling_dump(diff_cycles, 10000);
   #endif
 
-  printf("- final_exp:          ");
+  printf("- final_exp:                      ");
   LOAD_CACHE(final_exp(e1, f), 1000);
   #ifdef PROFILING
   profiling_reset();
@@ -291,7 +301,7 @@ void timing_pairing()
   profiling_dump(diff_cycles, 10000);
   #endif
 
-  printf("- optimal_ate_pairing:");
+  printf("- optimal_ate_pairing:            ");
   LOAD_CACHE(optimal_ate_pairing(e1, Q, P, 1), 1000);
   MEASURE_CYCLES(optimal_ate_pairing(e1, Q, P, 1), 10000);
   printf("  #cycle = %ld\n", diff_cycles);

@@ -562,3 +562,148 @@ void frobenius_map_fp12(vec384fp12 ret, const vec384fp12 a, size_t n)
   frobenius_map_fp12_cycles += end_cycles - start_cycles;
 #endif
 }
+
+
+// ----------------------------------------------------------
+
+void compressed_cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
+{
+#if 0
+  vec384fp2 t0, t1, t2, t3, t4, t5, t6;
+
+  sqr_fp2(t0, a[0][1]);
+  sqr_fp2(t1, a[1][2]);
+  add_fp2(t5, a[0][1], a[1][2]);
+  sqr_fp2(t2, t5);
+
+  add_fp2(t3, t0, t1);
+  sub_fp2(t5, t2, t3);
+
+  add_fp2(t6, a[1][0], a[0][2]);
+  sqr_fp2(t3, t6);
+  sqr_fp2(t2, a[1][0]);
+
+  mul_by_u_plus_1_fp2(t6, t5);
+  add_fp2(t5, t6, a[1][0]);
+  add_fp2(t5, t5, t5);
+  add_fp2(ret[1][0], t5, t6);
+
+  mul_by_u_plus_1_fp2(t4, t1);
+  add_fp2(t5, t0, t4);
+  sub_fp2(t6, t5, a[0][2]);
+
+  sqr_fp2(t1, a[0][2]);
+
+  add_fp2(t6, t6, t6);
+  add_fp2(ret[0][2], t6, t5);
+
+  mul_by_u_plus_1_fp2(t4, t1);
+  add_fp2(t5, t2, t4);
+  sub_fp2(t6, t5, a[0][1]);
+  add_fp2(t6, t6, t6);
+  add_fp2(ret[0][1], t6, t5);
+
+  add_fp2(t0, t2, t1);
+  sub_fp2(t5, t3, t0);
+  add_fp2(t6, t5, a[1][2]);
+  add_fp2(t6, t6, t6);
+  add_fp2(ret[1][2], t5, t6);
+#else 
+  vec384fp4 t1, t2;
+  
+  sqr_fp4(t1, a[1][0], a[0][2]);
+  sqr_fp4(t2, a[0][1], a[1][2]);
+
+  sub_fp2(ret[0][1], t1[0],     a[0][1]);
+  add_fp2(ret[0][1], ret[0][1], ret[0][1]);
+  add_fp2(ret[0][1], ret[0][1], t1[0]);
+
+  sub_fp2(ret[0][2], t2[0],     a[0][2]);
+  add_fp2(ret[0][2], ret[0][2], ret[0][2]);
+  add_fp2(ret[0][2], ret[0][2], t2[0]);
+
+  mul_by_u_plus_1_fp2(t2[1], t2[1]);
+  add_fp2(ret[1][0], t2[1],     a[1][0]);
+  add_fp2(ret[1][0], ret[1][0], ret[1][0]);
+  add_fp2(ret[1][0], ret[1][0], t2[1]);
+
+  add_fp2(ret[1][2], t1[1],     a[1][2]);
+  add_fp2(ret[1][2], ret[1][2], ret[1][2]);
+  add_fp2(ret[1][2], ret[1][2], t1[1]);
+#endif 
+}
+
+static void reciprocal_sim_fp2(vec384fp2 ret[], const vec384fp2 a[], const int n)
+{
+
+  vec384fp2 t[n], u;
+  int i;
+
+  vec_copy(ret[0], a[0], sizeof(vec384fp2));
+  vec_copy(t[0], a[0], sizeof(vec384fp2));
+
+  for (i = 1; i < n; i++) {
+    vec_copy(t[i], a[i], sizeof(vec384fp2));
+    mul_fp2(ret[i], ret[i - 1], t[i]);
+  }
+
+  reciprocal_fp2(u, ret[n - 1]);
+
+  for (i = n - 1; i > 0; i--) {
+    mul_fp2(ret[i], ret[i - 1], u);
+    mul_fp2(u, u, t[i]);
+  }
+  vec_copy(ret[0], u, sizeof(vec384fp2));
+}
+
+void back_cyclotomic_sim_fp12(vec384fp12 ret[], const vec384fp12 a[], const int n)
+{
+  vec384fp2 t0[n], t1[n], t2[n];
+  vec384 t3 = { ONE_MONT_P };
+  int i;
+
+  for (i = 0; i < n; i++) {
+    /* t0 = g4^2. */
+    sqr_fp2(t0[i], a[i][0][1]);
+
+    /* t1 = 3 * g4^2 - 2 * g3. */
+    sub_fp2(t1[i], t0[i], a[i][0][2]);
+    add_fp2(t1[i], t1[i], t1[i]);
+    add_fp2(t1[i], t1[i], t0[i]);
+
+    /* t0 = E * g5^2 + t1. */
+    sqr_fp2(t2[i], a[i][1][2]);
+    mul_by_u_plus_1_fp2(t0[i], t2[i]);
+    add_fp2(t0[i], t0[i], t1[i]);
+
+    /* t1 = 1/(4 * g2). */
+    add_fp2(t1[i], a[i][1][0], a[i][1][0]);
+    add_fp2(t1[i], t1[i], t1[i]);
+  }
+
+  // for (i = 0; i < n; i++)
+  //   reciprocal_fp2(t1[i], t1[i]);
+  reciprocal_sim_fp2(t1, t1, n);
+
+  for (i = 0; i < n; i++) {
+    /* c_1 = g1. */
+    mul_fp2(ret[i][1][1], t0[i], t1[i]);
+
+    /* t1 = g3 * g4. */
+    mul_fp2(t1[i], a[i][0][2], a[i][0][1]);
+
+    /* t2 = 2 * g1^2 - 3 * g3 * g4. */
+    sqr_fp2(t2[i], ret[i][1][1]);
+    sub_fp2(t2[i], t2[i], t1[i]);
+    add_fp2(t2[i], t2[i], t2[i]);
+    sub_fp2(t2[i], t2[i], t1[i]);
+
+    /* t1 = g2 * g5. */
+    mul_fp2(t1[i], a[i][1][0], a[i][1][2]);
+
+    /* c_0 = E * (2 * g1^2 + g2 * g5 - 3 * g3 * g4) + 1. */
+    add_fp2(t2[i], t2[i], t1[i]);
+    mul_by_u_plus_1_fp2(ret[i][0][0], t2[i]);
+    add_fp(ret[i][0][0][0], ret[i][0][0][0], t3);
+  }
+}

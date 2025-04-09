@@ -99,4 +99,7 @@ void frobenius_map_fp12(vec384fp12 ret, const vec384fp12 a, size_t n);
 #define neg_fp(r,a) cneg_fp((r),(a),1)
 #define neg_fp2(r,a) cneg_fp2((r),(a),1)
 
+void compressed_cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a);
+void back_cyclotomic_sim_fp12(vec384fp12 ret[], const vec384fp12 a[], const int n);
+
 #endif /* __BLS12_381_ASM_FIELDS_H__ */
