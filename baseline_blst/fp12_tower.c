@@ -681,8 +681,6 @@ void back_cyclotomic_sim_fp12(vec384fp12 ret[], const vec384fp12 a[], const int 
     add_fp2(t1[i], t1[i], t1[i]);
   }
 
-  // for (i = 0; i < n; i++)
-  //   reciprocal_fp2(t1[i], t1[i]);
   reciprocal_sim_fp2(t1, t1, n);
 
   for (i = 0; i < n; i++) {

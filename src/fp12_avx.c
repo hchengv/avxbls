@@ -4579,6 +4579,23 @@ void cyclotomic_sqr_fp12_vec_v2(fp4_1x2x2x2w ra, fp4_2x2x2x1w rbc, const fp4_1x2
   add_fp2_4x2x1w(rbc, rbc, tbc);        // 3*t1+2*z5 | 3*t0-2*z4 | 3*t2-2*z3 | 3*t3*(u+1)+2*z2
 }
 
+// double-length version
+void compressed_cyclotomic_sqr_fp12_vec_v1(fp4_2x2x2x1w rbc, const fp4_2x2x2x1w bc)
+{
+  fp4_2x2x2x1w tbc, t0;
+  const __m512i m0 = VSET(3, 2, 1, 0, 5, 4, 7, 6);
+
+  // compute B and C in 2x2x2x1w
+  // bc = z5 | z4 | z3 | z2 at Fp2 layer
+  sqr_fp4_2x2x2x1w_v1(tbc, bc);         //        t3 |        t2 |        t1 |              t0
+  mul_by_u_plus_1_fp2_4x2x1w(t0, tbc);  //  t3*(u+1) |       ... |       ... |             ...
+  blend_0xC0(tbc, tbc, t0);             //  t3*(u+1) |        t2 |        t1 |              t0
+  perm_var(tbc, tbc, m0);               //        t1 |        t0 |        t2 |        t3*(u+1)
+  assa_fp2_4x2x1w(rbc, tbc, bc);        //     t1+z5 |     t0-z4 |     t2-z3 |     t3*(u+1)+z2
+  add_fp2_4x2x1w(rbc, rbc, rbc);        // 2*(t1+z5) | 2*(t0-z4) | 2*(t2-z3) | 2*(t3*(u+1)+z2)
+  add_fp2_4x2x1w(rbc, rbc, tbc);        // 3*t1+2*z5 | 3*t0-2*z4 | 3*t2-2*z3 | 3*t3*(u+1)+2*z2
+}
+
 // schoolbook
 // single-length version
 void mul_fp12_vec_v1(fp2_4x2x1w r01, fp2_4x2x1w r2, const fp2_8x1x1w ab0, const fp2_8x1x1w ab1, const fp2_8x1x1w ab2)

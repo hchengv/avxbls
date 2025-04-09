@@ -328,7 +328,7 @@ static void raise_to_z(vec384fp12 ret, const vec384fp12 a)
  */
 void final_exp(vec384fp12 ret, const vec384fp12 f)
 {
-    vec384fp12 y0, y1, y2, y3, y4;
+    vec384fp12 y0, y1, y2, y3;
 
     vec_copy(y1, f, sizeof(y1));
     conjugate_fp12(y1);

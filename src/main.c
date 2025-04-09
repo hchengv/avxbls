@@ -1438,6 +1438,11 @@ void test_timing_fp12()
   MEASURE_CYCLES(cyclotomic_sqr_fp12_vec_v2(ra_1x2x2x2w, rbc_2x2x2x1w, a_1x2x2x2w, bc_2x2x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
+  printf("- compressed_cyclotomic_sqr_fp12_vec_v1: ");
+  LOAD_CACHE(compressed_cyclotomic_sqr_fp12_vec_v1(rbc_2x2x2x1w, bc_2x2x2x1w), 10000);
+  MEASURE_CYCLES(compressed_cyclotomic_sqr_fp12_vec_v1(rbc_2x2x2x1w, bc_2x2x2x1w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
   printf("- mul_fp12_scalar:            ");
   LOAD_CACHE(mul_fp12_scalar(r, a, a), 10000);
   MEASURE_CYCLES(mul_fp12_scalar(r, a, a), 100000);
