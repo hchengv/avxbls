@@ -1113,7 +1113,7 @@ static void raise_to_z_div_by_2(vec384fp12 ret, const vec384fp12 a)
 #if 0
 #define raise_to_z(a, b) (raise_to_z_div_by_2(a, b), cyclotomic_sqr_fp12(a, a))
 #else 
-static void raise_to_z_div(vec384fp12 ret, const vec384fp12 a)
+static void raise_to_z(vec384fp12 ret, const vec384fp12 a)
 {
   fp4_2x2x2x1w _bc;
   __m512i t[SWORDS];
