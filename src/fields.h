@@ -9,16 +9,6 @@
 #include "vect.h"
 #include "consts.h"
 
-#ifdef PROFILING
-  extern uint64_t read_tsc();
-  extern uint64_t sqr_fp12_cycles;
-  extern uint64_t mul_fp12_cycles;
-  extern uint64_t cyclotomic_sqr_fp12_cycles;
-  extern uint64_t mul_by_xy00z0_fp12_cycles;
-  extern uint64_t inverse_fp12_cycles;
-  extern uint64_t frobenius_map_fp12_cycles;
-#endif 
-
 /*
  * BLS12-381-specific Fp shortcuts to assembly.
  */

@@ -15,7 +15,12 @@ void line_add_scalar(vec384fp6 line, POINTonE2 *T, const POINTonE2 *R,
                                                    const POINTonE2_affine *Q);
 void line_add_vector(vec384fp6 line, POINTonE2 *T, const POINTonE2 *R,
                                                    const POINTonE2_affine *Q);
-                                                   
+
+#define add_n_dbl_n add_n_dbl_n_vector               
+#define mul_n_sqr   mul_n_sqr_vector
+
+// use Fp12 compressed cyclotomic squaring or not  
+#define COMPRESSED_CYCLOTOMIC_SQR 1
 
 void miller_loop_n(vec384fp12 ret, const POINTonE2_affine Q[],
                                    const POINTonE1_affine P[], size_t n);

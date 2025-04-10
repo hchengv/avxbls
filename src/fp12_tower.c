@@ -224,10 +224,6 @@ static void neg_fp6(vec384fp6 ret, const vec384fp6 a)
  */
 void mul_fp12_scalar(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b)
 {
-#ifdef PROFILING
-  uint64_t start_cycles = read_tsc();
-#endif
-
     vec768fp6 t0, t1, rx;
     vec384fp6 t2;
 
@@ -249,19 +245,10 @@ void mul_fp12_scalar(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b)
     add_fp2x2(rx[1], t0[1], t1[0]);
     add_fp2x2(rx[2], t0[2], t1[1]);
     redc_fp6x2(ret[0], rx);
-
-#ifdef PROFILING
-  uint64_t end_cycles = read_tsc();
-  mul_fp12_cycles += end_cycles - start_cycles;
-#endif   
 }
 
 void mul_fp12_vector(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b)
 {
-#ifdef PROFILING
-  uint64_t start_cycles = read_tsc();
-#endif
-
   fp2_4x2x1w ab0, ab1, ab2;
   fp2_2x2x2w r001, r101, r2;
   __m512i t[3][SWORDS];
@@ -323,11 +310,6 @@ void mul_fp12_vector(vec384fp12 ret, const vec384fp12 a, const vec384fp12 b)
     ret[1][2][1][i         ] = ((uint64_t *)&t[2][i])[6];
     ret[1][2][1][i+SWORDS/2] = ((uint64_t *)&t[2][i])[7];
   }
-
-#ifdef PROFILING
-  uint64_t end_cycles = read_tsc();
-  mul_fp12_cycles += end_cycles - start_cycles;
-#endif    
 }
 
 static inline void mul_by_0y0_fp6x2(vec768fp6 ret, const vec384fp6 a,
@@ -371,10 +353,6 @@ static void mul_by_xy0_fp6x2(vec768fp6 ret, const vec384fp6 a,
 void mul_by_xy00z0_fp12_scalar(vec384fp12 ret, const vec384fp12 a,
                                                const vec384fp6 xy00z0)
 {
-#ifdef PROFILING
-  uint64_t start_cycles = read_tsc();
-#endif
-
     vec768fp6 t0, t1, rr;
     vec384fp6 t2;
 
@@ -397,20 +375,11 @@ void mul_by_xy00z0_fp12_scalar(vec384fp12 ret, const vec384fp12 a,
     add_fp2x2(rr[1], t0[1], t1[0]);
     add_fp2x2(rr[2], t0[2], t1[1]);
     redc_fp6x2(ret[0], rr);
-
-#ifdef PROFILING
-  uint64_t end_cycles = read_tsc();
-  mul_by_xy00z0_fp12_cycles += end_cycles - start_cycles;
-#endif
 }
 
 void mul_by_xy00z0_fp12_vector(vec384fp12 ret, const vec384fp12 a,
                                                const vec384fp6 xy00z0)
 {
-#ifdef PROFILING
-  uint64_t start_cycles = read_tsc();
-#endif
-
   fp2_4x2x1w r0, a01, a2, b01, b4;
   fp2_2x2x2w r1;
   __m512i t[4][SWORDS];
@@ -466,19 +435,10 @@ void mul_by_xy00z0_fp12_vector(vec384fp12 ret, const vec384fp12 a,
     ret[1][2][1][i         ] = ((uint64_t *)&t[1][i])[6];
     ret[1][2][1][i+SWORDS/2] = ((uint64_t *)&t[1][i])[7];
   }
-
-#ifdef PROFILING
-  uint64_t end_cycles = read_tsc();
-  mul_by_xy00z0_fp12_cycles += end_cycles - start_cycles;
-#endif
 }
 
 void sqr_fp12_scalar(vec384fp12 ret, const vec384fp12 a)
 {
-  #ifdef PROFILING
-    uint64_t start_cycles = read_tsc();
-  #endif
-
     vec384fp6 t0, t1;
 
     add_fp6(t0, a[0], a[1]);
@@ -499,19 +459,10 @@ void sqr_fp12_scalar(vec384fp12 ret, const vec384fp12 a)
     sub_fp2(ret[0][0], ret[0][0], t1[2]);
     sub_fp2(ret[0][1], ret[0][1], t1[0]);
     sub_fp2(ret[0][2], ret[0][2], t1[1]);
-
-#ifdef PROFILING
-  uint64_t end_cycles = read_tsc();
-  sqr_fp12_cycles += end_cycles - start_cycles;
-#endif
 }
 
 void sqr_fp12_vector(vec384fp12 ret, const vec384fp12 a)
 {
-#ifdef PROFILING
-  uint64_t start_cycles = read_tsc();
-#endif
-
   fp2_4x2x1w r0, r1, a0, a1;
   __m512i t[2][SWORDS];
   int i;
@@ -548,11 +499,6 @@ void sqr_fp12_vector(vec384fp12 ret, const vec384fp12 a)
     ret[1][2][0][i] = ((uint64_t *)&t[1][i])[4];
     ret[1][2][1][i] = ((uint64_t *)&t[1][i])[5];
   }
-
-#ifdef PROFILING
-  uint64_t end_cycles = read_tsc();
-  sqr_fp12_cycles += end_cycles - start_cycles;
-#endif
 }
 
 void conjugate_fp12(vec384fp12 a)
@@ -596,10 +542,6 @@ static void inverse_fp6(vec384fp6 ret, const vec384fp6 a)
 
 void inverse_fp12(vec384fp12 ret, const vec384fp12 a)
 {
-#ifdef PROFILING
-  uint64_t start_cycles = read_tsc();
-#endif
-
     vec384fp6 t0, t1;
 
     sqr_fp6(t0, a[0]);
@@ -614,11 +556,6 @@ void inverse_fp12(vec384fp12 ret, const vec384fp12 a)
     mul_fp6(ret[0], a[0], t1);
     mul_fp6(ret[1], a[1], t1);
     neg_fp6(ret[1], ret[1]);
-
-#ifdef PROFILING
-  uint64_t end_cycles = read_tsc();
-  inverse_fp12_cycles += end_cycles - start_cycles;
-#endif
 }
 
 #ifndef BENCHMARK
@@ -644,10 +581,6 @@ void sqr_fp4(vec384fp4 ret, const vec384x a0, const vec384x a1)
 
 void cyclotomic_sqr_fp12_scalar(vec384fp12 ret, const vec384fp12 a)
 {
-#ifdef PROFILING
-  uint64_t start_cycles = read_tsc();
-#endif
-
     vec384fp4 t0, t1, t2;
 
     sqr_fp4(t0, a[0][0], a[1][1]);
@@ -678,19 +611,10 @@ void cyclotomic_sqr_fp12_scalar(vec384fp12 ret, const vec384fp12 a)
     add_fp2(ret[1][2], t1[1],     a[1][2]);
     add_fp2(ret[1][2], ret[1][2], ret[1][2]);
     add_fp2(ret[1][2], ret[1][2], t1[1]);
-
-  #ifdef PROFILING
-    uint64_t end_cycles = read_tsc();
-    cyclotomic_sqr_fp12_cycles += end_cycles - start_cycles;
-  #endif
 }
 
 void cyclotomic_sqr_fp12_vector(vec384fp12 ret, const vec384fp12 a)
 {
-#ifdef PROFILING
-  uint64_t start_cycles = read_tsc();
-#endif
-
   fp4_1x2x2x2w _ra, _a;
   fp4_2x2x2x1w _rbc, _bc;
   __m512i t[SWORDS], s[SWORDS/2];
@@ -741,11 +665,6 @@ void cyclotomic_sqr_fp12_vector(vec384fp12 ret, const vec384fp12 a)
     ret[1][2][0][i] = ((uint64_t *)&t[i])[6];
     ret[1][2][1][i] = ((uint64_t *)&t[i])[7];
   }
-
-#ifdef PROFILING
-  uint64_t end_cycles = read_tsc();
-  cyclotomic_sqr_fp12_cycles += end_cycles - start_cycles;
-#endif
 }
 
 /*
@@ -792,10 +711,6 @@ static void frobenius_map_fp6(vec384fp6 ret, const vec384fp6 a, size_t n)
 
 void frobenius_map_fp12(vec384fp12 ret, const vec384fp12 a, size_t n)
 {
-#ifdef PROFILING
-  uint64_t start_cycles = read_tsc();
-#endif
-
     static const vec384x coeffs[] = {  /* (u + 1)^((P^n - 1) / 6) */
       { { TO_LIMB_T(0x07089552b319d465), TO_LIMB_T(0xc6695f92b50a8313),
           TO_LIMB_T(0x97e83cccd117228f), TO_LIMB_T(0xa35baecab2dc29ee),
@@ -820,11 +735,6 @@ void frobenius_map_fp12(vec384fp12 ret, const vec384fp12 a, size_t n)
     mul_fp2(ret[1][0], ret[1][0], coeffs[n]);
     mul_fp2(ret[1][1], ret[1][1], coeffs[n]);
     mul_fp2(ret[1][2], ret[1][2], coeffs[n]);
-
-#ifdef PROFILING
-  uint64_t end_cycles = read_tsc();
-  frobenius_map_fp12_cycles += end_cycles - start_cycles;
-#endif
 }
 
 // ----------------------------------------------------------

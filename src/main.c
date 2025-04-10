@@ -9,53 +9,6 @@
 #include "fp12_avx.h"
 
 // ----------------------------------------------------------------------------
-// for profiling
-
-#ifdef PROFILING
-uint64_t sqr_fp12_cycles;
-uint64_t mul_fp12_cycles;
-uint64_t cyclotomic_sqr_fp12_cycles;
-uint64_t mul_by_xy00z0_fp12_cycles;
-uint64_t inverse_fp12_cycles;
-uint64_t frobenius_map_fp12_cycles;
-
-uint64_t line_add_cycles;
-uint64_t line_dbl_cycles;
-uint64_t line_by_Px2_cycles;
-#endif
-
-#ifdef PROFILING
-static void profiling_reset() {
-  sqr_fp12_cycles            = 0;
-  mul_fp12_cycles            = 0;
-  cyclotomic_sqr_fp12_cycles = 0;
-  mul_by_xy00z0_fp12_cycles  = 0;
-  inverse_fp12_cycles        = 0;
-  frobenius_map_fp12_cycles  = 0;
-
-  line_add_cycles            = 0;
-  line_dbl_cycles            = 0;
-  line_by_Px2_cycles         = 0;
-}
-
-static void profiling_dump(uint64_t total_cycles, int iter){
-  puts("");
-  printf("sqr_fp12_cycles                = %lu (%.2f%%)\n", sqr_fp12_cycles              / iter, (double)(sqr_fp12_cycles            / iter) / total_cycles*100.0f);
-  printf("mul_fp12_cycles                = %lu (%.2f%%)\n", mul_fp12_cycles              / iter, (double)(mul_fp12_cycles            / iter) / total_cycles*100.0f);
-  printf("cyclotomic_sqr_fp12_cycles     = %lu (%.2f%%)\n", cyclotomic_sqr_fp12_cycles   / iter, (double)(cyclotomic_sqr_fp12_cycles / iter) / total_cycles*100.0f);
-  printf("mul_by_xy00z0_fp12_cycles      = %lu (%.2f%%)\n", mul_by_xy00z0_fp12_cycles    / iter, (double)(mul_by_xy00z0_fp12_cycles  / iter) / total_cycles*100.0f);
-  printf("inverse_fp12_cycles            = %lu (%.2f%%)\n", inverse_fp12_cycles          / iter, (double)(inverse_fp12_cycles        / iter) / total_cycles*100.0f);
-  printf("frobenius_map_fp12_cycles      = %lu (%.2f%%)\n", frobenius_map_fp12_cycles    / iter, (double)(frobenius_map_fp12_cycles  / iter) / total_cycles*100.0f);
-
-  printf("line_add_cycles                = %lu (%.2f%%)\n", line_add_cycles              / iter, (double)(line_add_cycles            / iter) / total_cycles*100.0f);
-  printf("line_dbl_cycles                = %lu (%.2f%%)\n", line_dbl_cycles              / iter, (double)(line_dbl_cycles            / iter) / total_cycles*100.0f);
-  printf("line_by_Px2_cycles             = %lu (%.2f%%)\n", line_by_Px2_cycles           / iter, (double)(line_by_Px2_cycles         / iter) / total_cycles*100.0f);
-
-  puts("");
-}
-#endif
-
-// ----------------------------------------------------------------------------
 // for measuring CPU cycles
 
 extern uint64_t read_tsc();
@@ -268,25 +221,13 @@ void timing_pairing()
 
   printf("- miller_loop:        ");
   LOAD_CACHE(miller_loop_n(f, Q, P, 1), 1000);
-  #ifdef PROFILING
-  profiling_reset();
-  #endif
   MEASURE_CYCLES(miller_loop_n(f, Q, P, 1), 10000);
   printf("  #cycle = %ld\n", diff_cycles);
-  #ifdef PROFILING
-  profiling_dump(diff_cycles, 10000);
-  #endif
 
   printf("- final_exp:          ");
   LOAD_CACHE(final_exp(e1, f), 1000);
-  #ifdef PROFILING
-  profiling_reset();
-  #endif
   MEASURE_CYCLES(final_exp(e1, f), 10000);
   printf("  #cycle = %ld\n", diff_cycles);
-  #ifdef PROFILING
-  profiling_dump(diff_cycles, 10000);
-  #endif
 
   printf("- optimal_ate_pairing:");
   LOAD_CACHE(optimal_ate_pairing(e1, Q, P, 1), 1000);
@@ -1423,72 +1364,74 @@ void test_timing_fp12()
   puts("\n=============================================================\n");
   puts("TIMING - FP12\n");
 
-  printf("- cyclotomic_sqr_fp12_scalar: ");
+  printf("- cyclotomic_sqr_fp12_scalar:            ");
   LOAD_CACHE(cyclotomic_sqr_fp12_scalar(r, a), 10000);
   MEASURE_CYCLES(cyclotomic_sqr_fp12_scalar(r, a), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- cyclotomic_sqr_fp12_vec_v1: ");
+  printf("- cyclotomic_sqr_fp12_vec_v1:            ");
   LOAD_CACHE(cyclotomic_sqr_fp12_vec_v1(ra_1x2x2x2w, rbc_2x2x2x1w, a_1x2x2x2w, bc_2x2x2x1w), 10000);
   MEASURE_CYCLES(cyclotomic_sqr_fp12_vec_v1(ra_1x2x2x2w, rbc_2x2x2x1w, a_1x2x2x2w, bc_2x2x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- cyclotomic_sqr_fp12_vec_v2: ");
+  printf("- cyclotomic_sqr_fp12_vec_v2:            ");
   LOAD_CACHE(cyclotomic_sqr_fp12_vec_v2(ra_1x2x2x2w, rbc_2x2x2x1w, a_1x2x2x2w, bc_2x2x2x1w), 10000);
   MEASURE_CYCLES(cyclotomic_sqr_fp12_vec_v2(ra_1x2x2x2w, rbc_2x2x2x1w, a_1x2x2x2w, bc_2x2x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
+#if COMPRESSED_CYCLOTOMIC_SQR
   printf("- compressed_cyclotomic_sqr_fp12_vec_v1: ");
   LOAD_CACHE(compressed_cyclotomic_sqr_fp12_vec_v1(rbc_2x2x2x1w, bc_2x2x2x1w), 10000);
   MEASURE_CYCLES(compressed_cyclotomic_sqr_fp12_vec_v1(rbc_2x2x2x1w, bc_2x2x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
+#endif
 
-  printf("- mul_fp12_scalar:            ");
+  printf("- mul_fp12_scalar:                       ");
   LOAD_CACHE(mul_fp12_scalar(r, a, a), 10000);
   MEASURE_CYCLES(mul_fp12_scalar(r, a, a), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- mul_fp12_vec_v1:            ");
+  printf("- mul_fp12_vec_v1:                       ");
   LOAD_CACHE(mul_fp12_vec_v1(r01_4x2x1w, r2_4x2x1w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 10000);
   MEASURE_CYCLES(mul_fp12_vec_v1(r01_4x2x1w, r2_4x2x1w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);  
 
-  printf("- mul_fp12_vec_v2:            ");
+  printf("- mul_fp12_vec_v2:                       ");
   LOAD_CACHE(mul_fp12_vec_v2(r01_4x2x1w, r2_2x2x2w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 10000);
   MEASURE_CYCLES(mul_fp12_vec_v2(r01_4x2x1w, r2_2x2x2w, a0_8x1x1w, a1_8x1x1w, a2_8x1x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);  
 
-  printf("- mul_fp12_vec_v3:            ");
+  printf("- mul_fp12_vec_v3:                       ");
   LOAD_CACHE(mul_fp12_vec_v3(r001_2x2x2w, r101_2x2x2w, r2_2x2x2w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 10000);
   MEASURE_CYCLES(mul_fp12_vec_v3(r001_2x2x2w, r101_2x2x2w, r2_2x2x2w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);  
 
-  printf("- mul_fp12_vec_v4:            ");
+  printf("- mul_fp12_vec_v4:                       ");
   LOAD_CACHE(mul_fp12_vec_v4(r0_4x2x1w, r101_2x2x2w, r12_2x2x2w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 10000);
   MEASURE_CYCLES(mul_fp12_vec_v4(r0_4x2x1w, r101_2x2x2w, r12_2x2x2w, a0_4x2x1w, a1_4x2x1w, a2_4x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);  
 
-  printf("- mul_by_xy00z0_fp12_scalar:  ");
+  printf("- mul_by_xy00z0_fp12_scalar:             ");
   LOAD_CACHE(mul_by_xy00z0_fp12_scalar(r, a, b), 10000);
   MEASURE_CYCLES(mul_by_xy00z0_fp12_scalar(r, a, b), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- mul_by_xy00z0_fp12_vec_v1:  ");
+  printf("- mul_by_xy00z0_fp12_vec_v1:             ");
   LOAD_CACHE(mul_by_xy00z0_fp12_vec_v1(r0_4x2x1w, r1_2x2x2w, a01_4x2x1w, a2_4x2x1w, b01_4x2x1w, b4_4x2x1w), 10000);
   MEASURE_CYCLES(mul_by_xy00z0_fp12_vec_v1(r0_4x2x1w, r1_2x2x2w, a01_4x2x1w, a2_4x2x1w, b01_4x2x1w, b4_4x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- mul_by_xy00z0_fp12_vec_v2:  ");
+  printf("- mul_by_xy00z0_fp12_vec_v2:             ");
   LOAD_CACHE(mul_by_xy00z0_fp12_vec_v2(r0_4x2x1w, r1_2x2x2w, a_8x1x1w, b_8x1x1w), 10000);
   MEASURE_CYCLES(mul_by_xy00z0_fp12_vec_v2(r0_4x2x1w, r1_2x2x2w, a_8x1x1w, b_8x1x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- sqr_fp12_scalar:            ");
+  printf("- sqr_fp12_scalar:                       ");
   LOAD_CACHE(sqr_fp12_scalar(r, a), 10000);
   MEASURE_CYCLES(sqr_fp12_scalar(r, a), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- sqr_fp12_vec_v1:            ");
+  printf("- sqr_fp12_vec_v1:                       ");
   LOAD_CACHE(sqr_fp12_vec_v1(r0_4x2x1w, r1_4x2x1w, a0_4x2x1w, a1_4x2x1w), 10000);
   MEASURE_CYCLES(sqr_fp12_vec_v1(r0_4x2x1w, r1_4x2x1w, a0_4x2x1w, a1_4x2x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
