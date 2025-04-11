@@ -681,7 +681,7 @@ static void mul_n_sqr_vector(vec384fp12 ret, const vec384fp12 a, size_t n)
 
   conv_48to64_fp_8x1w(t[0], _bc);
   for (i = 0; i < SWORDS; i++) {
-    ret[1][0][0][i] = ((uint64_t *)&t[0][i])[0];
+    ret[1][0][0][i] = ((uint64_t *)&t[0][i])[0]; 
     ret[1][0][1][i] = ((uint64_t *)&t[0][i])[1];
     ret[0][2][0][i] = ((uint64_t *)&t[0][i])[2];
     ret[0][2][1][i] = ((uint64_t *)&t[0][i])[3];
@@ -692,9 +692,9 @@ static void mul_n_sqr_vector(vec384fp12 ret, const vec384fp12 a, size_t n)
   } 
 }
 
+#if COMPRESSED_CYCLOTOMIC_SQR
 static void raise_to_z_div_by_2(vec384fp12 ret, const vec384fp12 a)
 {
-#if COMPRESSED_CYCLOTOMIC_SQR
   fp4_2x2x2x1w _bc;
   __m512i t[SWORDS];
   vec384fp12 s[6];
@@ -709,8 +709,7 @@ static void raise_to_z_div_by_2(vec384fp12 ret, const vec384fp12 a)
 
   conv_64to48_fp_8x1w(_bc, t);
 
-  for (i = 0; i < 15; i++) 
-    compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
+  for (i = 0; i < 15; i++) compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
   conv_48to64_fp_8x1w(t, _bc);
   for (i = 0; i < SWORDS; i++) {
     s[0][1][0][0][i] = ((uint64_t *)&t[i])[0];
@@ -722,8 +721,8 @@ static void raise_to_z_div_by_2(vec384fp12 ret, const vec384fp12 a)
     s[0][1][2][0][i] = ((uint64_t *)&t[i])[6];
     s[0][1][2][1][i] = ((uint64_t *)&t[i])[7];
   }
-  for (i = 0; i < 32; i++) 
-    compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
+
+  for (i = 0; i < 32; i++) compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
   conv_48to64_fp_8x1w(t, _bc);
   for (i = 0; i < SWORDS; i++) {
     s[1][1][0][0][i] = ((uint64_t *)&t[i])[0];
@@ -735,8 +734,8 @@ static void raise_to_z_div_by_2(vec384fp12 ret, const vec384fp12 a)
     s[1][1][2][0][i] = ((uint64_t *)&t[i])[6];
     s[1][1][2][1][i] = ((uint64_t *)&t[i])[7];
   }
-  for (i = 0; i < 9; i++) 
-    compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
+
+  for (i = 0; i < 9; i++) compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
   conv_48to64_fp_8x1w(t, _bc);
   for (i = 0; i < SWORDS; i++) {
     s[2][1][0][0][i] = ((uint64_t *)&t[i])[0];
@@ -748,8 +747,8 @@ static void raise_to_z_div_by_2(vec384fp12 ret, const vec384fp12 a)
     s[2][1][2][0][i] = ((uint64_t *)&t[i])[6];
     s[2][1][2][1][i] = ((uint64_t *)&t[i])[7];
   }
-  for (i = 0; i < 3; i++) 
-    compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
+
+  for (i = 0; i < 3; i++) compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
   conv_48to64_fp_8x1w(t, _bc);
   for (i = 0; i < SWORDS; i++) {
     s[3][1][0][0][i] = ((uint64_t *)&t[i])[0];
@@ -761,8 +760,8 @@ static void raise_to_z_div_by_2(vec384fp12 ret, const vec384fp12 a)
     s[3][1][2][0][i] = ((uint64_t *)&t[i])[6];
     s[3][1][2][1][i] = ((uint64_t *)&t[i])[7];
   }
-  for (i = 0; i < 2; i++) 
-    compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
+
+  for (i = 0; i < 2; i++) compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
   conv_48to64_fp_8x1w(t, _bc);
   for (i = 0; i < SWORDS; i++) {
     s[4][1][0][0][i] = ((uint64_t *)&t[i])[0];
@@ -774,7 +773,8 @@ static void raise_to_z_div_by_2(vec384fp12 ret, const vec384fp12 a)
     s[4][1][2][0][i] = ((uint64_t *)&t[i])[6];
     s[4][1][2][1][i] = ((uint64_t *)&t[i])[7];
   }
-    compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
+
+  compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
   conv_48to64_fp_8x1w(t, _bc);
   for (i = 0; i < SWORDS; i++) {
     s[5][1][0][0][i] = ((uint64_t *)&t[i])[0];
@@ -787,46 +787,208 @@ static void raise_to_z_div_by_2(vec384fp12 ret, const vec384fp12 a)
     s[5][1][2][1][i] = ((uint64_t *)&t[i])[7];
   }
 
+
   back_cyclotomic_sim_fp12(s, s, 6);
 
-  // fp2_4x2x1w ab0, ab1, ab2;
-  // fp2_2x2x2w r001, r101, r2;
-  // __m512i _t[3][SWORDS];
 
-  // // form < b1 | a1 | b0 | a0 >
-  // for (i = 0; i < SWORDS; i++) {
-  //   t[0][i] = VSET( s[1][1][0][1][i], s[1][1][0][0][i],
-  //                   s[0][1][0][1][i], s[0][1][0][0][i],
-  //                   s[1][0][0][1][i], s[1][0][0][0][i],
-  //                   s[0][0][0][1][i], s[0][0][0][0][i]);
-  //   t[1][i] = VSET( s[1][1][1][1][i], s[1][1][1][0][i],
-  //                   s[0][1][1][1][i], s[0][1][1][0][i],
-  //                   s[1][0][1][1][i], s[1][0][1][0][i],
-  //                   s[0][0][1][1][i], s[0][0][1][0][i]);
-  //   t[2][i] = VSET( s[1][1][2][1][i], s[1][1][2][0][i],
-  //                   s[0][1][2][1][i], s[0][1][2][0][i],
-  //                   s[1][0][2][1][i], s[1][0][2][0][i],
-  //                   s[0][0][2][1][i], s[0][0][2][0][i]);
-  // }
+  fp2_4x2x1w ab0[4], ab1[4], ab2[4], _ab3;
+  fp2_2x2x2w r001[4], r101[4], r2[4];
+  __m512i _t[3][3][SWORDS];
 
-  // conv_64to48_fp_8x1w(ab0, t[0]);
-  // conv_64to48_fp_8x1w(ab1, t[1]);
-  // conv_64to48_fp_8x1w(ab2, t[2]);
+  for (i = 0; i < SWORDS; i++) {
+    t[0][0][i] = VSET( s[1][1][0][1][i], s[1][1][0][0][i],
+                       s[0][1][0][1][i], s[0][1][0][0][i],
+                       s[1][0][0][1][i], s[1][0][0][0][i],
+                       s[0][0][0][1][i], s[0][0][0][0][i]);
+    t[0][1][i] = VSET( s[1][1][1][1][i], s[1][1][1][0][i],
+                       s[0][1][1][1][i], s[0][1][1][0][i],
+                       s[1][0][1][1][i], s[1][0][1][0][i],
+                       s[0][0][1][1][i], s[0][0][1][0][i]);
+    t[0][2][i] = VSET( s[1][1][2][1][i], s[1][1][2][0][i],
+                       s[0][1][2][1][i], s[0][1][2][0][i],
+                       s[1][0][2][1][i], s[1][0][2][0][i],
+                       s[0][0][2][1][i], s[0][0][2][0][i]);
+  }
 
-  // mul_fp12_vec_v3(r001, r101, r2, ab0, ab1, ab2);
+  conv_64to48_fp_8x1w(ab0[0], t[0][0]);
+  conv_64to48_fp_8x1w(ab1[0], t[0][1]);
+  conv_64to48_fp_8x1w(ab2[0], t[0][2]);
 
-  // carryp_fp_4x2w(r001);
-  // carryp_fp_4x2w(r101);
-  // carryp_fp_4x2w(r2);
+  for (i = 0; i < SWORDS; i++) {
+    t[1][0][i] = VSET( s[3][1][0][1][i], s[3][1][0][0][i],
+                       s[2][1][0][1][i], s[2][1][0][0][i],
+                       s[3][0][0][1][i], s[3][0][0][0][i],
+                       s[2][0][0][1][i], s[2][0][0][0][i]);
+    t[1][1][i] = VSET( s[3][1][1][1][i], s[3][1][1][0][i],
+                       s[2][1][1][1][i], s[2][1][1][0][i],
+                       s[3][0][1][1][i], s[3][0][1][0][i],
+                       s[2][0][1][1][i], s[2][0][1][0][i]);
+    t[1][2][i] = VSET( s[3][1][2][1][i], s[3][1][2][0][i],
+                       s[2][1][2][1][i], s[2][1][2][0][i],
+                       s[3][0][2][1][i], s[3][0][2][0][i],
+                       s[2][0][2][1][i], s[2][0][2][0][i]);
+  }
 
-  mul_fp12_vector(ret, s[0], s[1]);
-  mul_fp12_vector(ret, ret,  s[2]);
-  mul_fp12_vector(ret, ret,  s[3]);
-  mul_fp12_vector(ret, ret,  s[4]);
-  mul_fp12_vector(ret, ret,  s[5]);
+  conv_64to48_fp_8x1w(ab0[1], t[1][0]);
+  conv_64to48_fp_8x1w(ab1[1], t[1][1]);
+  conv_64to48_fp_8x1w(ab2[1], t[1][2]);
+
+  for (i = 0; i < SWORDS; i++) {
+    t[2][0][i] = VSET( s[5][1][0][1][i], s[5][1][0][0][i],
+                       s[4][1][0][1][i], s[4][1][0][0][i],
+                       s[5][0][0][1][i], s[5][0][0][0][i],
+                       s[4][0][0][1][i], s[4][0][0][0][i]);
+    t[2][1][i] = VSET( s[5][1][1][1][i], s[5][1][1][0][i],
+                       s[4][1][1][1][i], s[4][1][1][0][i],
+                       s[5][0][1][1][i], s[5][0][1][0][i],
+                       s[4][0][1][1][i], s[4][0][1][0][i]);
+    t[2][2][i] = VSET( s[5][1][2][1][i], s[5][1][2][0][i],
+                       s[4][1][2][1][i], s[4][1][2][0][i],
+                       s[5][0][2][1][i], s[5][0][2][0][i],
+                       s[4][0][2][1][i], s[4][0][2][0][i]);
+  }
+
+  conv_64to48_fp_8x1w(ab0[2], t[2][0]);
+  conv_64to48_fp_8x1w(ab1[2], t[2][1]);
+  conv_64to48_fp_8x1w(ab2[2], t[2][2]);
+
+  mul_fp12_vec_v3(r001[0], r101[0], r2[0], ab0[0], ab1[0], ab2[0]);
+  mul_fp12_vec_v3(r001[1], r101[1], r2[1], ab0[1], ab1[1], ab2[1]);
+  mul_fp12_vec_v3(r001[2], r101[2], r2[2], ab0[2], ab1[2], ab2[2]);
+
+  fp2_2x2x2w _t0, _t1;
+  const __m512i m0 = VSET(3, 2, 1, 0, 7, 6, 5, 4); 
+  const __m512i m1 = VSET(6, 4, 6, 4, 2, 0, 2, 0);
+  const __m512i m2 = VSET(7, 5, 7, 5, 3, 1, 3, 1);
+  const __m512i m3 = VSET(2, 0, 2, 0, 6, 4, 6, 4);
+  const __m512i m4 = VSET(3, 1, 3, 1, 7, 5, 7, 5);
+
+  // r101[0] =  r1[0] |  r1[1] 
+  perm_var_hl(r101[0], r101[0], m0);
+  // r101[1] = r1'[0] | r1'[1]
+  perm_var_hl(r101[1], r101[1], m0);
+  //    _t0 =   r1[0] |  r0[0]
+  blend_0x0F_hl(_t0, r101[0], r001[0]);
+  //    _t1 =  r1'[0] | r0'[0]
+  blend_0x0F_hl(_t1, r101[1], r001[1]);
+  //   ab0[3] =   r1[0] |  r1[0] |  r0[0] |  r0[0]
+  //   ab1[3] =  r1'[0] | r1'[0] | r0'[0] | r0'[0] 
+  for (i = 0; i < VWORDS; i++) {
+    ab0[3][i]        = VPERMV(m1, _t0[i]);
+    ab0[3][i+VWORDS] = VPERMV(m2, _t0[i]);
+    ab1[3][i]        = VPERMV(m1, _t1[i]);
+    ab1[3][i+VWORDS] = VPERMV(m2, _t1[i]);
+  }
+  // ab0[3] =  r1'[0] | r1[0] | r0'[0] | r0'[0] 
+  blend_0x33(ab0[3], ab1[3], ab0[3]);
+
+  //  _t0 =   r0[1] |  r1[1]
+  blend_0x0F_hl(_t0, r001[0], r101[0]);
+  //  _t1 =  r0'[1] | r1'[1]
+  blend_0x0F_hl(_t1, r001[1], r101[1]);
+  // ab1[3] =   r1[1] |  r1[1] |  r0[1] |  r0[1]
+  // ab2[3] =  r1'[1] |  r1'[1]| r0'[1] | r0'[1] 
+  for (i = 0; i < VWORDS; i++) {
+    ab1[3][i]        = VPERMV(m3, _t0[i]);
+    ab1[3][i+VWORDS] = VPERMV(m4, _t0[i]);
+    ab2[3][i]        = VPERMV(m3, _t1[i]);
+    ab2[3][i+VWORDS] = VPERMV(m4, _t1[i]);
+  }
+  // ab1[3] =  r1'[1] |  r1[1] | r0'[1] | r0'[1] 
+  blend_0x33(ab1[3], ab2[3], ab1[3]);
+
+  // ab2[3] =   r1[2] |  r1[2] |  r0[2] |  r0[2]
+  // _ab3 =  r1'[2] | r1'[2] | r0'[2] | r0'[2] 
+  for (i = 0; i < VWORDS; i++) {
+    ab2[3][i]        = VPERMV(m1, r2[0][i]);
+    ab2[3][i+VWORDS] = VPERMV(m2, r2[0][i]);
+    _ab3[i]          = VPERMV(m1, r2[1][i]);
+    _ab3[i+VWORDS]   = VPERMV(m2, r2[1][i]);
+  }
+  // ab2[3] =  r1'[2] |  r1[2] | r0'[2] | r0'[2] 
+  blend_0x33(ab2[3], _ab3, ab2[3]);
+
+  mul_fp12_vec_v3(r001[3], r101[3], r2[3], ab0[3], ab1[3], ab2[3]);
+
+  perm_var_hl(r101[2], r101[2], m0);
+  perm_var_hl(r101[3], r101[3], m0);
+  blend_0x0F_hl(_t0, r101[2], r001[2]);
+  blend_0x0F_hl(_t1, r101[3], r001[3]);
+  for (i = 0; i < VWORDS; i++) {
+    ab0[3][i]        = VPERMV(m1, _t0[i]);
+    ab0[3][i+VWORDS] = VPERMV(m2, _t0[i]);
+    ab1[3][i]        = VPERMV(m1, _t1[i]);
+    ab1[3][i+VWORDS] = VPERMV(m2, _t1[i]);
+  }
+  blend_0x33(ab0[3], ab1[3], ab0[3]);
+
+  blend_0x0F_hl(_t0, r001[2], r101[2]);
+  blend_0x0F_hl(_t1, r001[3], r101[3]);
+  for (i = 0; i < VWORDS; i++) {
+    ab1[3][i]        = VPERMV(m3, _t0[i]);
+    ab1[3][i+VWORDS] = VPERMV(m4, _t0[i]);
+    ab2[3][i]        = VPERMV(m3, _t1[i]);
+    ab2[3][i+VWORDS] = VPERMV(m4, _t1[i]);
+  }
+  blend_0x33(ab1[3], ab2[3], ab1[3]);
+
+  for (i = 0; i < VWORDS; i++) {
+    ab2[3][i]        = VPERMV(m1, r2[2][i]);
+    ab2[3][i+VWORDS] = VPERMV(m2, r2[2][i]);
+    _ab3[i]          = VPERMV(m1, r2[3][i]);
+    _ab3[i+VWORDS]   = VPERMV(m2, r2[3][i]);
+  }
+  blend_0x33(ab2[3], _ab3, ab2[3]);
+
+  mul_fp12_vec_v3(r001[3], r101[3], r2[3], ab0[3], ab1[3], ab2[3]);
+
+  carryp_fp_4x2w(r001[3]);
+  carryp_fp_4x2w(r101[3]);
+  carryp_fp_4x2w(r2[3]);
+
+  conv_48to64_fp_4x2w(t[0][0], r001[3]);
+  conv_48to64_fp_4x2w(t[0][1], r101[3]);
+  conv_48to64_fp_4x2w(t[0][2], r2[3]);
+
+  for (i = 0; i < SWORDS/2; i++) {
+    ret[0][0][0][i         ] = ((uint64_t *)&t[0][0][i])[0];
+    ret[0][0][0][i+SWORDS/2] = ((uint64_t *)&t[0][0][i])[1];
+    ret[0][0][1][i         ] = ((uint64_t *)&t[0][0][i])[2];
+    ret[0][0][1][i+SWORDS/2] = ((uint64_t *)&t[0][0][i])[3];
+    ret[0][1][0][i         ] = ((uint64_t *)&t[0][0][i])[4];
+    ret[0][1][0][i+SWORDS/2] = ((uint64_t *)&t[0][0][i])[5];
+    ret[0][1][1][i         ] = ((uint64_t *)&t[0][0][i])[6];
+    ret[0][1][1][i+SWORDS/2] = ((uint64_t *)&t[0][0][i])[7];
+    ret[1][0][0][i         ] = ((uint64_t *)&t[0][1][i])[0];
+    ret[1][0][0][i+SWORDS/2] = ((uint64_t *)&t[0][1][i])[1];
+    ret[1][0][1][i         ] = ((uint64_t *)&t[0][1][i])[2];
+    ret[1][0][1][i+SWORDS/2] = ((uint64_t *)&t[0][1][i])[3];
+    ret[1][1][0][i         ] = ((uint64_t *)&t[0][1][i])[4];
+    ret[1][1][0][i+SWORDS/2] = ((uint64_t *)&t[0][1][i])[5];
+    ret[1][1][1][i         ] = ((uint64_t *)&t[0][1][i])[6];
+    ret[1][1][1][i+SWORDS/2] = ((uint64_t *)&t[0][1][i])[7];
+    ret[0][2][0][i         ] = ((uint64_t *)&t[0][2][i])[0];
+    ret[0][2][0][i+SWORDS/2] = ((uint64_t *)&t[0][2][i])[1];
+    ret[0][2][1][i         ] = ((uint64_t *)&t[0][2][i])[2];
+    ret[0][2][1][i+SWORDS/2] = ((uint64_t *)&t[0][2][i])[3];
+    ret[1][2][0][i         ] = ((uint64_t *)&t[0][2][i])[4];
+    ret[1][2][0][i+SWORDS/2] = ((uint64_t *)&t[0][2][i])[5];
+    ret[1][2][1][i         ] = ((uint64_t *)&t[0][2][i])[6];
+    ret[1][2][1][i+SWORDS/2] = ((uint64_t *)&t[0][2][i])[7];
+  }
+
+
+  // mul_fp12_vector(s[0], s[0], s[1]);
+  // mul_fp12_vector(s[1], s[2], s[3]);
+  // mul_fp12_vector(s[2], s[4], s[5]);
+  // mul_fp12_vector(ret,  s[0], s[1]);
+  // mul_fp12_vector(ret,  ret,  s[2]);
 
   conjugate_fp12(ret);                /* account for z being negative */
+}
 #else 
+static void raise_to_z_div_by_2(vec384fp12 ret, const vec384fp12 a)
+{
   cyclotomic_sqr_fp12(ret, a);                /* 0x2                  */
   mul_n_sqr(ret, a, 2);                       /* ..0xc                */
   mul_n_sqr(ret, a, 3);                       /* ..0x68               */
@@ -834,8 +996,8 @@ static void raise_to_z_div_by_2(vec384fp12 ret, const vec384fp12 a)
   mul_n_sqr(ret, a, 32);                      /* ..0xd20100000000     */
   mul_n_sqr(ret, a, 16-1);                    /* ..0x6900800000008000 */
   conjugate_fp12(ret);                /* account for z being negative */
-#endif
 }
+#endif
 
 #if COMPRESSED_CYCLOTOMIC_SQR
 static void raise_to_z(vec384fp12 ret, const vec384fp12 a)
