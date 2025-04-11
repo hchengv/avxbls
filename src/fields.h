@@ -115,7 +115,7 @@ void sqr_fp4(vec384fp4 ret, const vec384x a0, const vec384x a1);
 void mul_fp6x2(vec768fp6 ret, const vec384fp6 a, const vec384fp6 b);
 #endif
 
-void compressed_cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a);
+void compressed_cyclotomic_sqr_fp12_scalar(vec384fp12 ret, const vec384fp12 a);
 void back_cyclotomic_sim_fp12(vec384fp12 ret[], const vec384fp12 a[], const int n);
 
 #endif /* __BLS12_381_ASM_FIELDS_H__ */

@@ -739,7 +739,7 @@ void frobenius_map_fp12(vec384fp12 ret, const vec384fp12 a, size_t n)
 
 // ----------------------------------------------------------
 
-void compressed_cyclotomic_sqr_fp12(vec384fp12 ret, const vec384fp12 a)
+void compressed_cyclotomic_sqr_fp12_scalar(vec384fp12 ret, const vec384fp12 a)
 {
   vec384fp2 t0, t1, t2, t3, t4, t5, t6;
 
