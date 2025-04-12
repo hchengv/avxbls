@@ -5439,8 +5439,10 @@ void mul_fpx2_8x1w_hybrid(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b)
   y3 = VMACHI(y3, a0, b3); y3 = VMACHI(y3, a1, b2); y3 = VMACHI(y3, a2, b1); 
   // y3 = VMACHI(y3, a3, b0);
 
+  // --------------------------------------------------------------------------
   uint64_t lo[8];
   long long unsigned int hi[8];
+  const __m512i ifmamask = VSET1(IFMAMASK);
 
   lo[0] = _mulx_u64(((uint64_t *)&a3)[0], ((uint64_t *)&b0)[0], &hi[0]);
   lo[1] = _mulx_u64(((uint64_t *)&a3)[1], ((uint64_t *)&b0)[1], &hi[1]);
@@ -5453,23 +5455,27 @@ void mul_fpx2_8x1w_hybrid(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b)
 
   // to be replaced by AVX-512 instructions
 
-  ((uint64_t *)&z3)[0] += lo[0] & IFMAMASK;
-  ((uint64_t *)&z3)[1] += lo[1] & IFMAMASK;
-  ((uint64_t *)&z3)[2] += lo[2] & IFMAMASK;
-  ((uint64_t *)&z3)[3] += lo[3] & IFMAMASK;
-  ((uint64_t *)&z3)[4] += lo[4] & IFMAMASK;
-  ((uint64_t *)&z3)[5] += lo[5] & IFMAMASK;
-  ((uint64_t *)&z3)[6] += lo[6] & IFMAMASK;
-  ((uint64_t *)&z3)[7] += lo[7] & IFMAMASK;
+  // ((uint64_t *)&z3)[0] += lo[0] & IFMAMASK;
+  // ((uint64_t *)&z3)[1] += lo[1] & IFMAMASK;
+  // ((uint64_t *)&z3)[2] += lo[2] & IFMAMASK;
+  // ((uint64_t *)&z3)[3] += lo[3] & IFMAMASK;
+  // ((uint64_t *)&z3)[4] += lo[4] & IFMAMASK;
+  // ((uint64_t *)&z3)[5] += lo[5] & IFMAMASK;
+  // ((uint64_t *)&z3)[6] += lo[6] & IFMAMASK;
+  // ((uint64_t *)&z3)[7] += lo[7] & IFMAMASK;
+  z3 = VADD(z3, VAND(*(__m512i *) lo, ifmamask));
 
-  ((uint64_t *)&y3)[0] += (hi[0] << 12) ^ (lo[0] >> 52);
-  ((uint64_t *)&y3)[1] += (hi[1] << 12) ^ (lo[1] >> 52);
-  ((uint64_t *)&y3)[2] += (hi[2] << 12) ^ (lo[2] >> 52);
-  ((uint64_t *)&y3)[3] += (hi[3] << 12) ^ (lo[3] >> 52);
-  ((uint64_t *)&y3)[4] += (hi[4] << 12) ^ (lo[4] >> 52);
-  ((uint64_t *)&y3)[5] += (hi[5] << 12) ^ (lo[5] >> 52);
-  ((uint64_t *)&y3)[6] += (hi[6] << 12) ^ (lo[6] >> 52);
-  ((uint64_t *)&y3)[7] += (hi[7] << 12) ^ (lo[7] >> 52);
+  // ((uint64_t *)&y3)[0] += (hi[0] << 12) ^ (lo[0] >> 52);
+  // ((uint64_t *)&y3)[1] += (hi[1] << 12) ^ (lo[1] >> 52);
+  // ((uint64_t *)&y3)[2] += (hi[2] << 12) ^ (lo[2] >> 52);
+  // ((uint64_t *)&y3)[3] += (hi[3] << 12) ^ (lo[3] >> 52);
+  // ((uint64_t *)&y3)[4] += (hi[4] << 12) ^ (lo[4] >> 52);
+  // ((uint64_t *)&y3)[5] += (hi[5] << 12) ^ (lo[5] >> 52);
+  // ((uint64_t *)&y3)[6] += (hi[6] << 12) ^ (lo[6] >> 52);
+  // ((uint64_t *)&y3)[7] += (hi[7] << 12) ^ (lo[7] >> 52);
+  y3 = VADD(y3, VXOR(VSHL(*(__m512i *)hi, 12), VSRA(*(__m512i *)hi, 52)));
+
+  // --------------------------------------------------------------------------
 
   y3 = VSHL(y3, BALIGN);
 
