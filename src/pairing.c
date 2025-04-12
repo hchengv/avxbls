@@ -1017,8 +1017,7 @@ static void raise_to_z(vec384fp12 ret, const vec384fp12 a)
 
   conv_64to48_fp_8x1w(_bc, t);
 
-  for (i = 0; i < 16; i++) 
-    compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
+  for (i = 0; i < 16; i++) compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
   conv_48to64_fp_8x1w(t, _bc);
   for (i = 0; i < SWORDS; i++) {
     s[0][1][0][0][i] = ((uint64_t *)&t[i])[0];
@@ -1030,8 +1029,8 @@ static void raise_to_z(vec384fp12 ret, const vec384fp12 a)
     s[0][1][2][0][i] = ((uint64_t *)&t[i])[6];
     s[0][1][2][1][i] = ((uint64_t *)&t[i])[7];
   }
-  for (i = 0; i < 32; i++) 
-    compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
+
+  for (i = 0; i < 32; i++) compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
   conv_48to64_fp_8x1w(t, _bc);
   for (i = 0; i < SWORDS; i++) {
     s[1][1][0][0][i] = ((uint64_t *)&t[i])[0];
@@ -1043,8 +1042,8 @@ static void raise_to_z(vec384fp12 ret, const vec384fp12 a)
     s[1][1][2][0][i] = ((uint64_t *)&t[i])[6];
     s[1][1][2][1][i] = ((uint64_t *)&t[i])[7];
   }
-  for (i = 0; i < 9; i++) 
-    compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
+
+  for (i = 0; i < 9; i++) compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
   conv_48to64_fp_8x1w(t, _bc);
   for (i = 0; i < SWORDS; i++) {
     s[2][1][0][0][i] = ((uint64_t *)&t[i])[0];
@@ -1056,8 +1055,8 @@ static void raise_to_z(vec384fp12 ret, const vec384fp12 a)
     s[2][1][2][0][i] = ((uint64_t *)&t[i])[6];
     s[2][1][2][1][i] = ((uint64_t *)&t[i])[7];
   }
-  for (i = 0; i < 3; i++) 
-    compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
+
+  for (i = 0; i < 3; i++) compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
   conv_48to64_fp_8x1w(t, _bc);
   for (i = 0; i < SWORDS; i++) {
     s[3][1][0][0][i] = ((uint64_t *)&t[i])[0];
@@ -1069,8 +1068,8 @@ static void raise_to_z(vec384fp12 ret, const vec384fp12 a)
     s[3][1][2][0][i] = ((uint64_t *)&t[i])[6];
     s[3][1][2][1][i] = ((uint64_t *)&t[i])[7];
   }
-  for (i = 0; i < 2; i++) 
-    compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
+
+  for (i = 0; i < 2; i++) compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
   conv_48to64_fp_8x1w(t, _bc);
   for (i = 0; i < SWORDS; i++) {
     s[4][1][0][0][i] = ((uint64_t *)&t[i])[0];
@@ -1082,7 +1081,8 @@ static void raise_to_z(vec384fp12 ret, const vec384fp12 a)
     s[4][1][2][0][i] = ((uint64_t *)&t[i])[6];
     s[4][1][2][1][i] = ((uint64_t *)&t[i])[7];
   }
-    compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
+  
+  compressed_cyclotomic_sqr_fp12_vec_v1(_bc, _bc);
   conv_48to64_fp_8x1w(t, _bc);
   for (i = 0; i < SWORDS; i++) {
     s[5][1][0][0][i] = ((uint64_t *)&t[i])[0];

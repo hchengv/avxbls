@@ -5439,7 +5439,6 @@ void mul_fpx2_8x1w_hybrid(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b)
   y3 = VMACHI(y3, a0, b3); y3 = VMACHI(y3, a1, b2); y3 = VMACHI(y3, a2, b1); 
   // y3 = VMACHI(y3, a3, b0);
 
-#if 1
   uint64_t lo[8];
   long long unsigned int hi[8];
 
@@ -5451,6 +5450,8 @@ void mul_fpx2_8x1w_hybrid(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b)
   lo[5] = _mulx_u64(((uint64_t *)&a3)[5], ((uint64_t *)&b0)[5], &hi[5]);
   lo[6] = _mulx_u64(((uint64_t *)&a3)[6], ((uint64_t *)&b0)[6], &hi[6]);
   lo[7] = _mulx_u64(((uint64_t *)&a3)[7], ((uint64_t *)&b0)[7], &hi[7]);
+
+  // to be replaced by AVX-512 instructions
 
   ((uint64_t *)&z3)[0] += lo[0] & IFMAMASK;
   ((uint64_t *)&z3)[1] += lo[1] & IFMAMASK;
@@ -5470,38 +5471,6 @@ void mul_fpx2_8x1w_hybrid(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b)
   ((uint64_t *)&y3)[6] += (hi[6] << 12) ^ (lo[6] >> 52);
   ((uint64_t *)&y3)[7] += (hi[7] << 12) ^ (lo[7] >> 52);
 
-#else 
-  __uint128_t t[8];
-  int i;
-
-  t[0] = (__uint128_t)((uint64_t *)&a3)[0] * ((uint64_t *)&b0)[0];
-  t[1] = (__uint128_t)((uint64_t *)&a3)[1] * ((uint64_t *)&b0)[1];
-  t[2] = (__uint128_t)((uint64_t *)&a3)[2] * ((uint64_t *)&b0)[2];
-  t[3] = (__uint128_t)((uint64_t *)&a3)[3] * ((uint64_t *)&b0)[3];
-  t[4] = (__uint128_t)((uint64_t *)&a3)[4] * ((uint64_t *)&b0)[4];
-  t[5] = (__uint128_t)((uint64_t *)&a3)[5] * ((uint64_t *)&b0)[5];
-  t[6] = (__uint128_t)((uint64_t *)&a3)[6] * ((uint64_t *)&b0)[6];
-  t[7] = (__uint128_t)((uint64_t *)&a3)[7] * ((uint64_t *)&b0)[7];
-
-  ((uint64_t *)&z3)[0] += (uint64_t)t[0] & IFMAMASK;
-  ((uint64_t *)&z3)[1] += (uint64_t)t[1] & IFMAMASK;
-  ((uint64_t *)&z3)[2] += (uint64_t)t[2] & IFMAMASK;
-  ((uint64_t *)&z3)[3] += (uint64_t)t[3] & IFMAMASK;
-  ((uint64_t *)&z3)[4] += (uint64_t)t[4] & IFMAMASK;
-  ((uint64_t *)&z3)[5] += (uint64_t)t[5] & IFMAMASK;
-  ((uint64_t *)&z3)[6] += (uint64_t)t[6] & IFMAMASK;
-  ((uint64_t *)&z3)[7] += (uint64_t)t[7] & IFMAMASK;
-
-  ((uint64_t *)&y3)[0] += (uint64_t)(t[0] >> 52);
-  ((uint64_t *)&y3)[1] += (uint64_t)(t[1] >> 52);
-  ((uint64_t *)&y3)[2] += (uint64_t)(t[2] >> 52);
-  ((uint64_t *)&y3)[3] += (uint64_t)(t[3] >> 52);
-  ((uint64_t *)&y3)[4] += (uint64_t)(t[4] >> 52);
-  ((uint64_t *)&y3)[5] += (uint64_t)(t[5] >> 52);
-  ((uint64_t *)&y3)[6] += (uint64_t)(t[6] >> 52);
-  ((uint64_t *)&y3)[7] += (uint64_t)(t[7] >> 52);
-
-#endif
   y3 = VSHL(y3, BALIGN);
 
   z4 = VMACLO(y3, a1, b3); z4 = VMACLO(z4, a2, b2); z4 = VMACLO(z4, a3, b1);
