@@ -5,6 +5,14 @@
 #include "point.h"
 #include "consts.h"
 
+
+// use Fp12 compressed cyclotomic squaring or not  
+#ifdef PROFILING
+#define COMPRESSED_CYCLOTOMIC_SQR 0
+#else
+#define COMPRESSED_CYCLOTOMIC_SQR 1
+#endif
+
 void miller_loop_n(vec384fp12 ret, const POINTonE2_affine Q[],
                                    const POINTonE1_affine P[], size_t n);
                                    
