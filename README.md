@@ -25,12 +25,11 @@ BLS12-381.
   make
   ```
 
-- Execute test, benchmark, and profiling: 
+- Execute test and benchmark: 
 
   ```sh
   ./bin/test
   ./bin/bench
-  ./bin/profiling
   ```
 
 <!--- ==================================================================== --->
