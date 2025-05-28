@@ -263,7 +263,7 @@ void test_timing_fp()
   __m512i a_8x1w[NWORDS], b_8x1w[NWORDS], r_8x1w[NWORDS], z_8x1w[2*NWORDS];
   __m512i a_4x2w[VWORDS], b_4x2w[VWORDS], r_4x2w[VWORDS], z_4x2w[3*VWORDS];
   vec768 s;
-  vec384 c, d;
+  vec384 c = {TV_A}, d = {TV_B};
   uint64_t start_cycles, end_cycles, diff_cycles;
   int i;
 
@@ -360,6 +360,11 @@ void test_timing_fp()
   printf("- mul_fpx2_4x2w_v1:     ");
   LOAD_CACHE(mul_fpx2_4x2w_v1(z_4x2w, a_4x2w, b_4x2w), 10000);
   MEASURE_CYCLES(mul_fpx2_4x2w_v1(z_4x2w, a_4x2w, b_4x2w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- mul_fpx2_4x2w_hybrid_v1: ");
+  LOAD_CACHE(mul_fpx2_4x2w_hybrid_v1(z_4x2w, s, a_4x2w, b_4x2w, c, d), 10000);
+  MEASURE_CYCLES(mul_fpx2_4x2w_hybrid_v1(z_4x2w, s, a_4x2w, b_4x2w, c, d), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
   printf("- redc_fpx2_8x1w:       ");
