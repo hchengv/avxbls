@@ -262,6 +262,8 @@ void test_timing_fp()
   uint64_t a48[NWORDS], b48[NWORDS], r48[NWORDS], z48[2*NWORDS];
   __m512i a_8x1w[NWORDS], b_8x1w[NWORDS], r_8x1w[NWORDS], z_8x1w[2*NWORDS];
   __m512i a_4x2w[VWORDS], b_4x2w[VWORDS], r_4x2w[VWORDS], z_4x2w[3*VWORDS];
+  vec768 s;
+  vec384 c, d;
   uint64_t start_cycles, end_cycles, diff_cycles;
   int i;
 
@@ -335,9 +337,14 @@ void test_timing_fp()
   MEASURE_CYCLES(mul_fpx2_8x1w_v2(z_8x1w, a_8x1w, b_8x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
-  printf("- mul_fpx2_8x1w_hybrid: ");
-  LOAD_CACHE(mul_fpx2_8x1w_hybrid(z_8x1w, a_8x1w, b_8x1w), 10000);
-  MEASURE_CYCLES(mul_fpx2_8x1w_hybrid(z_8x1w, a_8x1w, b_8x1w), 100000);
+  printf("- mul_fpx2_8x1w_hybrid_v0: ");
+  LOAD_CACHE(mul_fpx2_8x1w_hybrid_v0(z_8x1w, a_8x1w, b_8x1w), 10000);
+  MEASURE_CYCLES(mul_fpx2_8x1w_hybrid_v0(z_8x1w, a_8x1w, b_8x1w), 100000);
+  printf("#cycle = %ld\n", diff_cycles);
+
+  printf("- mul_fpx2_8x1w_hybrid_v1: ");
+  LOAD_CACHE(mul_fpx2_8x1w_hybrid_v1(z_8x1w, s, a_8x1w, b_8x1w, c, d), 10000);
+  MEASURE_CYCLES(mul_fpx2_8x1w_hybrid_v1(z_8x1w, s, a_8x1w, b_8x1w, c, d), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
   printf("- mul_fpx2_8x1w_v3:     ");

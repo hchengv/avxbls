@@ -32,7 +32,7 @@ typedef limb_t bool_t;
 /*
  * Assembly subroutines...
  */
- # define sqr_n_mul_mont_383 sqrx_n_mul_mont_383
+# define sqr_n_mul_mont_383 sqrx_n_mul_mont_383
 # define mul_mont_384 mulx_mont_384
 # define sqr_mont_384 sqrx_mont_384
 # define mul_384 mulx_384
