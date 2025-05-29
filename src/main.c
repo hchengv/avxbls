@@ -373,8 +373,8 @@ void test_timing_fp()
   printf("#cycle = %ld\n", diff_cycles);
 
   printf("- mul_fpx2_4x2w_hybrid_v2: ");
-  LOAD_CACHE(mul_fpx2_4x2w_hybrid_v2(z_4x2w, s, w, a_4x2w, b_4x2w, c, d, h, g), 10000);
-  MEASURE_CYCLES(mul_fpx2_4x2w_hybrid_v2(z_4x2w, s, w, a_4x2w, b_4x2w, c, d, h, g), 100000);
+  LOAD_CACHE(mul_fpx2_4x2w_hybrid_v2(z_4x2w, s, w, a_4x2w, b_4x2w, c, d, u, v), 10000);
+  MEASURE_CYCLES(mul_fpx2_4x2w_hybrid_v2(z_4x2w, s, w, a_4x2w, b_4x2w, c, d, u, v), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
   printf("- redc_fpx2_8x1w:       ");
