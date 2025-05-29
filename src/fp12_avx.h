@@ -78,7 +78,10 @@ void redc_fpx2_4x2w(fp_4x2w r, const fpx2_4x2w a);
 
 void mul_fpx2_8x1w_hybrid_v0(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b);
 void mul_fpx2_8x1w_hybrid_v1(fpx2_8x1w r, uint64_t *s, const fp_8x1w a, const fp_8x1w b, const uint64_t *c, const uint64_t *d);
-void mul_fpx2_4x2w_hybrid_v1(fpx2_4x2w r, uint64_t *s, const fp_4x2w a, const fp_4x2w b, uint64_t *c, uint64_t *d);
+void mul_fpx2_8x1w_hybrid_v2(fpx2_8x1w r, uint64_t *s, uint64_t *w, const fp_8x1w a, const fp_8x1w b, const uint64_t *c, const uint64_t *d, const uint64_t *u, const uint64_t *v);
+void mul_fpx2_4x2w_hybrid_v1(fpx2_4x2w r, uint64_t *s, const fp_4x2w a, const fp_4x2w b, const uint64_t *c, const uint64_t *d);
+void mul_fpx2_4x2w_hybrid_v2(fpx2_4x2w r, uint64_t *s, uint64_t *w, const fp_4x2w a, const fp_4x2w b, const uint64_t *c, const uint64_t *d, const uint64_t *u, const uint64_t *v);
+
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp2 single-length operations
