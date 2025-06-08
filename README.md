@@ -1,12 +1,12 @@
-# avxbls: an AVX-512 implementation of optimal ate pairing on BLS12-381
+# AVXBLS: fast AVX-512 implementation of the optimal ate pairing on BLS12-381
 
 <!--- ==================================================================== --->
 
 ## Overview 
 
-AVXBLS is based on [BLST](https://github.com/supranational/blst) and provides a
-latency-optimized AVX-512 implementation of the optimal ate pairing on
-BLS12-381. 
+AVXBLS is a software library containing a latency-optimized AVX-512
+implementation of the optimal ate pairing on BLS12-381 curve, and is based on
+the widely-used [BLST](https://github.com/supranational/blst) library.
 
 <!--- ==================================================================== --->
 

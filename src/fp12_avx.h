@@ -82,7 +82,6 @@ void mul_fpx2_8x1w_hybrid_v2(fpx2_8x1w r, uint64_t *s, uint64_t *w, const fp_8x1
 void mul_fpx2_4x2w_hybrid_v1(fpx2_4x2w r, uint64_t *s, const fp_4x2w a, const fp_4x2w b, const uint64_t *c, const uint64_t *d);
 void mul_fpx2_4x2w_hybrid_v2(fpx2_4x2w r, uint64_t *s, uint64_t *w, const fp_4x2w a, const fp_4x2w b, const uint64_t *c, const uint64_t *d, const uint64_t *u, const uint64_t *v);
 
-
 // ----------------------------------------------------------------------------
 // prototypes: Fp2 single-length operations
 
@@ -209,7 +208,6 @@ static void blend_0x33(__m512i *r, const __m512i *a, const __m512i *b)
   r[0] = r0; r[1] = r1; r[2] = r2; r[3] = r3;
   r[4] = r4; r[5] = r5; r[6] = r6; r[7] = r7;
 }
-
 
 // a = < H | G | F | E | D | C | B | A >
 // b = < P | O | N | M | L | K | J | I >
@@ -470,4 +468,3 @@ static void get_channel_4x2w(uint64_t *r, const __m512i *a, const int ch)
 // ----------------------------------------------------------------------------
 
 #endif
-
