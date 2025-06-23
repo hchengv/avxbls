@@ -337,6 +337,7 @@ void test_timing_fp()
   MEASURE_CYCLES(mul_fpx2_8x1w_v2(z_8x1w, a_8x1w, b_8x1w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
+#if 0
   printf("- mul_fpx2_8x1w_hybrid_v0: ");
   LOAD_CACHE(mul_fpx2_8x1w_hybrid_v0(z_8x1w, a_8x1w, b_8x1w), 10000);
   MEASURE_CYCLES(mul_fpx2_8x1w_hybrid_v0(z_8x1w, a_8x1w, b_8x1w), 100000);
@@ -351,6 +352,7 @@ void test_timing_fp()
   LOAD_CACHE(mul_fpx2_8x1w_hybrid_v2(z_8x1w, s, w, a_8x1w, b_8x1w, c, d, u, v), 10000);
   MEASURE_CYCLES(mul_fpx2_8x1w_hybrid_v2(z_8x1w, s, w, a_8x1w, b_8x1w, c, d, u, v), 100000);
   printf("#cycle = %ld\n", diff_cycles);
+#endif
 
   printf("- mul_fpx2_8x1w_v3:     ");
   LOAD_CACHE(mul_fpx2_8x1w_v3(z_8x1w, a_8x1w, b_8x1w), 10000);
@@ -367,6 +369,7 @@ void test_timing_fp()
   MEASURE_CYCLES(mul_fpx2_4x2w_v1(z_4x2w, a_4x2w, b_4x2w), 100000);
   printf("#cycle = %ld\n", diff_cycles);
 
+#if 0
   printf("- mul_fpx2_4x2w_hybrid_v1: ");
   LOAD_CACHE(mul_fpx2_4x2w_hybrid_v1(z_4x2w, s, a_4x2w, b_4x2w, c, d), 10000);
   MEASURE_CYCLES(mul_fpx2_4x2w_hybrid_v1(z_4x2w, s, a_4x2w, b_4x2w, c, d), 100000);
@@ -376,6 +379,7 @@ void test_timing_fp()
   LOAD_CACHE(mul_fpx2_4x2w_hybrid_v2(z_4x2w, s, w, a_4x2w, b_4x2w, c, d, u, v), 10000);
   MEASURE_CYCLES(mul_fpx2_4x2w_hybrid_v2(z_4x2w, s, w, a_4x2w, b_4x2w, c, d, u, v), 100000);
   printf("#cycle = %ld\n", diff_cycles);
+#endif
 
   printf("- redc_fpx2_8x1w:       ");
   LOAD_CACHE(redc_fpx2_8x1w(r_8x1w, z_8x1w), 10000);

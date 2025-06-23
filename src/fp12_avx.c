@@ -5397,6 +5397,7 @@ void line_by_Px2_2x2x2w(fp2_2x2x2w r, const fp2_2x2x2w a, const fp2_2x2x2w Px2)
 
 // ----------------------------------------------------------------------------
 
+#if 0
 #define IFMAMASK  0xFFFFFFFFFFFFFULL
 
 // Karatsuba (excl. carry prop.)
@@ -6467,5 +6468,6 @@ void mul_fpx2_4x2w_hybrid_v2(fpx2_4x2w r, uint64_t *s, uint64_t *w, const fp_4x2
   w[6 ] = x6 ; w[7 ] = x7 ; w[8 ] = x8 ; 
   w[9 ] = x9 ; w[10] = x10; w[11] = x11;
 }
+#endif
 
 // ----------------------------------------------------------------------------
