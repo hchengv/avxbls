@@ -10,7 +10,7 @@
 #ifdef PROFILING
 #define COMPRESSED_CYCLOTOMIC_SQR 0
 #else
-#define COMPRESSED_CYCLOTOMIC_SQR 1
+#define COMPRESSED_CYCLOTOMIC_SQR 0
 #endif
 
 void miller_loop_n(vec384fp12 ret, const POINTonE2_affine Q[],
