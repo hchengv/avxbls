@@ -15,7 +15,7 @@ the widely-used [BLST](https://github.com/supranational/blst) library.
 - Clone the repo:
 
   ```sh
-  git clone https://github.com/ulhaocheng/avxbls ./avxbls
+  git clone https://github.com/hchengv/avxbls ./avxbls
   cd ./avxbls
   ```
 
