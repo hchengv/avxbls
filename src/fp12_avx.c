@@ -2713,24 +2713,6 @@ void mul_fpx2_8x1w_v4(fpx2_8x1w r, const fp_8x1w a, const fp_8x1w b)
 
   z15 = y14;
 
-  // carry propagation 
-  z1  = VADD(z1,  VSRA(z0,  BRADIX)); z0  = VAND(z0,  bmask);
-  z2  = VADD(z2,  VSRA(z1,  BRADIX)); z1  = VAND(z1,  bmask);
-  z3  = VADD(z3,  VSRA(z2,  BRADIX)); z2  = VAND(z2,  bmask);
-  z4  = VADD(z4,  VSRA(z3,  BRADIX)); z3  = VAND(z3,  bmask);
-  z5  = VADD(z5,  VSRA(z4,  BRADIX)); z4  = VAND(z4,  bmask);
-  z6  = VADD(z6,  VSRA(z5,  BRADIX)); z5  = VAND(z5,  bmask);
-  z7  = VADD(z7,  VSRA(z6,  BRADIX)); z6  = VAND(z6,  bmask);
-  z8  = VADD(z8,  VSRA(z7,  BRADIX)); z7  = VAND(z7,  bmask);
-  z9  = VADD(z9,  VSRA(z8,  BRADIX)); z8  = VAND(z8,  bmask);
-  z10 = VADD(z10, VSRA(z9,  BRADIX)); z9  = VAND(z9,  bmask);
-  z11 = VADD(z11, VSRA(z10, BRADIX)); z10 = VAND(z10, bmask);
-  z12 = VADD(z12, VSRA(z11, BRADIX)); z11 = VAND(z11, bmask);
-  z13 = VADD(z13, VSRA(z12, BRADIX)); z12 = VAND(z12, bmask);
-  z14 = VADD(z14, VSRA(z13, BRADIX)); z13 = VAND(z13, bmask);
-  z15 = VADD(z15, VSRA(z14, BRADIX)); z14 = VAND(z14, bmask);
-
-
   r[0 ] = z0 ; r[1 ] = z1 ; r[2 ] = z2 ; r[3 ] = z3 ;
   r[4 ] = z4 ; r[5 ] = z5 ; r[6 ] = z6 ; r[7 ] = z7 ;
   r[8 ] = z8 ; r[9 ] = z9 ; r[10] = z10; r[11] = z11;
