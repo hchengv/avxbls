@@ -33,18 +33,24 @@ typedef __m512i   fpx2_4x2w[3*VWORDS];
 
 // ----------------------------------------------------------------------------
 
-#define ADCX(R, A)   __asm__ volatile (\
-    "adcx %[a], %[res]"                \
-    : [res] "+r" (R)                   \
-    : [a] "r" (A)                      \
-    : "cc"                             \
+#define ADCX(R, A)   __asm__ volatile (     \
+    "adcx %[a], %[res]"                     \
+    : [res] "+r" (R)                        \
+    : [a] "r" (A)                           \
+    : "cc"                                  \
   );
 
-#define ADOX(R, A)   __asm__ volatile (\
-    "adox %[a], %[res]"                \
-    : [res] "+r" (R)                   \
-    : [a] "r" (A)                      \
-    : "cc"                             \
+#define ADOX(R, A)   __asm__ volatile (     \
+    "adox %[a], %[res]"                     \
+    : [res] "+r" (R)                        \
+    : [a] "r" (A)                           \
+    : "cc"                                  \
+  );
+
+#define MULX(L, H, A, B) __asm__ volatile ( \
+    "mulx %[b], %[l], %[h]"                 \
+    : [h] "=r" (H), [l] "=r" (L)            \
+    : [b] "rm" (B), "d" (A)                 \
   );
 
 // ----------------------------------------------------------------------------
@@ -254,13 +260,13 @@ void mul_fpx2_8x1w_hybrid_v1(fpx2_8x1w r, uint64_t *s, const fp_8x1w a, const fp
     :::"eax","cc"
   );
 
-  x0 = _mulx_u64(c0, d0, (long long unsigned int *)&x1);
-  t0 = _mulx_u64(c1, d0, (long long unsigned int *)&x2); ADCX(x1, t0);
-  t0 = _mulx_u64(c2, d0, (long long unsigned int *)&x3); ADCX(x2, t0);
-  t0 = _mulx_u64(c3, d0, (long long unsigned int *)&x4); ADCX(x3, t0);
-  t0 = _mulx_u64(c4, d0, (long long unsigned int *)&x5); ADCX(x4, t0);
-  t0 = _mulx_u64(c5, d0, (long long unsigned int *)&x6); ADCX(x5, t0);
-                               ADCX(x6, zero);
+  MULX(x0, x1, c0, d0);
+  MULX(t0, x2, c1, d0); ADCX(x1, t0);
+  MULX(t0, x3, c2, d0); ADCX(x2, t0);
+  MULX(t0, x4, c3, d0); ADCX(x3, t0);
+  MULX(t0, x5, c4, d0); ADCX(x4, t0);
+  MULX(t0, x6, c5, d0); ADCX(x5, t0);
+                        ADCX(x6, zero);
 
   z1 = VMACLO(y0, a0, b1); z1 = VMACLO(z1, a1, b0);
   y1 = VMACHI(y1, a0, b1); y1 = VMACHI(y1, a1, b0);
@@ -270,13 +276,13 @@ void mul_fpx2_8x1w_hybrid_v1(fpx2_8x1w r, uint64_t *s, const fp_8x1w a, const fp
   y2 = VMACHI(y2, a0, b2); y2 = VMACHI(y2, a1, b1); y2 = VMACHI(y2, a2, b0);
   y2 = VSHL(y2, BALIGN);
 
-  t0 = _mulx_u64(c0, d1, (long long unsigned int *)&t1); ADCX(x1, t0); ADOX(x2, t1);
-  t0 = _mulx_u64(c1, d1, (long long unsigned int *)&t1); ADCX(x2, t0); ADOX(x3, t1);
-  t0 = _mulx_u64(c2, d1, (long long unsigned int *)&t1); ADCX(x3, t0); ADOX(x4, t1);
-  t0 = _mulx_u64(c3, d1, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c4, d1, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c5, d1, (long long unsigned int *)&x7); ADCX(x6, t0); ADOX(x7, zero);
-                               ADCX(x7, zero);
+  MULX(t0, t1, c0, d1); ADCX(x1, t0); ADOX(x2, t1);
+  MULX(t0, t1, c1, d1); ADCX(x2, t0); ADOX(x3, t1);
+  MULX(t0, t1, c2, d1); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c3, d1); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c4, d1); ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, x7, c5, d1); ADCX(x6, t0); ADOX(x7, zero);
+                        ADCX(x7, zero);
 
   z3 = VMACLO(y2, a0, b3); z3 = VMACLO(z3, a1, b2); z3 = VMACLO(z3, a2, b1); 
   z3 = VMACLO(z3, a3, b0);
@@ -288,13 +294,13 @@ void mul_fpx2_8x1w_hybrid_v1(fpx2_8x1w r, uint64_t *s, const fp_8x1w a, const fp
   y4 = VMACHI(y4, a1, b3); y4 = VMACHI(y4, a2, b2); y4 = VMACHI(y4, a3, b1);
   y4 = VSHL(y4, BALIGN);
 
-  t0 = _mulx_u64(c0, d2, (long long unsigned int *)&t1); ADCX(x2, t0); ADOX(x3, t1);
-  t0 = _mulx_u64(c1, d2, (long long unsigned int *)&t1); ADCX(x3, t0); ADOX(x4, t1);
-  t0 = _mulx_u64(c2, d2, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c3, d2, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c4, d2, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c5, d2, (long long unsigned int *)&x8); ADCX(x7, t0); ADOX(x8, zero);
-                               ADCX(x8, zero);
+  MULX(t0, t1, c0, d2); ADCX(x2, t0); ADOX(x3, t1);
+  MULX(t0, t1, c1, d2); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c2, d2); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c3, d2); ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, t1, c4, d2); ADCX(x6, t0); ADOX(x7, t1);
+  MULX(t0, x8, c5, d2); ADCX(x7, t0); ADOX(x8, zero);
+                        ADCX(x8, zero);
 
   z5 = VMACLO(y4, a2, b3); z5 = VMACLO(z5, a3, b2);
   y5 = VMACHI(y5, a2, b3); y5 = VMACHI(y5, a3, b2);
@@ -312,13 +318,13 @@ void mul_fpx2_8x1w_hybrid_v1(fpx2_8x1w r, uint64_t *s, const fp_8x1w a, const fp
   y8 = VMACHI(y8, a4, b4);
   y8 = VSHL(y8, BALIGN);
 
-  t0 = _mulx_u64(c0, d3, (long long unsigned int *)&t1); ADCX(x3, t0); ADOX(x4, t1);
-  t0 = _mulx_u64(c1, d3, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c2, d3, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c3, d3, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c4, d3, (long long unsigned int *)&t1); ADCX(x7, t0); ADOX(x8, t1);
-  t0 = _mulx_u64(c5, d3, (long long unsigned int *)&x9); ADCX(x8, t0); ADOX(x9, zero);
-                               ADCX(x9, zero);
+  MULX(t0, t1, c0, d3); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c1, d3); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c2, d3); ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, t1, c3, d3); ADCX(x6, t0); ADOX(x7, t1);
+  MULX(t0, t1, c4, d3); ADCX(x7, t0); ADOX(x8, t1);
+  MULX(t0, x9, c5, d3); ADCX(x8, t0); ADOX(x9, zero);
+                        ADCX(x9, zero);
 
   z9 = VMACLO(y8, a4, b5); z9 = VMACLO(z9, a5, b4);
   y9 = VMACHI(y9, a4, b5); y9 = VMACHI(y9, a5, b4);
@@ -330,13 +336,13 @@ void mul_fpx2_8x1w_hybrid_v1(fpx2_8x1w r, uint64_t *s, const fp_8x1w a, const fp
   y10 = VMACHI(y10, a6, b4);
   y10 = VSHL(y10, BALIGN);
 
-  t0 = _mulx_u64(c0, d4, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c1, d4, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c2, d4, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c3, d4, (long long unsigned int *)&t1); ADCX(x7, t0); ADOX(x8, t1);
-  t0 = _mulx_u64(c4, d4, (long long unsigned int *)&t1); ADCX(x8, t0); ADOX(x9, t1);
-  t0 = _mulx_u64(c5, d4, (long long unsigned int *)&x10); ADCX(x9, t0); ADOX(x10, zero);
-                                ADCX(x10, zero);
+  MULX(t0, t1, c0, d4);  ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c1, d4);  ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, t1, c2, d4);  ADCX(x6, t0); ADOX(x7, t1);
+  MULX(t0, t1, c3, d4);  ADCX(x7, t0); ADOX(x8, t1);
+  MULX(t0, t1, c4, d4);  ADCX(x8, t0); ADOX(x9, t1);
+  MULX(t0, x10, c5, d4); ADCX(x9, t0); ADOX(x10, zero);
+                         ADCX(x10, zero);
 
   z11 = VMACLO(y10, a4, b7); z11 = VMACLO(z11, a5, b6);
   z11 = VMACLO(z11, a6, b5); z11 = VMACLO(z11, a7, b4);
@@ -350,13 +356,13 @@ void mul_fpx2_8x1w_hybrid_v1(fpx2_8x1w r, uint64_t *s, const fp_8x1w a, const fp
   y12 = VMACHI(y12, a7, b5);
   y12 = VSHL(y12, BALIGN);
 
-  t0 = _mulx_u64(c0, d5, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c1, d5, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c2, d5, (long long unsigned int *)&t1); ADCX(x7, t0); ADOX(x8, t1);
-  t0 = _mulx_u64(c3, d5, (long long unsigned int *)&t1); ADCX(x8, t0); ADOX(x9, t1);
-  t0 = _mulx_u64(c4, d5, (long long unsigned int *)&t1); ADCX(x9, t0); ADOX(x10, t1);
-  t0 = _mulx_u64(c5, d5, (long long unsigned int *)&x11); ADCX(x10, t0); ADOX(x11, zero);
-                                ADCX(x11, zero);
+  MULX(t0, t1, c0, d5);  ADCX(x5, t0);  ADOX(x6, t1);
+  MULX(t0, t1, c1, d5);  ADCX(x6, t0);  ADOX(x7, t1);
+  MULX(t0, t1, c2, d5);  ADCX(x7, t0);  ADOX(x8, t1);
+  MULX(t0, t1, c3, d5);  ADCX(x8, t0);  ADOX(x9, t1);
+  MULX(t0, t1, c4, d5);  ADCX(x9, t0);  ADOX(x10, t1);
+  MULX(t0, x11, c5, d5); ADCX(x10, t0); ADOX(x11, zero);
+                         ADCX(x11, zero);
 
   z13 = VMACLO(y12, a6, b7); z13 = VMACLO(z13, a7, b6);
   y13 = VMACHI(y13, a6, b7); y13 = VMACHI(y13, a7, b6);
@@ -482,13 +488,13 @@ void mul_fpx2_8x1w_hybrid_v2(fpx2_8x1w r, uint64_t *s, uint64_t *w, const fp_8x1
     :::"eax","cc"
   );
 
-  x0 = _mulx_u64(c0, d0, (long long unsigned int *)&x1);
-  t0 = _mulx_u64(c1, d0, (long long unsigned int *)&x2); ADCX(x1, t0);
-  t0 = _mulx_u64(c2, d0, (long long unsigned int *)&x3); ADCX(x2, t0);
-  t0 = _mulx_u64(c3, d0, (long long unsigned int *)&x4); ADCX(x3, t0);
-  t0 = _mulx_u64(c4, d0, (long long unsigned int *)&x5); ADCX(x4, t0);
-  t0 = _mulx_u64(c5, d0, (long long unsigned int *)&x6); ADCX(x5, t0);
-                               ADCX(x6, zero);
+  MULX(x0, x1, c0, d0);
+  MULX(t0, x2, c1, d0); ADCX(x1, t0);
+  MULX(t0, x3, c2, d0); ADCX(x2, t0);
+  MULX(t0, x4, c3, d0); ADCX(x3, t0);
+  MULX(t0, x5, c4, d0); ADCX(x4, t0);
+  MULX(t0, x6, c5, d0); ADCX(x5, t0);
+                        ADCX(x6, zero);
 
   z1 = VMACLO(y0, a0, b1); z1 = VMACLO(z1, a1, b0);
   y1 = VMACHI(y1, a0, b1); y1 = VMACHI(y1, a1, b0);
@@ -498,13 +504,13 @@ void mul_fpx2_8x1w_hybrid_v2(fpx2_8x1w r, uint64_t *s, uint64_t *w, const fp_8x1
   y2 = VMACHI(y2, a0, b2); y2 = VMACHI(y2, a1, b1); y2 = VMACHI(y2, a2, b0);
   y2 = VSHL(y2, BALIGN);
 
-  t0 = _mulx_u64(c0, d1, (long long unsigned int *)&t1); ADCX(x1, t0); ADOX(x2, t1);
-  t0 = _mulx_u64(c1, d1, (long long unsigned int *)&t1); ADCX(x2, t0); ADOX(x3, t1);
-  t0 = _mulx_u64(c2, d1, (long long unsigned int *)&t1); ADCX(x3, t0); ADOX(x4, t1);
-  t0 = _mulx_u64(c3, d1, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c4, d1, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c5, d1, (long long unsigned int *)&x7); ADCX(x6, t0); ADOX(x7, zero);
-                               ADCX(x7, zero);
+  MULX(t0, t1, c0, d1); ADCX(x1, t0); ADOX(x2, t1);
+  MULX(t0, t1, c1, d1); ADCX(x2, t0); ADOX(x3, t1);
+  MULX(t0, t1, c2, d1); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c3, d1); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c4, d1); ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, x7, c5, d1); ADCX(x6, t0); ADOX(x7, zero);
+                        ADCX(x7, zero);
 
   z3 = VMACLO(y2, a0, b3); z3 = VMACLO(z3, a1, b2); z3 = VMACLO(z3, a2, b1); 
   z3 = VMACLO(z3, a3, b0);
@@ -516,13 +522,13 @@ void mul_fpx2_8x1w_hybrid_v2(fpx2_8x1w r, uint64_t *s, uint64_t *w, const fp_8x1
   y4 = VMACHI(y4, a1, b3); y4 = VMACHI(y4, a2, b2); y4 = VMACHI(y4, a3, b1);
   y4 = VSHL(y4, BALIGN);
 
-  t0 = _mulx_u64(c0, d2, (long long unsigned int *)&t1); ADCX(x2, t0); ADOX(x3, t1);
-  t0 = _mulx_u64(c1, d2, (long long unsigned int *)&t1); ADCX(x3, t0); ADOX(x4, t1);
-  t0 = _mulx_u64(c2, d2, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c3, d2, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c4, d2, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c5, d2, (long long unsigned int *)&x8); ADCX(x7, t0); ADOX(x8, zero);
-                               ADCX(x8, zero);
+  MULX(t0, t1, c0, d2); ADCX(x2, t0); ADOX(x3, t1);
+  MULX(t0, t1, c1, d2); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c2, d2); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c3, d2); ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, t1, c4, d2); ADCX(x6, t0); ADOX(x7, t1);
+  MULX(t0, x8, c5, d2); ADCX(x7, t0); ADOX(x8, zero);
+                        ADCX(x8, zero);
 
   z5 = VMACLO(y4, a2, b3); z5 = VMACLO(z5, a3, b2);
   y5 = VMACHI(y5, a2, b3); y5 = VMACHI(y5, a3, b2);
@@ -540,13 +546,13 @@ void mul_fpx2_8x1w_hybrid_v2(fpx2_8x1w r, uint64_t *s, uint64_t *w, const fp_8x1
   y8 = VMACHI(y8, a4, b4);
   y8 = VSHL(y8, BALIGN);
 
-  t0 = _mulx_u64(c0, d3, (long long unsigned int *)&t1); ADCX(x3, t0); ADOX(x4, t1);
-  t0 = _mulx_u64(c1, d3, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c2, d3, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c3, d3, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c4, d3, (long long unsigned int *)&t1); ADCX(x7, t0); ADOX(x8, t1);
-  t0 = _mulx_u64(c5, d3, (long long unsigned int *)&x9); ADCX(x8, t0); ADOX(x9, zero);
-                               ADCX(x9, zero);
+  MULX(t0, t1, c0, d3); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c1, d3); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c2, d3); ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, t1, c3, d3); ADCX(x6, t0); ADOX(x7, t1);
+  MULX(t0, t1, c4, d3); ADCX(x7, t0); ADOX(x8, t1);
+  MULX(t0, x9, c5, d3); ADCX(x8, t0); ADOX(x9, zero);
+                        ADCX(x9, zero);
 
   z9 = VMACLO(y8, a4, b5); z9 = VMACLO(z9, a5, b4);
   y9 = VMACHI(y9, a4, b5); y9 = VMACHI(y9, a5, b4);
@@ -558,13 +564,13 @@ void mul_fpx2_8x1w_hybrid_v2(fpx2_8x1w r, uint64_t *s, uint64_t *w, const fp_8x1
   y10 = VMACHI(y10, a6, b4);
   y10 = VSHL(y10, BALIGN);
 
-  t0 = _mulx_u64(c0, d4, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c1, d4, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c2, d4, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c3, d4, (long long unsigned int *)&t1); ADCX(x7, t0); ADOX(x8, t1);
-  t0 = _mulx_u64(c4, d4, (long long unsigned int *)&t1); ADCX(x8, t0); ADOX(x9, t1);
-  t0 = _mulx_u64(c5, d4, (long long unsigned int *)&x10); ADCX(x9, t0); ADOX(x10, zero);
-                                ADCX(x10, zero);
+  MULX(t0, t1, c0, d4);  ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c1, d4);  ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, t1, c2, d4);  ADCX(x6, t0); ADOX(x7, t1);
+  MULX(t0, t1, c3, d4);  ADCX(x7, t0); ADOX(x8, t1);
+  MULX(t0, t1, c4, d4);  ADCX(x8, t0); ADOX(x9, t1);
+  MULX(t0, x10, c5, d4); ADCX(x9, t0); ADOX(x10, zero);
+                         ADCX(x10, zero);
 
   z11 = VMACLO(y10, a4, b7); z11 = VMACLO(z11, a5, b6);
   z11 = VMACLO(z11, a6, b5); z11 = VMACLO(z11, a7, b4);
@@ -578,13 +584,13 @@ void mul_fpx2_8x1w_hybrid_v2(fpx2_8x1w r, uint64_t *s, uint64_t *w, const fp_8x1
   y12 = VMACHI(y12, a7, b5);
   y12 = VSHL(y12, BALIGN);
 
-  t0 = _mulx_u64(c0, d5, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c1, d5, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c2, d5, (long long unsigned int *)&t1); ADCX(x7, t0); ADOX(x8, t1);
-  t0 = _mulx_u64(c3, d5, (long long unsigned int *)&t1); ADCX(x8, t0); ADOX(x9, t1);
-  t0 = _mulx_u64(c4, d5, (long long unsigned int *)&t1); ADCX(x9, t0); ADOX(x10, t1);
-  t0 = _mulx_u64(c5, d5, (long long unsigned int *)&x11); ADCX(x10, t0); ADOX(x11, zero);
-                                ADCX(x11, zero);
+  MULX(t0, t1, c0, d5);  ADCX(x5, t0);  ADOX(x6, t1);
+  MULX(t0, t1, c1, d5);  ADCX(x6, t0);  ADOX(x7, t1);
+  MULX(t0, t1, c2, d5);  ADCX(x7, t0);  ADOX(x8, t1);
+  MULX(t0, t1, c3, d5);  ADCX(x8, t0);  ADOX(x9, t1);
+  MULX(t0, t1, c4, d5);  ADCX(x9, t0);  ADOX(x10, t1);
+  MULX(t0, x11, c5, d5); ADCX(x10, t0); ADOX(x11, zero);
+                         ADCX(x11, zero);
 
   s[0 ] = x0 ; s[1 ] = x1 ; s[2 ] = x2 ; 
   s[3 ] = x3 ; s[4 ] = x4 ; s[5 ] = x5 ; 
@@ -611,13 +617,13 @@ void mul_fpx2_8x1w_hybrid_v2(fpx2_8x1w r, uint64_t *s, uint64_t *w, const fp_8x1
     :::"eax","cc"
   );
 
-  x0 = _mulx_u64(c0, d0, (long long unsigned int *)&x1);
-  t0 = _mulx_u64(c1, d0, (long long unsigned int *)&x2); ADCX(x1, t0);
-  t0 = _mulx_u64(c2, d0, (long long unsigned int *)&x3); ADCX(x2, t0);
-  t0 = _mulx_u64(c3, d0, (long long unsigned int *)&x4); ADCX(x3, t0);
-  t0 = _mulx_u64(c4, d0, (long long unsigned int *)&x5); ADCX(x4, t0);
-  t0 = _mulx_u64(c5, d0, (long long unsigned int *)&x6); ADCX(x5, t0);
-                               ADCX(x6, zero);
+  MULX(x0, x1, c0, d0);
+  MULX(t0, x2, c1, d0); ADCX(x1, t0);
+  MULX(t0, x3, c2, d0); ADCX(x2, t0);
+  MULX(t0, x4, c3, d0); ADCX(x3, t0);
+  MULX(t0, x5, c4, d0); ADCX(x4, t0);
+  MULX(t0, x6, c5, d0); ADCX(x5, t0);
+                        ADCX(x6, zero);
 
   // ta(ta0-ta3) = aL(a0-a3) + aH(a4-a7)
   ta0 = VADD(a0, a4); ta1 = VADD(a1, a5);
@@ -627,13 +633,13 @@ void mul_fpx2_8x1w_hybrid_v2(fpx2_8x1w r, uint64_t *s, uint64_t *w, const fp_8x1
   tb0 = VADD(b0, b4); tb1 = VADD(b1, b5); 
   tb2 = VADD(b2, b6); tb3 = VADD(b3, b7);
 
-  t0 = _mulx_u64(c0, d1, (long long unsigned int *)&t1); ADCX(x1, t0); ADOX(x2, t1);
-  t0 = _mulx_u64(c1, d1, (long long unsigned int *)&t1); ADCX(x2, t0); ADOX(x3, t1);
-  t0 = _mulx_u64(c2, d1, (long long unsigned int *)&t1); ADCX(x3, t0); ADOX(x4, t1);
-  t0 = _mulx_u64(c3, d1, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c4, d1, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c5, d1, (long long unsigned int *)&x7); ADCX(x6, t0); ADOX(x7, zero);
-                               ADCX(x7, zero);
+  MULX(t0, t1, c0, d1); ADCX(x1, t0); ADOX(x2, t1);
+  MULX(t0, t1, c1, d1); ADCX(x2, t0); ADOX(x3, t1);
+  MULX(t0, t1, c2, d1); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c3, d1); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c4, d1); ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, x7, c5, d1); ADCX(x6, t0); ADOX(x7, zero);
+                        ADCX(x7, zero);
 
   // zM = ta * tb - zL - zH 
   
@@ -647,13 +653,13 @@ void mul_fpx2_8x1w_hybrid_v2(fpx2_8x1w r, uint64_t *s, uint64_t *w, const fp_8x1
   y1 = VMACHI(y1, ta0, tb1); y1 = VMACHI(y1, ta1, tb0);
   y1 = VSHL(y1, BALIGN);
 
-  t0 = _mulx_u64(c0, d2, (long long unsigned int *)&t1); ADCX(x2, t0); ADOX(x3, t1);
-  t0 = _mulx_u64(c1, d2, (long long unsigned int *)&t1); ADCX(x3, t0); ADOX(x4, t1);
-  t0 = _mulx_u64(c2, d2, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c3, d2, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c4, d2, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c5, d2, (long long unsigned int *)&x8); ADCX(x7, t0); ADOX(x8, zero);
-                               ADCX(x8, zero);
+  MULX(t0, t1, c0, d2); ADCX(x2, t0); ADOX(x3, t1);
+  MULX(t0, t1, c1, d2); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c2, d2); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c3, d2); ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, t1, c4, d2); ADCX(x6, t0); ADOX(x7, t1);
+  MULX(t0, x8, c5, d2); ADCX(x7, t0); ADOX(x8, zero);
+                        ADCX(x8, zero);
 
   m2 = VMACLO(y1, ta0, tb2); m2 = VMACLO(m2, ta1, tb1); 
   m2 = VMACLO(m2, ta2, tb0);
@@ -667,13 +673,13 @@ void mul_fpx2_8x1w_hybrid_v2(fpx2_8x1w r, uint64_t *s, uint64_t *w, const fp_8x1
   y3 = VMACHI(y3, ta2, tb1); y3 = VMACHI(y3, ta3, tb0);
   y3 = VSHL(y3, BALIGN);
 
-  t0 = _mulx_u64(c0, d3, (long long unsigned int *)&t1); ADCX(x3, t0); ADOX(x4, t1);
-  t0 = _mulx_u64(c1, d3, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c2, d3, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c3, d3, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c4, d3, (long long unsigned int *)&t1); ADCX(x7, t0); ADOX(x8, t1);
-  t0 = _mulx_u64(c5, d3, (long long unsigned int *)&x9); ADCX(x8, t0); ADOX(x9, zero);
-                               ADCX(x9, zero);
+  MULX(t0, t1, c0, d3); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c1, d3); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c2, d3); ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, t1, c3, d3); ADCX(x6, t0); ADOX(x7, t1);
+  MULX(t0, t1, c4, d3); ADCX(x7, t0); ADOX(x8, t1);
+  MULX(t0, x9, c5, d3); ADCX(x8, t0); ADOX(x9, zero);
+                        ADCX(x9, zero);
 
   m4 = VMACLO(y3, ta1, tb3); m4 = VMACLO(m4, ta2, tb2); 
   m4 = VMACLO(m4, ta3, tb1);
@@ -691,26 +697,26 @@ void mul_fpx2_8x1w_hybrid_v2(fpx2_8x1w r, uint64_t *s, uint64_t *w, const fp_8x1
 
   m7 = y6;
 
-  t0 = _mulx_u64(c0, d4, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c1, d4, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c2, d4, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c3, d4, (long long unsigned int *)&t1); ADCX(x7, t0); ADOX(x8, t1);
-  t0 = _mulx_u64(c4, d4, (long long unsigned int *)&t1); ADCX(x8, t0); ADOX(x9, t1);
-  t0 = _mulx_u64(c5, d4, (long long unsigned int *)&x10); ADCX(x9, t0); ADOX(x10, zero);
-                                ADCX(x10, zero);
+  MULX(t0, t1, c0, d4);  ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c1, d4);  ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, t1, c2, d4);  ADCX(x6, t0); ADOX(x7, t1);
+  MULX(t0, t1, c3, d4);  ADCX(x7, t0); ADOX(x8, t1);
+  MULX(t0, t1, c4, d4);  ADCX(x8, t0); ADOX(x9, t1);
+  MULX(t0, x10, c5, d4); ADCX(x9, t0); ADOX(x10, zero);
+                         ADCX(x10, zero);
 
   m0 = VSUB(m0, VADD(z0, z8 )); m1 = VSUB(m1, VADD(z1, z9 ));
   m2 = VSUB(m2, VADD(z2, z10)); m3 = VSUB(m3, VADD(z3, z11));
   m4 = VSUB(m4, VADD(z4, z12)); m5 = VSUB(m5, VADD(z5, z13));
   m6 = VSUB(m6, VADD(z6, z14)); m7 = VSUB(m7, VADD(z7, z15));
 
-  t0 = _mulx_u64(c0, d5, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c1, d5, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c2, d5, (long long unsigned int *)&t1); ADCX(x7, t0); ADOX(x8, t1);
-  t0 = _mulx_u64(c3, d5, (long long unsigned int *)&t1); ADCX(x8, t0); ADOX(x9, t1);
-  t0 = _mulx_u64(c4, d5, (long long unsigned int *)&t1); ADCX(x9, t0); ADOX(x10, t1);
-  t0 = _mulx_u64(c5, d5, (long long unsigned int *)&x11); ADCX(x10, t0); ADOX(x11, zero);
-                                ADCX(x11, zero);
+  MULX(t0, t1, c0, d5);  ADCX(x5, t0);  ADOX(x6, t1);
+  MULX(t0, t1, c1, d5);  ADCX(x6, t0);  ADOX(x7, t1);
+  MULX(t0, t1, c2, d5);  ADCX(x7, t0);  ADOX(x8, t1);
+  MULX(t0, t1, c3, d5);  ADCX(x8, t0);  ADOX(x9, t1);
+  MULX(t0, t1, c4, d5);  ADCX(x9, t0);  ADOX(x10, t1);
+  MULX(t0, x11, c5, d5); ADCX(x10, t0); ADOX(x11, zero);
+                         ADCX(x11, zero);
                 
   // z = z + zM
   z4  = VADD(z4 , m0); z5  = VADD(z5 , m1);
@@ -839,13 +845,13 @@ void mul_fpx2_4x2w_hybrid_v1(fpx2_4x2w r, uint64_t *s, const fp_4x2w a, const fp
     :::"eax","cc"
   );
 
-  x0 = _mulx_u64(c0, d0, (long long unsigned int *)&x1);
-  t0 = _mulx_u64(c1, d0, (long long unsigned int *)&x2); ADCX(x1, t0);
-  t0 = _mulx_u64(c2, d0, (long long unsigned int *)&x3); ADCX(x2, t0);
-  t0 = _mulx_u64(c3, d0, (long long unsigned int *)&x4); ADCX(x3, t0);
-  t0 = _mulx_u64(c4, d0, (long long unsigned int *)&x5); ADCX(x4, t0);
-  t0 = _mulx_u64(c5, d0, (long long unsigned int *)&x6); ADCX(x5, t0);
-                               ADCX(x6, zero);
+  MULX(x0, x1, c0, d0);
+  MULX(t0, x2, c1, d0); ADCX(x1, t0);
+  MULX(t0, x3, c2, d0); ADCX(x2, t0);
+  MULX(t0, x4, c3, d0); ADCX(x3, t0);
+  MULX(t0, x5, c4, d0); ADCX(x4, t0);
+  MULX(t0, x6, c5, d0); ADCX(x5, t0);
+                        ADCX(x6, zero);
 
   tb = VSHUF(b1, 0x44);
   z1 = VMACLO(z1, tb, a0); z2 = VMACLO(z2, tb, a1);
@@ -853,13 +859,13 @@ void mul_fpx2_4x2w_hybrid_v1(fpx2_4x2w r, uint64_t *s, const fp_4x2w a, const fp
   y1 = VMACHI(y1, tb, a0); y2 = VMACHI(y2, tb, a1);
   y3 = VMACHI(y3, tb, a2); y4 = VMACHI(y4, tb, a3);
 
-  t0 = _mulx_u64(c0, d1, (long long unsigned int *)&t1); ADCX(x1, t0); ADOX(x2, t1);
-  t0 = _mulx_u64(c1, d1, (long long unsigned int *)&t1); ADCX(x2, t0); ADOX(x3, t1);
-  t0 = _mulx_u64(c2, d1, (long long unsigned int *)&t1); ADCX(x3, t0); ADOX(x4, t1);
-  t0 = _mulx_u64(c3, d1, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c4, d1, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c5, d1, (long long unsigned int *)&x7); ADCX(x6, t0); ADOX(x7, zero);
-                               ADCX(x7, zero);
+  MULX(t0, t1, c0, d1); ADCX(x1, t0); ADOX(x2, t1);
+  MULX(t0, t1, c1, d1); ADCX(x2, t0); ADOX(x3, t1);
+  MULX(t0, t1, c2, d1); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c3, d1); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c4, d1); ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, x7, c5, d1); ADCX(x6, t0); ADOX(x7, zero);
+                        ADCX(x7, zero);
 
   tb = VSHUF(b2, 0x44);
   z2 = VMACLO(z2, tb, a0); z3 = VMACLO(z3, tb, a1);
@@ -873,13 +879,13 @@ void mul_fpx2_4x2w_hybrid_v1(fpx2_4x2w r, uint64_t *s, const fp_4x2w a, const fp
   y3 = VMACHI(y3, tb, a0); y4 = VMACHI(y4, tb, a1);
   y5 = VMACHI(y5, tb, a2); y6 = VMACHI(y6, tb, a3);
 
-  t0 = _mulx_u64(c0, d2, (long long unsigned int *)&t1); ADCX(x2, t0); ADOX(x3, t1);
-  t0 = _mulx_u64(c1, d2, (long long unsigned int *)&t1); ADCX(x3, t0); ADOX(x4, t1);
-  t0 = _mulx_u64(c2, d2, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c3, d2, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c4, d2, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c5, d2, (long long unsigned int *)&x8); ADCX(x7, t0); ADOX(x8, zero);
-                               ADCX(x8, zero);
+  MULX(t0, t1, c0, d2); ADCX(x2, t0); ADOX(x3, t1);
+  MULX(t0, t1, c1, d2); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c2, d2); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c3, d2); ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, t1, c4, d2); ADCX(x6, t0); ADOX(x7, t1);
+  MULX(t0, x8, c5, d2); ADCX(x7, t0); ADOX(x8, zero);
+                        ADCX(x8, zero);
 
   tb = VSHUF(b0, 0xEE);
   z4 = VMACLO(z4, tb, a0); z5 = VMACLO(z5, tb, a1);
@@ -894,13 +900,13 @@ void mul_fpx2_4x2w_hybrid_v1(fpx2_4x2w r, uint64_t *s, const fp_4x2w a, const fp
   y5 = VMACHI(y5, tb, a0); y6 = VMACHI(y6, tb, a1);
   y7 = VMACHI(y7, tb, a2); y8 = VMACHI(y8, tb, a3);
 
-  t0 = _mulx_u64(c0, d3, (long long unsigned int *)&t1); ADCX(x3, t0); ADOX(x4, t1);
-  t0 = _mulx_u64(c1, d3, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c2, d3, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c3, d3, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c4, d3, (long long unsigned int *)&t1); ADCX(x7, t0); ADOX(x8, t1);
-  t0 = _mulx_u64(c5, d3, (long long unsigned int *)&x9); ADCX(x8, t0); ADOX(x9, zero);
-                               ADCX(x9, zero);
+  MULX(t0, t1, c0, d3); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c1, d3); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c2, d3); ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, t1, c3, d3); ADCX(x6, t0); ADOX(x7, t1);
+  MULX(t0, t1, c4, d3); ADCX(x7, t0); ADOX(x8, t1);
+  MULX(t0, x9, c5, d3); ADCX(x8, t0); ADOX(x9, zero);
+                        ADCX(x9, zero);
 
   tb = VSHUF(b2, 0xEE);
   z6 = VMACLO(z6, tb, a0); z7 = VMACLO(z7, tb, a1);
@@ -914,13 +920,13 @@ void mul_fpx2_4x2w_hybrid_v1(fpx2_4x2w r, uint64_t *s, const fp_4x2w a, const fp
   y7 = VMACHI(y7, tb, a0); y8 = VMACHI(y8, tb, a1);
   y9 = VMACHI(y9, tb, a2); y10 = VMACHI(y10, tb, a3);
 
-  t0 = _mulx_u64(c0, d4, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c1, d4, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c2, d4, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c3, d4, (long long unsigned int *)&t1); ADCX(x7, t0); ADOX(x8, t1);
-  t0 = _mulx_u64(c4, d4, (long long unsigned int *)&t1); ADCX(x8, t0); ADOX(x9, t1);
-  t0 = _mulx_u64(c5, d4, (long long unsigned int *)&x10); ADCX(x9, t0); ADOX(x10, zero);
-                                ADCX(x10, zero);
+  MULX(t0, t1, c0, d4);  ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c1, d4);  ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, t1, c2, d4);  ADCX(x6, t0); ADOX(x7, t1);
+  MULX(t0, t1, c3, d4);  ADCX(x7, t0); ADOX(x8, t1);
+  MULX(t0, t1, c4, d4);  ADCX(x8, t0); ADOX(x9, t1);
+  MULX(t0, x10, c5, d4); ADCX(x9, t0); ADOX(x10, zero);
+                         ADCX(x10, zero);
 
 
   z1  = VADD(z1 , VSHL(y0 , BALIGN));
@@ -935,13 +941,13 @@ void mul_fpx2_4x2w_hybrid_v1(fpx2_4x2w r, uint64_t *s, const fp_4x2w a, const fp
   z10 = VADD(z10, VSHL(y9 , BALIGN));
   z11 = VADD(z11, VSHL(y10, BALIGN));
 
-  t0 = _mulx_u64(c0, d5, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c1, d5, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c2, d5, (long long unsigned int *)&t1); ADCX(x7, t0); ADOX(x8, t1);
-  t0 = _mulx_u64(c3, d5, (long long unsigned int *)&t1); ADCX(x8, t0); ADOX(x9, t1);
-  t0 = _mulx_u64(c4, d5, (long long unsigned int *)&t1); ADCX(x9, t0); ADOX(x10, t1);
-  t0 = _mulx_u64(c5, d5, (long long unsigned int *)&x11); ADCX(x10, t0); ADOX(x11, zero);
-                                ADCX(x11, zero);
+  MULX(t0, t1, c0, d5);  ADCX(x5, t0);  ADOX(x6, t1);
+  MULX(t0, t1, c1, d5);  ADCX(x6, t0);  ADOX(x7, t1);
+  MULX(t0, t1, c2, d5);  ADCX(x7, t0);  ADOX(x8, t1);
+  MULX(t0, t1, c3, d5);  ADCX(x8, t0);  ADOX(x9, t1);
+  MULX(t0, t1, c4, d5);  ADCX(x9, t0);  ADOX(x10, t1);
+  MULX(t0, x11, c5, d5); ADCX(x10, t0); ADOX(x11, zero);
+                         ADCX(x11, zero);
 
   r[0 ] = z0 ; r[1 ] = z1 ; r[2 ] = z2 ; r[3 ] = z3 ;
   r[4 ] = z4 ; r[5 ] = z5 ; r[6 ] = z6 ; r[7 ] = z7 ;
@@ -980,13 +986,13 @@ void mul_fpx2_4x2w_hybrid_v2(fpx2_4x2w r, uint64_t *s, uint64_t *w, const fp_4x2
     :::"eax","cc"
   );
 
-  x0 = _mulx_u64(c0, d0, (long long unsigned int *)&x1);
-  t0 = _mulx_u64(c1, d0, (long long unsigned int *)&x2); ADCX(x1, t0);
-  t0 = _mulx_u64(c2, d0, (long long unsigned int *)&x3); ADCX(x2, t0);
-  t0 = _mulx_u64(c3, d0, (long long unsigned int *)&x4); ADCX(x3, t0);
-  t0 = _mulx_u64(c4, d0, (long long unsigned int *)&x5); ADCX(x4, t0);
-  t0 = _mulx_u64(c5, d0, (long long unsigned int *)&x6); ADCX(x5, t0);
-                               ADCX(x6, zero);
+  MULX(x0, x1, c0, d0);
+  MULX(t0, x2, c1, d0); ADCX(x1, t0);
+  MULX(t0, x3, c2, d0); ADCX(x2, t0);
+  MULX(t0, x4, c3, d0); ADCX(x3, t0);
+  MULX(t0, x5, c4, d0); ADCX(x4, t0);
+  MULX(t0, x6, c5, d0); ADCX(x5, t0);
+                        ADCX(x6, zero);
 
   tb = VSHUF(b0, 0x44);
   z0 = VMACLO(z0, tb, a0); z1 = VMACLO(z1, tb, a1);
@@ -994,13 +1000,13 @@ void mul_fpx2_4x2w_hybrid_v2(fpx2_4x2w r, uint64_t *s, uint64_t *w, const fp_4x2
   y0 = VMACHI(y0, tb, a0); y1 = VMACHI(y1, tb, a1);
   y2 = VMACHI(y2, tb, a2); y3 = VMACHI(y3, tb, a3);
 
-  t0 = _mulx_u64(c0, d1, (long long unsigned int *)&t1); ADCX(x1, t0); ADOX(x2, t1);
-  t0 = _mulx_u64(c1, d1, (long long unsigned int *)&t1); ADCX(x2, t0); ADOX(x3, t1);
-  t0 = _mulx_u64(c2, d1, (long long unsigned int *)&t1); ADCX(x3, t0); ADOX(x4, t1);
-  t0 = _mulx_u64(c3, d1, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c4, d1, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c5, d1, (long long unsigned int *)&x7); ADCX(x6, t0); ADOX(x7, zero);
-                               ADCX(x7, zero);
+  MULX(t0, t1, c0, d1); ADCX(x1, t0); ADOX(x2, t1);
+  MULX(t0, t1, c1, d1); ADCX(x2, t0); ADOX(x3, t1);
+  MULX(t0, t1, c2, d1); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c3, d1); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c4, d1); ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, x7, c5, d1); ADCX(x6, t0); ADOX(x7, zero);
+                        ADCX(x7, zero);
 
   tb = VSHUF(b1, 0x44);
   z1 = VMACLO(z1, tb, a0); z2 = VMACLO(z2, tb, a1);
@@ -1008,13 +1014,13 @@ void mul_fpx2_4x2w_hybrid_v2(fpx2_4x2w r, uint64_t *s, uint64_t *w, const fp_4x2
   y1 = VMACHI(y1, tb, a0); y2 = VMACHI(y2, tb, a1);
   y3 = VMACHI(y3, tb, a2); y4 = VMACHI(y4, tb, a3);
 
-  t0 = _mulx_u64(c0, d2, (long long unsigned int *)&t1); ADCX(x2, t0); ADOX(x3, t1);
-  t0 = _mulx_u64(c1, d2, (long long unsigned int *)&t1); ADCX(x3, t0); ADOX(x4, t1);
-  t0 = _mulx_u64(c2, d2, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c3, d2, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c4, d2, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c5, d2, (long long unsigned int *)&x8); ADCX(x7, t0); ADOX(x8, zero);
-                               ADCX(x8, zero);
+  MULX(t0, t1, c0, d2); ADCX(x2, t0); ADOX(x3, t1);
+  MULX(t0, t1, c1, d2); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c2, d2); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c3, d2); ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, t1, c4, d2); ADCX(x6, t0); ADOX(x7, t1);
+  MULX(t0, x8, c5, d2); ADCX(x7, t0); ADOX(x8, zero);
+                        ADCX(x8, zero);
 
   tb = VSHUF(b2, 0x44);
   z2 = VMACLO(z2, tb, a0); z3 = VMACLO(z3, tb, a1);
@@ -1022,13 +1028,13 @@ void mul_fpx2_4x2w_hybrid_v2(fpx2_4x2w r, uint64_t *s, uint64_t *w, const fp_4x2
   y2 = VMACHI(y2, tb, a0); y3 = VMACHI(y3, tb, a1);
   y4 = VMACHI(y4, tb, a2); y5 = VMACHI(y5, tb, a3);
 
-  t0 = _mulx_u64(c0, d3, (long long unsigned int *)&t1); ADCX(x3, t0); ADOX(x4, t1);
-  t0 = _mulx_u64(c1, d3, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c2, d3, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c3, d3, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c4, d3, (long long unsigned int *)&t1); ADCX(x7, t0); ADOX(x8, t1);
-  t0 = _mulx_u64(c5, d3, (long long unsigned int *)&x9); ADCX(x8, t0); ADOX(x9, zero);
-                               ADCX(x9, zero);
+  MULX(t0, t1, c0, d3); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c1, d3); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c2, d3); ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, t1, c3, d3); ADCX(x6, t0); ADOX(x7, t1);
+  MULX(t0, t1, c4, d3); ADCX(x7, t0); ADOX(x8, t1);
+  MULX(t0, x9, c5, d3); ADCX(x8, t0); ADOX(x9, zero);
+                        ADCX(x9, zero);
 
   tb = VSHUF(b3, 0x44);
   z3 = VMACLO(z3, tb, a0); z4 = VMACLO(z4, tb, a1);
@@ -1036,13 +1042,13 @@ void mul_fpx2_4x2w_hybrid_v2(fpx2_4x2w r, uint64_t *s, uint64_t *w, const fp_4x2
   y3 = VMACHI(y3, tb, a0); y4 = VMACHI(y4, tb, a1);
   y5 = VMACHI(y5, tb, a2); y6 = VMACHI(y6, tb, a3);
 
-  t0 = _mulx_u64(c0, d4, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c1, d4, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c2, d4, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c3, d4, (long long unsigned int *)&t1); ADCX(x7, t0); ADOX(x8, t1);
-  t0 = _mulx_u64(c4, d4, (long long unsigned int *)&t1); ADCX(x8, t0); ADOX(x9, t1);
-  t0 = _mulx_u64(c5, d4, (long long unsigned int *)&x10); ADCX(x9, t0); ADOX(x10, zero);
-                                ADCX(x10, zero);
+  MULX(t0, t1, c0, d4);  ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c1, d4);  ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, t1, c2, d4);  ADCX(x6, t0); ADOX(x7, t1);
+  MULX(t0, t1, c3, d4);  ADCX(x7, t0); ADOX(x8, t1);
+  MULX(t0, t1, c4, d4);  ADCX(x8, t0); ADOX(x9, t1);
+  MULX(t0, x10, c5, d4); ADCX(x9, t0); ADOX(x10, zero);
+                         ADCX(x10, zero);
 
   tb = VSHUF(b0, 0xEE);
   z4 = VMACLO(z4, tb, a0); z5 = VMACLO(z5, tb, a1);
@@ -1050,13 +1056,13 @@ void mul_fpx2_4x2w_hybrid_v2(fpx2_4x2w r, uint64_t *s, uint64_t *w, const fp_4x2
   y4 = VMACHI(y4, tb, a0); y5 = VMACHI(y5, tb, a1);
   y6 = VMACHI(y6, tb, a2); y7 = VMACHI(y7, tb, a3);
 
-  t0 = _mulx_u64(c0, d5, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c1, d5, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c2, d5, (long long unsigned int *)&t1); ADCX(x7, t0); ADOX(x8, t1);
-  t0 = _mulx_u64(c3, d5, (long long unsigned int *)&t1); ADCX(x8, t0); ADOX(x9, t1);
-  t0 = _mulx_u64(c4, d5, (long long unsigned int *)&t1); ADCX(x9, t0); ADOX(x10, t1);
-  t0 = _mulx_u64(c5, d5, (long long unsigned int *)&x11); ADCX(x10, t0); ADOX(x11, zero);
-                                ADCX(x11, zero);
+  MULX(t0, t1, c0, d5);  ADCX(x5, t0);  ADOX(x6, t1);
+  MULX(t0, t1, c1, d5);  ADCX(x6, t0);  ADOX(x7, t1);
+  MULX(t0, t1, c2, d5);  ADCX(x7, t0);  ADOX(x8, t1);
+  MULX(t0, t1, c3, d5);  ADCX(x8, t0);  ADOX(x9, t1);
+  MULX(t0, t1, c4, d5);  ADCX(x9, t0);  ADOX(x10, t1);
+  MULX(t0, x11, c5, d5); ADCX(x10, t0); ADOX(x11, zero);
+                         ADCX(x11, zero);
 
   s[0 ] = x0 ; s[1 ] = x1 ; s[2 ] = x2 ; 
   s[3 ] = x3 ; s[4 ] = x4 ; s[5 ] = x5 ; 
@@ -1085,13 +1091,13 @@ void mul_fpx2_4x2w_hybrid_v2(fpx2_4x2w r, uint64_t *s, uint64_t *w, const fp_4x2
     :::"eax","cc"
   );
 
-  x0 = _mulx_u64(c0, d0, (long long unsigned int *)&x1);
-  t0 = _mulx_u64(c1, d0, (long long unsigned int *)&x2); ADCX(x1, t0);
-  t0 = _mulx_u64(c2, d0, (long long unsigned int *)&x3); ADCX(x2, t0);
-  t0 = _mulx_u64(c3, d0, (long long unsigned int *)&x4); ADCX(x3, t0);
-  t0 = _mulx_u64(c4, d0, (long long unsigned int *)&x5); ADCX(x4, t0);
-  t0 = _mulx_u64(c5, d0, (long long unsigned int *)&x6); ADCX(x5, t0);
-                               ADCX(x6, zero);
+  MULX(x0, x1, c0, d0);
+  MULX(t0, x2, c1, d0); ADCX(x1, t0);
+  MULX(t0, x3, c2, d0); ADCX(x2, t0);
+  MULX(t0, x4, c3, d0); ADCX(x3, t0);
+  MULX(t0, x5, c4, d0); ADCX(x4, t0);
+  MULX(t0, x6, c5, d0); ADCX(x5, t0);
+                        ADCX(x6, zero);
 
   tb = VSHUF(b3, 0xEE);
   z7 = VMACLO(z7, tb, a0); z8 = VMACLO(z8, tb, a1);
@@ -1099,39 +1105,39 @@ void mul_fpx2_4x2w_hybrid_v2(fpx2_4x2w r, uint64_t *s, uint64_t *w, const fp_4x2
   y7 = VMACHI(y7, tb, a0); y8 = VMACHI(y8, tb, a1);
   y9 = VMACHI(y9, tb, a2); y10 = VMACHI(y10, tb, a3);
 
-  t0 = _mulx_u64(c0, d1, (long long unsigned int *)&t1); ADCX(x1, t0); ADOX(x2, t1);
-  t0 = _mulx_u64(c1, d1, (long long unsigned int *)&t1); ADCX(x2, t0); ADOX(x3, t1);
-  t0 = _mulx_u64(c2, d1, (long long unsigned int *)&t1); ADCX(x3, t0); ADOX(x4, t1);
-  t0 = _mulx_u64(c3, d1, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c4, d1, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c5, d1, (long long unsigned int *)&x7); ADCX(x6, t0); ADOX(x7, zero);
-                               ADCX(x7, zero);
+  MULX(t0, t1, c0, d1); ADCX(x1, t0); ADOX(x2, t1);
+  MULX(t0, t1, c1, d1); ADCX(x2, t0); ADOX(x3, t1);
+  MULX(t0, t1, c2, d1); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c3, d1); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c4, d1); ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, x7, c5, d1); ADCX(x6, t0); ADOX(x7, zero);
+                        ADCX(x7, zero);
 
   z1  = VADD(z1 , VSHL(y0 , BALIGN));
   z2  = VADD(z2 , VSHL(y1 , BALIGN));
   z3  = VADD(z3 , VSHL(y2 , BALIGN));
   z4  = VADD(z4 , VSHL(y3 , BALIGN));
 
-  t0 = _mulx_u64(c0, d2, (long long unsigned int *)&t1); ADCX(x2, t0); ADOX(x3, t1);
-  t0 = _mulx_u64(c1, d2, (long long unsigned int *)&t1); ADCX(x3, t0); ADOX(x4, t1);
-  t0 = _mulx_u64(c2, d2, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c3, d2, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c4, d2, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c5, d2, (long long unsigned int *)&x8); ADCX(x7, t0); ADOX(x8, zero);
-                               ADCX(x8, zero);
+  MULX(t0, t1, c0, d2); ADCX(x2, t0); ADOX(x3, t1);
+  MULX(t0, t1, c1, d2); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c2, d2); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c3, d2); ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, t1, c4, d2); ADCX(x6, t0); ADOX(x7, t1);
+  MULX(t0, x8, c5, d2); ADCX(x7, t0); ADOX(x8, zero);
+                        ADCX(x8, zero);
 
   z5  = VADD(z5 , VSHL(y4 , BALIGN));
   z6  = VADD(z6 , VSHL(y5 , BALIGN));
   z7  = VADD(z7 , VSHL(y6 , BALIGN));
   z8  = VADD(z8 , VSHL(y7 , BALIGN));
 
-  t0 = _mulx_u64(c0, d3, (long long unsigned int *)&t1); ADCX(x3, t0); ADOX(x4, t1);
-  t0 = _mulx_u64(c1, d3, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c2, d3, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c3, d3, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c4, d3, (long long unsigned int *)&t1); ADCX(x7, t0); ADOX(x8, t1);
-  t0 = _mulx_u64(c5, d3, (long long unsigned int *)&x9); ADCX(x8, t0); ADOX(x9, zero);
-                               ADCX(x9, zero);
+  MULX(t0, t1, c0, d3); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c1, d3); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c2, d3); ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, t1, c3, d3); ADCX(x6, t0); ADOX(x7, t1);
+  MULX(t0, t1, c4, d3); ADCX(x7, t0); ADOX(x8, t1);
+  MULX(t0, x9, c5, d3); ADCX(x8, t0); ADOX(x9, zero);
+                        ADCX(x9, zero);
 
   z9  = VADD(z9 , VSHL(y8 , BALIGN));
   z10 = VADD(z10, VSHL(y9 , BALIGN));
@@ -1141,21 +1147,21 @@ void mul_fpx2_4x2w_hybrid_v2(fpx2_4x2w r, uint64_t *s, uint64_t *w, const fp_4x2
   r[4 ] = z4 ; r[5 ] = z5 ; r[6 ] = z6 ; r[7 ] = z7 ;
   r[8 ] = z8 ; r[9 ] = z9 ; r[10] = z10; r[11] = z11;
 
-  t0 = _mulx_u64(c0, d4, (long long unsigned int *)&t1); ADCX(x4, t0); ADOX(x5, t1);
-  t0 = _mulx_u64(c1, d4, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c2, d4, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c3, d4, (long long unsigned int *)&t1); ADCX(x7, t0); ADOX(x8, t1);
-  t0 = _mulx_u64(c4, d4, (long long unsigned int *)&t1); ADCX(x8, t0); ADOX(x9, t1);
-  t0 = _mulx_u64(c5, d4, (long long unsigned int *)&x10); ADCX(x9, t0); ADOX(x10, zero);
-                                ADCX(x10, zero);
+  MULX(t0, t1, c0, d4);  ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c1, d4);  ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, t1, c2, d4);  ADCX(x6, t0); ADOX(x7, t1);
+  MULX(t0, t1, c3, d4);  ADCX(x7, t0); ADOX(x8, t1);
+  MULX(t0, t1, c4, d4);  ADCX(x8, t0); ADOX(x9, t1);
+  MULX(t0, x10, c5, d4); ADCX(x9, t0); ADOX(x10, zero);
+                         ADCX(x10, zero);
 
-  t0 = _mulx_u64(c0, d5, (long long unsigned int *)&t1); ADCX(x5, t0); ADOX(x6, t1);
-  t0 = _mulx_u64(c1, d5, (long long unsigned int *)&t1); ADCX(x6, t0); ADOX(x7, t1);
-  t0 = _mulx_u64(c2, d5, (long long unsigned int *)&t1); ADCX(x7, t0); ADOX(x8, t1);
-  t0 = _mulx_u64(c3, d5, (long long unsigned int *)&t1); ADCX(x8, t0); ADOX(x9, t1);
-  t0 = _mulx_u64(c4, d5, (long long unsigned int *)&t1); ADCX(x9, t0); ADOX(x10, t1);
-  t0 = _mulx_u64(c5, d5, (long long unsigned int *)&x11); ADCX(x10, t0); ADOX(x11, zero);
-                                ADCX(x11, zero);
+  MULX(t0, t1, c0, d5);  ADCX(x5, t0);  ADOX(x6, t1);
+  MULX(t0, t1, c1, d5);  ADCX(x6, t0);  ADOX(x7, t1);
+  MULX(t0, t1, c2, d5);  ADCX(x7, t0);  ADOX(x8, t1);
+  MULX(t0, t1, c3, d5);  ADCX(x8, t0);  ADOX(x9, t1);
+  MULX(t0, t1, c4, d5);  ADCX(x9, t0);  ADOX(x10, t1);
+  MULX(t0, x11, c5, d5); ADCX(x10, t0); ADOX(x11, zero);
+                         ADCX(x11, zero);
 
   w[0 ] = x0 ; w[1 ] = x1 ; w[2 ] = x2 ; 
   w[3 ] = x3 ; w[4 ] = x4 ; w[5 ] = x5 ; 
@@ -1316,8 +1322,7 @@ int main()
     b_4x2w[i] = VSET(0, 0, 0, 0, 0, 0, b48[i+VWORDS], b48[i]);
   }
 
-#if 0
-
+#if 1
   mul_fpx2_8x1w(z_8x1w, a_8x1w, b_8x1w);
   carryp_dl_8x1w(z_8x1w);
   get_channel_dl_8x1w(z48, z_8x1w, 0);
@@ -1351,33 +1356,33 @@ int main()
 
   printf("- mul_fpx2_8x1w:               ");
   LOAD_CACHE(mul_fpx2_8x1w(z_8x1w, z_8x1w, z_8x1w), 10000);  
-  MEASURE_CYCLES(mul_fpx2_8x1w(z_8x1w, z_8x1w, z_8x1w), 100000);
-  printf("#cycle/inst = %.2f\n", (double) diff_cycles/8);
+  MEASURE_CYCLES(mul_fpx2_8x1w(z_8x1w, z_8x1w, z_8x1w), 1000000);
+  printf("#cycle = %ld\n", diff_cycles);
 
   printf("- mul_fpx2_8x1w_hybrid_v1:     ");
   LOAD_CACHE(mul_fpx2_8x1w_hybrid_v1(z_8x1w, s, a_8x1w, b_8x1w, c, d), 10000);
-  MEASURE_CYCLES(mul_fpx2_8x1w_hybrid_v1(z_8x1w, s, a_8x1w, b_8x1w, c, d), 100000);
-  printf("#cycle/inst = %.2f\n", (double) diff_cycles/9);
+  MEASURE_CYCLES(mul_fpx2_8x1w_hybrid_v1(z_8x1w, s, a_8x1w, b_8x1w, c, d), 1000000);
+  printf("#cycle = %ld\n", diff_cycles);
 
   printf("- mul_fpx2_8x1w_hybrid_v2:     ");
   LOAD_CACHE(mul_fpx2_8x1w_hybrid_v2(z_8x1w, s, w, a_8x1w, b_8x1w, c, d, c, d), 10000);
-  MEASURE_CYCLES(mul_fpx2_8x1w_hybrid_v2(z_8x1w, s, w, a_8x1w, b_8x1w, c, d, c, d), 100000);
-  printf("#cycle/inst = %.2f\n", (double) diff_cycles/10);
+  MEASURE_CYCLES(mul_fpx2_8x1w_hybrid_v2(z_8x1w, s, w, a_8x1w, b_8x1w, c, d, c, d), 1000000);
+  printf("#cycle = %ld\n", diff_cycles);
 
   printf("- mul_fpx2_4x2w:               ");
   LOAD_CACHE(mul_fpx2_4x2w(z_4x2w, z_4x2w, z_4x2w), 10000);
-  MEASURE_CYCLES(mul_fpx2_4x2w(z_4x2w, z_4x2w, z_4x2w), 100000);
-  printf("#cycle/inst = %.2f\n", (double) diff_cycles/4);
+  MEASURE_CYCLES(mul_fpx2_4x2w(z_4x2w, z_4x2w, z_4x2w), 1000000);
+  printf("#cycle = %ld\n", diff_cycles);
 
   printf("- mul_fpx2_4x2w_hybrid_v1:     ");
   LOAD_CACHE(mul_fpx2_4x2w_hybrid_v1(z_4x2w, s, a_4x2w, b_4x2w, c, d), 10000);
-  MEASURE_CYCLES(mul_fpx2_4x2w_hybrid_v1(z_4x2w, s, a_4x2w, b_4x2w, c, d), 100000);
-  printf("#cycle/inst = %.2f\n", (double) diff_cycles/5);
+  MEASURE_CYCLES(mul_fpx2_4x2w_hybrid_v1(z_4x2w, s, a_4x2w, b_4x2w, c, d), 1000000);
+  printf("#cycle = %ld\n", diff_cycles);
 
   printf("- mul_fpx2_4x2w_hybrid_v2:     ");
   LOAD_CACHE(mul_fpx2_4x2w_hybrid_v2(z_4x2w, s, w, a_4x2w, b_4x2w, c, d, c, d), 10000);
-  MEASURE_CYCLES(mul_fpx2_4x2w_hybrid_v2(z_4x2w, s, w, a_4x2w, b_4x2w, c, d, c, d), 100000);
-  printf("#cycle/inst = %.2f\n", (double) diff_cycles/6);
+  MEASURE_CYCLES(mul_fpx2_4x2w_hybrid_v2(z_4x2w, s, w, a_4x2w, b_4x2w, c, d, c, d), 1000000);
+  printf("#cycle = %ld\n", diff_cycles);
 
   return 0;
 }

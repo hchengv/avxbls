@@ -6,7 +6,7 @@ OUT_DIR = ./bin
 all: bench
 
 bench: $(wildcard *.c) $(wildcard *.S)
-	$(CC) $(SRCS) -o bench      $(FLAGS) -DTEST
+	$(CC) $(SRCS) -o bench      $(FLAGS)
 
 clean:
 	rm -r bench
