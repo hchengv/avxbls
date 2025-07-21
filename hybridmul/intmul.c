@@ -506,6 +506,11 @@ void mul_fpx2_8x1w_hybrid_v2(fpx2_8x1w r, uint64_t *s, uint64_t *w, const fp_8x1
   uint8_t e0, e1;
   uint64_t zero = 0;
 
+  __asm__ volatile(
+    "test %%eax, %%eax" 
+    :::"eax","cc"
+  );
+
   // compute vector zL(z0-z7) by aL(a0-a3) * bL(b0-b4)
   // compute scalar x = c * d
 
@@ -513,60 +518,76 @@ void mul_fpx2_8x1w_hybrid_v2(fpx2_8x1w r, uint64_t *s, uint64_t *w, const fp_8x1
   y0 = VMACHI(y0, a0, b0);
   y0 = VSHL(y0, BALIGN);
 
-  __asm__ volatile(
-    "test %%eax, %%eax" 
-    :::"eax","cc"
-  );
-
   MULX(x0, x1, c0, d0);
   MULX(t0, x2, c1, d0); ADCX(x1, t0);
+
+  z1 = VMACLO(y0, a0, b1); z1 = VMACLO(z1, a1, b0);
+
   MULX(t0, x3, c2, d0); ADCX(x2, t0);
   MULX(t0, x4, c3, d0); ADCX(x3, t0);
+
+  y1 = VMACHI(y1, a0, b1); y1 = VMACHI(y1, a1, b0);
+  y1 = VSHL(y1, BALIGN);
+
   MULX(t0, x5, c4, d0); ADCX(x4, t0);
   MULX(t0, x6, c5, d0); ADCX(x5, t0);
                         ADCX(x6, zero);
 
-  z1 = VMACLO(y0, a0, b1); z1 = VMACLO(z1, a1, b0);
-  y1 = VMACHI(y1, a0, b1); y1 = VMACHI(y1, a1, b0);
-  y1 = VSHL(y1, BALIGN);
-
   z2 = VMACLO(y1, a0, b2); z2 = VMACLO(z2, a1, b1); z2 = VMACLO(z2, a2, b0);
-  y2 = VMACHI(y2, a0, b2); y2 = VMACHI(y2, a1, b1); y2 = VMACHI(y2, a2, b0);
-  y2 = VSHL(y2, BALIGN);
 
   MULX(t0, t1, c0, d1); ADCX(x1, t0); ADOX(x2, t1);
   MULX(t0, t1, c1, d1); ADCX(x2, t0); ADOX(x3, t1);
+
+  y2 = VMACHI(y2, a0, b2); y2 = VMACHI(y2, a1, b1); y2 = VMACHI(y2, a2, b0);
+  y2 = VSHL(y2, BALIGN);
+
   MULX(t0, t1, c2, d1); ADCX(x3, t0); ADOX(x4, t1);
   MULX(t0, t1, c3, d1); ADCX(x4, t0); ADOX(x5, t1);
+
+  z3 = VMACLO(y2, a0, b3); z3 = VMACLO(z3, a1, b2); z3 = VMACLO(z3, a2, b1); 
+  z3 = VMACLO(z3, a3, b0);
+
   MULX(t0, t1, c4, d1); ADCX(x5, t0); ADOX(x6, t1);
   MULX(t0, x7, c5, d1); ADCX(x6, t0); ADOX(x7, zero);
                         ADCX(x7, zero);
 
-  z3 = VMACLO(y2, a0, b3); z3 = VMACLO(z3, a1, b2); z3 = VMACLO(z3, a2, b1); 
-  z3 = VMACLO(z3, a3, b0);
   y3 = VMACHI(y3, a0, b3); y3 = VMACHI(y3, a1, b2); y3 = VMACHI(y3, a2, b1); 
   y3 = VMACHI(y3, a3, b0);
   y3 = VSHL(y3, BALIGN);
 
+  MULX(t0, t1, c0, d2); ADCX(x2, t0); ADOX(x3, t1);
+  MULX(t0, t1, c1, d2); ADCX(x3, t0); ADOX(x4, t1);
+
   z4 = VMACLO(y3, a1, b3); z4 = VMACLO(z4, a2, b2); z4 = VMACLO(z4, a3, b1);
+
+  MULX(t0, t1, c2, d2); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c3, d2); ADCX(x5, t0); ADOX(x6, t1);
+
   y4 = VMACHI(y4, a1, b3); y4 = VMACHI(y4, a2, b2); y4 = VMACHI(y4, a3, b1);
   y4 = VSHL(y4, BALIGN);
 
-  MULX(t0, t1, c0, d2); ADCX(x2, t0); ADOX(x3, t1);
-  MULX(t0, t1, c1, d2); ADCX(x3, t0); ADOX(x4, t1);
-  MULX(t0, t1, c2, d2); ADCX(x4, t0); ADOX(x5, t1);
-  MULX(t0, t1, c3, d2); ADCX(x5, t0); ADOX(x6, t1);
   MULX(t0, t1, c4, d2); ADCX(x6, t0); ADOX(x7, t1);
   MULX(t0, x8, c5, d2); ADCX(x7, t0); ADOX(x8, zero);
                         ADCX(x8, zero);
 
   z5 = VMACLO(y4, a2, b3); z5 = VMACLO(z5, a3, b2);
+
+  MULX(t0, t1, c0, d3); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c1, d3); ADCX(x4, t0); ADOX(x5, t1);
+
   y5 = VMACHI(y5, a2, b3); y5 = VMACHI(y5, a3, b2);
   y5 = VSHL(y5, BALIGN);
+
+  MULX(t0, t1, c2, d3); ADCX(x5, t0); ADOX(x6, t1);
+  MULX(t0, t1, c3, d3); ADCX(x6, t0); ADOX(x7, t1);
 
   z6 = VMACLO(y5, a3, b3);
   y6 = VMACHI(y6, a3, b3);
   y6 = VSHL(y6, BALIGN);
+
+  MULX(t0, t1, c4, d3); ADCX(x7, t0); ADOX(x8, t1);
+  MULX(t0, x9, c5, d3); ADCX(x8, t0); ADOX(x9, zero);
+                        ADCX(x9, zero);
 
   z7 = y6;
 
@@ -576,66 +597,52 @@ void mul_fpx2_8x1w_hybrid_v2(fpx2_8x1w r, uint64_t *s, uint64_t *w, const fp_8x1
   y8 = VMACHI(y8, a4, b4);
   y8 = VSHL(y8, BALIGN);
 
-  MULX(t0, t1, c0, d3); ADCX(x3, t0); ADOX(x4, t1);
-  MULX(t0, t1, c1, d3); ADCX(x4, t0); ADOX(x5, t1);
-  MULX(t0, t1, c2, d3); ADCX(x5, t0); ADOX(x6, t1);
-  MULX(t0, t1, c3, d3); ADCX(x6, t0); ADOX(x7, t1);
-  MULX(t0, t1, c4, d3); ADCX(x7, t0); ADOX(x8, t1);
-  MULX(t0, x9, c5, d3); ADCX(x8, t0); ADOX(x9, zero);
-                        ADCX(x9, zero);
+  MULX(t0, t1, c0, d4);  ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c1, d4);  ADCX(x5, t0); ADOX(x6, t1);
 
   z9 = VMACLO(y8, a4, b5); z9 = VMACLO(z9, a5, b4);
   y9 = VMACHI(y9, a4, b5); y9 = VMACHI(y9, a5, b4);
   y9 = VSHL(y9, BALIGN);
 
-  z10 = VMACLO(y9,  a4, b6); z10 = VMACLO(z10, a5, b5); 
-  z10 = VMACLO(z10, a6, b4);
-  y10 = VMACHI(y10, a4, b6); y10 = VMACHI(y10, a5, b5); 
-  y10 = VMACHI(y10, a6, b4);
-  y10 = VSHL(y10, BALIGN);
-
-  MULX(t0, t1, c0, d4);  ADCX(x4, t0); ADOX(x5, t1);
-  MULX(t0, t1, c1, d4);  ADCX(x5, t0); ADOX(x6, t1);
   MULX(t0, t1, c2, d4);  ADCX(x6, t0); ADOX(x7, t1);
   MULX(t0, t1, c3, d4);  ADCX(x7, t0); ADOX(x8, t1);
+
+  z10 = VMACLO(y9,  a4, b6); z10 = VMACLO(z10, a5, b5); 
+  z10 = VMACLO(z10, a6, b4);
+
   MULX(t0, t1, c4, d4);  ADCX(x8, t0); ADOX(x9, t1);
   MULX(t0, x10, c5, d4); ADCX(x9, t0); ADOX(x10, zero);
                          ADCX(x10, zero);
 
+  y10 = VMACHI(y10, a4, b6); y10 = VMACHI(y10, a5, b5); 
+  y10 = VMACHI(y10, a6, b4);
+  y10 = VSHL(y10, BALIGN);
+
+  MULX(t0, t1, c0, d5);  ADCX(x5, t0);  ADOX(x6, t1);
+  MULX(t0, t1, c1, d5);  ADCX(x6, t0);  ADOX(x7, t1);
+
   z11 = VMACLO(y10, a4, b7); z11 = VMACLO(z11, a5, b6);
   z11 = VMACLO(z11, a6, b5); z11 = VMACLO(z11, a7, b4);
+
+  MULX(t0, t1, c2, d5);  ADCX(x7, t0);  ADOX(x8, t1);
+  MULX(t0, t1, c3, d5);  ADCX(x8, t0);  ADOX(x9, t1);
+
   y11 = VMACHI(y11, a4, b7); y11 = VMACHI(y11, a5, b6);
   y11 = VMACHI(y11, a6, b5); y11 = VMACHI(y11, a7, b4);
   y11 = VSHL(y11, BALIGN);
 
-  z12 = VMACLO(y11, a5, b7); z12 = VMACLO(z12, a6, b6);
-  z12 = VMACLO(z12, a7, b5);
-  y12 = VMACHI(y12, a5, b7); y12 = VMACHI(y12, a6, b6);
-  y12 = VMACHI(y12, a7, b5);
-  y12 = VSHL(y12, BALIGN);
-
-  MULX(t0, t1, c0, d5);  ADCX(x5, t0);  ADOX(x6, t1);
-  MULX(t0, t1, c1, d5);  ADCX(x6, t0);  ADOX(x7, t1);
-  MULX(t0, t1, c2, d5);  ADCX(x7, t0);  ADOX(x8, t1);
-  MULX(t0, t1, c3, d5);  ADCX(x8, t0);  ADOX(x9, t1);
   MULX(t0, t1, c4, d5);  ADCX(x9, t0);  ADOX(x10, t1);
   MULX(t0, x11, c5, d5); ADCX(x10, t0); ADOX(x11, zero);
                          ADCX(x11, zero);
+
 
   s[0 ] = x0 ; s[1 ] = x1 ; s[2 ] = x2 ; 
   s[3 ] = x3 ; s[4 ] = x4 ; s[5 ] = x5 ; 
   s[6 ] = x6 ; s[7 ] = x7 ; s[8 ] = x8 ; 
   s[9 ] = x9 ; s[10] = x10; s[11] = x11;
 
-  z13 = VMACLO(y12, a6, b7); z13 = VMACLO(z13, a7, b6);
-  y13 = VMACHI(y13, a6, b7); y13 = VMACHI(y13, a7, b6);
-  y13 = VSHL(y13, BALIGN);
-
-  z14 = VMACLO(y13, a7, b7);
-  y14 = VMACHI(y14, a7, b7);
-  y14 = VSHL(y14, BALIGN);
-
-  z15 = y14;
+  z12 = VMACLO(y11, a5, b7); z12 = VMACLO(z12, a6, b6);
+  z12 = VMACLO(z12, a7, b5);
 
   c0 = u[0], c1 = u[1], c2 = u[2];
   c3 = u[3], c4 = u[4], c5 = u[5];
@@ -647,26 +654,46 @@ void mul_fpx2_8x1w_hybrid_v2(fpx2_8x1w r, uint64_t *s, uint64_t *w, const fp_8x1
     :::"eax","cc"
   );
 
+
+  y12 = VMACHI(y12, a5, b7); y12 = VMACHI(y12, a6, b6);
+  y12 = VMACHI(y12, a7, b5);
+  y12 = VSHL(y12, BALIGN);
+
   MULX(x0, x1, c0, d0);
   MULX(t0, x2, c1, d0); ADCX(x1, t0);
+
+  z13 = VMACLO(y12, a6, b7); z13 = VMACLO(z13, a7, b6);
+
   MULX(t0, x3, c2, d0); ADCX(x2, t0);
   MULX(t0, x4, c3, d0); ADCX(x3, t0);
+
+  y13 = VMACHI(y13, a6, b7); y13 = VMACHI(y13, a7, b6);
+  y13 = VSHL(y13, BALIGN);
+
   MULX(t0, x5, c4, d0); ADCX(x4, t0);
   MULX(t0, x6, c5, d0); ADCX(x5, t0);
                         ADCX(x6, zero);
+
+  z14 = VMACLO(y13, a7, b7);
+  y14 = VMACHI(y14, a7, b7);
+  y14 = VSHL(y14, BALIGN);
+
+  MULX(t0, t1, c0, d1); ADCX(x1, t0); ADOX(x2, t1);
+  MULX(t0, t1, c1, d1); ADCX(x2, t0); ADOX(x3, t1);
+
+  z15 = y14;
 
   // ta(ta0-ta3) = aL(a0-a3) + aH(a4-a7)
   ta0 = VADD(a0, a4); ta1 = VADD(a1, a5);
   ta2 = VADD(a2, a6); ta3 = VADD(a3, a7);
 
+  MULX(t0, t1, c2, d1); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c3, d1); ADCX(x4, t0); ADOX(x5, t1);
+
   // tb(tb0-tb3) = bL(b0-b3) + bH(b4-b7)
   tb0 = VADD(b0, b4); tb1 = VADD(b1, b5); 
   tb2 = VADD(b2, b6); tb3 = VADD(b3, b7);
 
-  MULX(t0, t1, c0, d1); ADCX(x1, t0); ADOX(x2, t1);
-  MULX(t0, t1, c1, d1); ADCX(x2, t0); ADOX(x3, t1);
-  MULX(t0, t1, c2, d1); ADCX(x3, t0); ADOX(x4, t1);
-  MULX(t0, t1, c3, d1); ADCX(x4, t0); ADOX(x5, t1);
   MULX(t0, t1, c4, d1); ADCX(x5, t0); ADOX(x6, t1);
   MULX(t0, x7, c5, d1); ADCX(x6, t0); ADOX(x7, zero);
                         ADCX(x7, zero);
@@ -679,47 +706,68 @@ void mul_fpx2_8x1w_hybrid_v2(fpx2_8x1w r, uint64_t *s, uint64_t *w, const fp_8x1
   y0 = VMACHI(y0, ta0, tb0);
   y0 = VSHL(y0, BALIGN);
 
+  MULX(t0, t1, c0, d2); ADCX(x2, t0); ADOX(x3, t1);
+  MULX(t0, t1, c1, d2); ADCX(x3, t0); ADOX(x4, t1);
+
   m1 = VMACLO(y0, ta0, tb1); m1 = VMACLO(m1, ta1, tb0);
+
+  MULX(t0, t1, c2, d2); ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c3, d2); ADCX(x5, t0); ADOX(x6, t1);
+
   y1 = VMACHI(y1, ta0, tb1); y1 = VMACHI(y1, ta1, tb0);
   y1 = VSHL(y1, BALIGN);
 
-  MULX(t0, t1, c0, d2); ADCX(x2, t0); ADOX(x3, t1);
-  MULX(t0, t1, c1, d2); ADCX(x3, t0); ADOX(x4, t1);
-  MULX(t0, t1, c2, d2); ADCX(x4, t0); ADOX(x5, t1);
-  MULX(t0, t1, c3, d2); ADCX(x5, t0); ADOX(x6, t1);
   MULX(t0, t1, c4, d2); ADCX(x6, t0); ADOX(x7, t1);
   MULX(t0, x8, c5, d2); ADCX(x7, t0); ADOX(x8, zero);
                         ADCX(x8, zero);
 
   m2 = VMACLO(y1, ta0, tb2); m2 = VMACLO(m2, ta1, tb1); 
   m2 = VMACLO(m2, ta2, tb0);
+
+  MULX(t0, t1, c0, d3); ADCX(x3, t0); ADOX(x4, t1);
+  MULX(t0, t1, c1, d3); ADCX(x4, t0); ADOX(x5, t1);
+
   y2 = VMACHI(y2, ta0, tb2); y2 = VMACHI(y2, ta1, tb1); 
   y2 = VMACHI(y2, ta2, tb0);
   y2 = VSHL(y2, BALIGN);
 
-  m3 = VMACLO(y2, ta0, tb3); m3 = VMACLO(m3, ta1, tb2); 
-  m3 = VMACLO(m3, ta2, tb1); m3 = VMACLO(m3, ta3, tb0);
-  y3 = VMACHI(y3, ta0, tb3); y3 = VMACHI(y3, ta1, tb2); 
-  y3 = VMACHI(y3, ta2, tb1); y3 = VMACHI(y3, ta3, tb0);
-  y3 = VSHL(y3, BALIGN);
-
-  MULX(t0, t1, c0, d3); ADCX(x3, t0); ADOX(x4, t1);
-  MULX(t0, t1, c1, d3); ADCX(x4, t0); ADOX(x5, t1);
   MULX(t0, t1, c2, d3); ADCX(x5, t0); ADOX(x6, t1);
   MULX(t0, t1, c3, d3); ADCX(x6, t0); ADOX(x7, t1);
+
+  m3 = VMACLO(y2, ta0, tb3); m3 = VMACLO(m3, ta1, tb2); 
+  m3 = VMACLO(m3, ta2, tb1); m3 = VMACLO(m3, ta3, tb0);
+
   MULX(t0, t1, c4, d3); ADCX(x7, t0); ADOX(x8, t1);
   MULX(t0, x9, c5, d3); ADCX(x8, t0); ADOX(x9, zero);
                         ADCX(x9, zero);
 
+  y3 = VMACHI(y3, ta0, tb3); y3 = VMACHI(y3, ta1, tb2); 
+  y3 = VMACHI(y3, ta2, tb1); y3 = VMACHI(y3, ta3, tb0);
+  y3 = VSHL(y3, BALIGN);
+
+  MULX(t0, t1, c0, d4);  ADCX(x4, t0); ADOX(x5, t1);
+  MULX(t0, t1, c1, d4);  ADCX(x5, t0); ADOX(x6, t1);
+
   m4 = VMACLO(y3, ta1, tb3); m4 = VMACLO(m4, ta2, tb2); 
   m4 = VMACLO(m4, ta3, tb1);
+
+  MULX(t0, t1, c2, d4);  ADCX(x6, t0); ADOX(x7, t1);
+  MULX(t0, t1, c3, d4);  ADCX(x7, t0); ADOX(x8, t1);
+
   y4 = VMACHI(y4, ta1, tb3); y4 = VMACHI(y4, ta2, tb2); 
   y4 = VMACHI(y4, ta3, tb1);
   y4 = VSHL(y4, BALIGN);
 
+  MULX(t0, t1, c4, d4);  ADCX(x8, t0); ADOX(x9, t1);
+  MULX(t0, x10, c5, d4); ADCX(x9, t0); ADOX(x10, zero);
+                         ADCX(x10, zero);
+
   m5 = VMACLO(y4, ta2, tb3); m5 = VMACLO(m5, ta3, tb2);
   y5 = VMACHI(y5, ta2, tb3); y5 = VMACHI(y5, ta3, tb2);
   y5 = VSHL(y5, BALIGN);
+
+  MULX(t0, t1, c0, d5);  ADCX(x5, t0);  ADOX(x6, t1);
+  MULX(t0, t1, c1, d5);  ADCX(x6, t0);  ADOX(x7, t1);
 
   m6 = VMACLO(y5, ta3, tb3);
   y6 = VMACHI(y6, ta3, tb3);
@@ -727,26 +775,18 @@ void mul_fpx2_8x1w_hybrid_v2(fpx2_8x1w r, uint64_t *s, uint64_t *w, const fp_8x1
 
   m7 = y6;
 
-  MULX(t0, t1, c0, d4);  ADCX(x4, t0); ADOX(x5, t1);
-  MULX(t0, t1, c1, d4);  ADCX(x5, t0); ADOX(x6, t1);
-  MULX(t0, t1, c2, d4);  ADCX(x6, t0); ADOX(x7, t1);
-  MULX(t0, t1, c3, d4);  ADCX(x7, t0); ADOX(x8, t1);
-  MULX(t0, t1, c4, d4);  ADCX(x8, t0); ADOX(x9, t1);
-  MULX(t0, x10, c5, d4); ADCX(x9, t0); ADOX(x10, zero);
-                         ADCX(x10, zero);
+  MULX(t0, t1, c2, d5);  ADCX(x7, t0);  ADOX(x8, t1);
+  MULX(t0, t1, c3, d5);  ADCX(x8, t0);  ADOX(x9, t1);
 
   m0 = VSUB(m0, VADD(z0, z8 )); m1 = VSUB(m1, VADD(z1, z9 ));
   m2 = VSUB(m2, VADD(z2, z10)); m3 = VSUB(m3, VADD(z3, z11));
-  m4 = VSUB(m4, VADD(z4, z12)); m5 = VSUB(m5, VADD(z5, z13));
-  m6 = VSUB(m6, VADD(z6, z14)); m7 = VSUB(m7, VADD(z7, z15));
 
-  MULX(t0, t1, c0, d5);  ADCX(x5, t0);  ADOX(x6, t1);
-  MULX(t0, t1, c1, d5);  ADCX(x6, t0);  ADOX(x7, t1);
-  MULX(t0, t1, c2, d5);  ADCX(x7, t0);  ADOX(x8, t1);
-  MULX(t0, t1, c3, d5);  ADCX(x8, t0);  ADOX(x9, t1);
   MULX(t0, t1, c4, d5);  ADCX(x9, t0);  ADOX(x10, t1);
   MULX(t0, x11, c5, d5); ADCX(x10, t0); ADOX(x11, zero);
                          ADCX(x11, zero);
+
+  m4 = VSUB(m4, VADD(z4, z12)); m5 = VSUB(m5, VADD(z5, z13));
+  m6 = VSUB(m6, VADD(z6, z14)); m7 = VSUB(m7, VADD(z7, z15));
                 
   // z = z + zM
   z4  = VADD(z4 , m0); z5  = VADD(z5 , m1);
@@ -1076,83 +1116,109 @@ void mul_fpx2_4x2w_hybrid_v2(fpx2_4x2w r, uint64_t *s, uint64_t *w, const fp_4x2
     :::"eax","cc"
   );
 
+  tb = VSHUF(b0, 0x44);
+  z0 = VMACLO(z0, tb, a0); z1 = VMACLO(z1, tb, a1);
+
   MULX(x0, x1, c0, d0);
   MULX(t0, x2, c1, d0); ADCX(x1, t0);
+
+  z2 = VMACLO(z2, tb, a2); z3 = VMACLO(z3, tb, a3);
+
   MULX(t0, x3, c2, d0); ADCX(x2, t0);
   MULX(t0, x4, c3, d0); ADCX(x3, t0);
+
+  y0 = VMACHI(y0, tb, a0); y1 = VMACHI(y1, tb, a1);
+
   MULX(t0, x5, c4, d0); ADCX(x4, t0);
   MULX(t0, x6, c5, d0); ADCX(x5, t0);
                         ADCX(x6, zero);
 
-  tb = VSHUF(b0, 0x44);
-  z0 = VMACLO(z0, tb, a0); z1 = VMACLO(z1, tb, a1);
-  z2 = VMACLO(z2, tb, a2); z3 = VMACLO(z3, tb, a3);
-  y0 = VMACHI(y0, tb, a0); y1 = VMACHI(y1, tb, a1);
   y2 = VMACHI(y2, tb, a2); y3 = VMACHI(y3, tb, a3);
 
   MULX(t0, t1, c0, d1); ADCX(x1, t0); ADOX(x2, t1);
   MULX(t0, t1, c1, d1); ADCX(x2, t0); ADOX(x3, t1);
+
+  tb = VSHUF(b1, 0x44);
+  z1 = VMACLO(z1, tb, a0); z2 = VMACLO(z2, tb, a1);
+
   MULX(t0, t1, c2, d1); ADCX(x3, t0); ADOX(x4, t1);
   MULX(t0, t1, c3, d1); ADCX(x4, t0); ADOX(x5, t1);
+
+  z3 = VMACLO(z3, tb, a2); z4 = VMACLO(z4, tb, a3);
+
   MULX(t0, t1, c4, d1); ADCX(x5, t0); ADOX(x6, t1);
   MULX(t0, x7, c5, d1); ADCX(x6, t0); ADOX(x7, zero);
                         ADCX(x7, zero);
 
-  tb = VSHUF(b1, 0x44);
-  z1 = VMACLO(z1, tb, a0); z2 = VMACLO(z2, tb, a1);
-  z3 = VMACLO(z3, tb, a2); z4 = VMACLO(z4, tb, a3);
   y1 = VMACHI(y1, tb, a0); y2 = VMACHI(y2, tb, a1);
-  y3 = VMACHI(y3, tb, a2); y4 = VMACHI(y4, tb, a3);
 
   MULX(t0, t1, c0, d2); ADCX(x2, t0); ADOX(x3, t1);
   MULX(t0, t1, c1, d2); ADCX(x3, t0); ADOX(x4, t1);
+
+  y3 = VMACHI(y3, tb, a2); y4 = VMACHI(y4, tb, a3);
+
   MULX(t0, t1, c2, d2); ADCX(x4, t0); ADOX(x5, t1);
   MULX(t0, t1, c3, d2); ADCX(x5, t0); ADOX(x6, t1);
+
+  tb = VSHUF(b2, 0x44);
+  z2 = VMACLO(z2, tb, a0); z3 = VMACLO(z3, tb, a1);
+
   MULX(t0, t1, c4, d2); ADCX(x6, t0); ADOX(x7, t1);
   MULX(t0, x8, c5, d2); ADCX(x7, t0); ADOX(x8, zero);
                         ADCX(x8, zero);
 
-  tb = VSHUF(b2, 0x44);
-  z2 = VMACLO(z2, tb, a0); z3 = VMACLO(z3, tb, a1);
   z4 = VMACLO(z4, tb, a2); z5 = VMACLO(z5, tb, a3);
-  y2 = VMACHI(y2, tb, a0); y3 = VMACHI(y3, tb, a1);
-  y4 = VMACHI(y4, tb, a2); y5 = VMACHI(y5, tb, a3);
 
   MULX(t0, t1, c0, d3); ADCX(x3, t0); ADOX(x4, t1);
   MULX(t0, t1, c1, d3); ADCX(x4, t0); ADOX(x5, t1);
+
+  y2 = VMACHI(y2, tb, a0); y3 = VMACHI(y3, tb, a1);
+
   MULX(t0, t1, c2, d3); ADCX(x5, t0); ADOX(x6, t1);
   MULX(t0, t1, c3, d3); ADCX(x6, t0); ADOX(x7, t1);
+
+  y4 = VMACHI(y4, tb, a2); y5 = VMACHI(y5, tb, a3);
+
   MULX(t0, t1, c4, d3); ADCX(x7, t0); ADOX(x8, t1);
   MULX(t0, x9, c5, d3); ADCX(x8, t0); ADOX(x9, zero);
                         ADCX(x9, zero);
 
   tb = VSHUF(b3, 0x44);
   z3 = VMACLO(z3, tb, a0); z4 = VMACLO(z4, tb, a1);
-  z5 = VMACLO(z5, tb, a2); z6 = VMACLO(z6, tb, a3);
-  y3 = VMACHI(y3, tb, a0); y4 = VMACHI(y4, tb, a1);
-  y5 = VMACHI(y5, tb, a2); y6 = VMACHI(y6, tb, a3);
 
   MULX(t0, t1, c0, d4);  ADCX(x4, t0); ADOX(x5, t1);
   MULX(t0, t1, c1, d4);  ADCX(x5, t0); ADOX(x6, t1);
+
+  z5 = VMACLO(z5, tb, a2); z6 = VMACLO(z6, tb, a3);
+
   MULX(t0, t1, c2, d4);  ADCX(x6, t0); ADOX(x7, t1);
   MULX(t0, t1, c3, d4);  ADCX(x7, t0); ADOX(x8, t1);
+
+  y3 = VMACHI(y3, tb, a0); y4 = VMACHI(y4, tb, a1);
+
   MULX(t0, t1, c4, d4);  ADCX(x8, t0); ADOX(x9, t1);
   MULX(t0, x10, c5, d4); ADCX(x9, t0); ADOX(x10, zero);
                          ADCX(x10, zero);
 
-  tb = VSHUF(b0, 0xEE);
-  z4 = VMACLO(z4, tb, a0); z5 = VMACLO(z5, tb, a1);
-  z6 = VMACLO(z6, tb, a2); z7 = VMACLO(z7, tb, a3);
-  y4 = VMACHI(y4, tb, a0); y5 = VMACHI(y5, tb, a1);
-  y6 = VMACHI(y6, tb, a2); y7 = VMACHI(y7, tb, a3);
+  y5 = VMACHI(y5, tb, a2); y6 = VMACHI(y6, tb, a3);
 
   MULX(t0, t1, c0, d5);  ADCX(x5, t0);  ADOX(x6, t1);
   MULX(t0, t1, c1, d5);  ADCX(x6, t0);  ADOX(x7, t1);
+
+  tb = VSHUF(b0, 0xEE);
+  z4 = VMACLO(z4, tb, a0); z5 = VMACLO(z5, tb, a1);
+
   MULX(t0, t1, c2, d5);  ADCX(x7, t0);  ADOX(x8, t1);
   MULX(t0, t1, c3, d5);  ADCX(x8, t0);  ADOX(x9, t1);
+
+  z6 = VMACLO(z6, tb, a2); z7 = VMACLO(z7, tb, a3);
+
   MULX(t0, t1, c4, d5);  ADCX(x9, t0);  ADOX(x10, t1);
   MULX(t0, x11, c5, d5); ADCX(x10, t0); ADOX(x11, zero);
                          ADCX(x11, zero);
+
+  y4 = VMACHI(y4, tb, a0); y5 = VMACHI(y5, tb, a1);
+  y6 = VMACHI(y6, tb, a2); y7 = VMACHI(y7, tb, a3);
 
   s[0 ] = x0 ; s[1 ] = x1 ; s[2 ] = x2 ; 
   s[3 ] = x3 ; s[4 ] = x4 ; s[5 ] = x5 ; 
@@ -1170,68 +1236,88 @@ void mul_fpx2_4x2w_hybrid_v2(fpx2_4x2w r, uint64_t *s, uint64_t *w, const fp_4x2
   d0 = v[0], d1 = v[1], d2 = v[2];
   d3 = v[3], d4 = v[4], d5 = v[5];
 
-  tb = VSHUF(b2, 0xEE);
-  z6 = VMACLO(z6, tb, a0); z7 = VMACLO(z7, tb, a1);
-  z8 = VMACLO(z8, tb, a2); z9 = VMACLO(z9, tb, a3);
-  y6 = VMACHI(y6, tb, a0); y7 = VMACHI(y7, tb, a1);
-  y8 = VMACHI(y8, tb, a2); y9 = VMACHI(y9, tb, a3);
-
   __asm__ volatile(
     "test %%eax, %%eax" 
     :::"eax","cc"
   );
 
+
+  tb = VSHUF(b2, 0xEE);
+  z6 = VMACLO(z6, tb, a0); z7 = VMACLO(z7, tb, a1);
+
   MULX(x0, x1, c0, d0);
   MULX(t0, x2, c1, d0); ADCX(x1, t0);
+
+  z8 = VMACLO(z8, tb, a2); z9 = VMACLO(z9, tb, a3);
+
   MULX(t0, x3, c2, d0); ADCX(x2, t0);
   MULX(t0, x4, c3, d0); ADCX(x3, t0);
+
+  y6 = VMACHI(y6, tb, a0); y7 = VMACHI(y7, tb, a1);
+
   MULX(t0, x5, c4, d0); ADCX(x4, t0);
   MULX(t0, x6, c5, d0); ADCX(x5, t0);
                         ADCX(x6, zero);
 
+  y8 = VMACHI(y8, tb, a2); y9 = VMACHI(y9, tb, a3);
+
   tb = VSHUF(b3, 0xEE);
   z7 = VMACLO(z7, tb, a0); z8 = VMACLO(z8, tb, a1);
-  z9 = VMACLO(z9, tb, a2); z10 = VMACLO(z10, tb, a3);
-  y7 = VMACHI(y7, tb, a0); y8 = VMACHI(y8, tb, a1);
-  y9 = VMACHI(y9, tb, a2); y10 = VMACHI(y10, tb, a3);
 
   MULX(t0, t1, c0, d1); ADCX(x1, t0); ADOX(x2, t1);
   MULX(t0, t1, c1, d1); ADCX(x2, t0); ADOX(x3, t1);
+
+  z9 = VMACLO(z9, tb, a2); z10 = VMACLO(z10, tb, a3);
+
   MULX(t0, t1, c2, d1); ADCX(x3, t0); ADOX(x4, t1);
   MULX(t0, t1, c3, d1); ADCX(x4, t0); ADOX(x5, t1);
+
+  y7 = VMACHI(y7, tb, a0); y8 = VMACHI(y8, tb, a1);
+
   MULX(t0, t1, c4, d1); ADCX(x5, t0); ADOX(x6, t1);
   MULX(t0, x7, c5, d1); ADCX(x6, t0); ADOX(x7, zero);
                         ADCX(x7, zero);
 
-  z1  = VADD(z1 , VSHL(y0 , BALIGN));
-  z2  = VADD(z2 , VSHL(y1 , BALIGN));
-  z3  = VADD(z3 , VSHL(y2 , BALIGN));
-  z4  = VADD(z4 , VSHL(y3 , BALIGN));
+  y9 = VMACHI(y9, tb, a2); y10 = VMACHI(y10, tb, a3);
 
   MULX(t0, t1, c0, d2); ADCX(x2, t0); ADOX(x3, t1);
   MULX(t0, t1, c1, d2); ADCX(x3, t0); ADOX(x4, t1);
+
+
+  z1  = VADD(z1 , VSHL(y0 , BALIGN));
+  z2  = VADD(z2 , VSHL(y1 , BALIGN));
+
   MULX(t0, t1, c2, d2); ADCX(x4, t0); ADOX(x5, t1);
   MULX(t0, t1, c3, d2); ADCX(x5, t0); ADOX(x6, t1);
+
+  z3  = VADD(z3 , VSHL(y2 , BALIGN));
+  z4  = VADD(z4 , VSHL(y3 , BALIGN));
+
   MULX(t0, t1, c4, d2); ADCX(x6, t0); ADOX(x7, t1);
   MULX(t0, x8, c5, d2); ADCX(x7, t0); ADOX(x8, zero);
                         ADCX(x8, zero);
 
   z5  = VADD(z5 , VSHL(y4 , BALIGN));
   z6  = VADD(z6 , VSHL(y5 , BALIGN));
-  z7  = VADD(z7 , VSHL(y6 , BALIGN));
-  z8  = VADD(z8 , VSHL(y7 , BALIGN));
 
   MULX(t0, t1, c0, d3); ADCX(x3, t0); ADOX(x4, t1);
   MULX(t0, t1, c1, d3); ADCX(x4, t0); ADOX(x5, t1);
+
+  z7  = VADD(z7 , VSHL(y6 , BALIGN));
+  z8  = VADD(z8 , VSHL(y7 , BALIGN));
+
+
   MULX(t0, t1, c2, d3); ADCX(x5, t0); ADOX(x6, t1);
   MULX(t0, t1, c3, d3); ADCX(x6, t0); ADOX(x7, t1);
-  MULX(t0, t1, c4, d3); ADCX(x7, t0); ADOX(x8, t1);
-  MULX(t0, x9, c5, d3); ADCX(x8, t0); ADOX(x9, zero);
-                        ADCX(x9, zero);
 
   z9  = VADD(z9 , VSHL(y8 , BALIGN));
   z10 = VADD(z10, VSHL(y9 , BALIGN));
   z11 = VADD(z11, VSHL(y10, BALIGN));
+
+  MULX(t0, t1, c4, d3); ADCX(x7, t0); ADOX(x8, t1);
+  MULX(t0, x9, c5, d3); ADCX(x8, t0); ADOX(x9, zero);
+                        ADCX(x9, zero);
+
 
   r[0 ] = z0 ; r[1 ] = z1 ; r[2 ] = z2 ; r[3 ] = z3 ;
   r[4 ] = z4 ; r[5 ] = z5 ; r[6 ] = z6 ; r[7 ] = z7 ;
@@ -1450,13 +1536,13 @@ int main()
   printf("#cycle = %ld\n", diff_cycles);
 
   printf("- mul_fpx2_8x1w_hybrid_v1:     ");
-  LOAD_CACHE(mul_fpx2_8x1w_hybrid_v1(z_8x1w, s, z_8x1w, z_8x1w, c, d), 10000);
-  MEASURE_CYCLES(mul_fpx2_8x1w_hybrid_v1(z_8x1w, s, z_8x1w, z_8x1w, c, d), 1000000);
+  LOAD_CACHE(mul_fpx2_8x1w_hybrid_v1(z_8x1w, s, z_8x1w, z_8x1w, s, s), 10000);
+  MEASURE_CYCLES(mul_fpx2_8x1w_hybrid_v1(z_8x1w, s, z_8x1w, z_8x1w, s, s), 1000000);
   printf("#cycle = %ld\n", diff_cycles);
 
   printf("- mul_fpx2_8x1w_hybrid_v2:     ");
-  LOAD_CACHE(mul_fpx2_8x1w_hybrid_v2(z_8x1w, s, w, z_8x1w, z_8x1w, c, d, c, d), 10000);
-  MEASURE_CYCLES(mul_fpx2_8x1w_hybrid_v2(z_8x1w, s, w, z_8x1w, z_8x1w, c, d, c, d), 1000000);
+  LOAD_CACHE(mul_fpx2_8x1w_hybrid_v2(z_8x1w, s, w, z_8x1w, z_8x1w, s, s, w, w), 10000);
+  MEASURE_CYCLES(mul_fpx2_8x1w_hybrid_v2(z_8x1w, s, w, z_8x1w, z_8x1w, s, s, w, w), 1000000);
   printf("#cycle = %ld\n", diff_cycles);
 
   printf("- mul_fpx2_4x2w:               ");
@@ -1465,13 +1551,13 @@ int main()
   printf("#cycle = %ld\n", diff_cycles);
 
   printf("- mul_fpx2_4x2w_hybrid_v1:     ");
-  LOAD_CACHE(mul_fpx2_4x2w_hybrid_v1(z_4x2w, s, z_4x2w, z_4x2w, c, d), 10000);
-  MEASURE_CYCLES(mul_fpx2_4x2w_hybrid_v1(z_4x2w, s, z_4x2w, z_4x2w, c, d), 1000000);
+  LOAD_CACHE(mul_fpx2_4x2w_hybrid_v1(z_4x2w, s, z_4x2w, z_4x2w, s, s), 10000);
+  MEASURE_CYCLES(mul_fpx2_4x2w_hybrid_v1(z_4x2w, s, z_4x2w, z_4x2w, s, s), 1000000);
   printf("#cycle = %ld\n", diff_cycles);
 
   printf("- mul_fpx2_4x2w_hybrid_v2:     ");
-  LOAD_CACHE(mul_fpx2_4x2w_hybrid_v2(z_4x2w, s, w, z_4x2w, z_4x2w, c, d, c, d), 10000);
-  MEASURE_CYCLES(mul_fpx2_4x2w_hybrid_v2(z_4x2w, s, w, z_4x2w, z_4x2w, c, d, c, d), 1000000);
+  LOAD_CACHE(mul_fpx2_4x2w_hybrid_v2(z_4x2w, s, w, z_4x2w, z_4x2w, s, s, w, w), 10000);
+  MEASURE_CYCLES(mul_fpx2_4x2w_hybrid_v2(z_4x2w, s, w, z_4x2w, z_4x2w, s, s, w, w), 1000000);
   printf("#cycle = %ld\n", diff_cycles);
 
   return 0;
