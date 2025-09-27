@@ -123,6 +123,13 @@ void mul_fp6x2_1x2x2x2w(fp2x2_2x2x2w r01, fp2x2_2x2x2w r2, const fp2_2x2x2w ab0,
 
 // ----------------------------------------------------------------------------
 // prototypes: Fp12 and line operations
+// used versions:
+// 1) cyclotomic_sqr_fp12_vec_v1
+// 2) mul_fp12_vec_v3
+// 3) mul_by_xy00z0_fp12_vec_v1
+// 4) sqr_fp12_vec_v1
+// 5) line_dbl_vec_v2
+// 6) line_add_vec_v1
 
 void cyclotomic_sqr_fp12_vec_v1(fp4_1x2x2x2w ra, fp4_2x2x2x1w rbc, 
                                 const fp4_1x2x2x2w a, const fp4_2x2x2x1w bc);
